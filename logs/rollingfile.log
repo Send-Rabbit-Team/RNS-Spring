@@ -1,0 +1,26 @@
+2023-01-01 17:08:56.053 [INFO ] [org.hibernate.validator.internal.util.Version] [background-preinit]- HV000001: Hibernate Validator 6.2.5.Final
+2023-01-01 17:08:56.103 [INFO ] [org.springframework.boot.StartupInfoLogger] [main]- Starting MessageServerApplication using Java 17.0.3 on Hyeongjun-Kim with PID 20548 (C:\가천_카카오_엔터프라이즈\기업실무_프로젝트\message-server\build\classes\java\main started by Hyeongjun Kim in C:\가천_카카오_엔터프라이즈\기업실무_프로젝트\message-server)
+2023-01-01 17:08:56.110 [INFO ] [org.springframework.boot.SpringApplication] [main]- No active profile set, falling back to 1 default profile: "default"
+2023-01-01 17:08:56.961 [INFO ] [org.springframework.data.repository.config.RepositoryConfigurationDelegate] [main]- Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2023-01-01 17:08:56.982 [INFO ] [org.springframework.data.repository.config.RepositoryConfigurationDelegate] [main]- Finished Spring Data repository scanning in 11 ms. Found 0 JPA repository interfaces.
+2023-01-01 17:08:57.545 [INFO ] [org.springframework.boot.web.embedded.tomcat.TomcatWebServer] [main]- Tomcat initialized with port(s): 8080 (http)
+2023-01-01 17:08:57.553 [INFO ] [org.apache.juli.logging.DirectJDKLog] [main]- Initializing ProtocolHandler ["http-nio-8080"]
+2023-01-01 17:08:57.554 [INFO ] [org.apache.juli.logging.DirectJDKLog] [main]- Starting service [Tomcat]
+2023-01-01 17:08:57.554 [INFO ] [org.apache.juli.logging.DirectJDKLog] [main]- Starting Servlet engine: [Apache Tomcat/9.0.65]
+2023-01-01 17:08:57.688 [INFO ] [org.apache.juli.logging.DirectJDKLog] [main]- Initializing Spring embedded WebApplicationContext
+2023-01-01 17:08:57.688 [INFO ] [org.springframework.boot.web.servlet.context.ServletWebServerApplicationContext] [main]- Root WebApplicationContext: initialization completed in 1527 ms
+2023-01-01 17:08:57.809 [INFO ] [org.hibernate.jpa.internal.util.LogHelper] [main]- HHH000204: Processing PersistenceUnitInfo [name: default]
+2023-01-01 17:08:57.853 [INFO ] [org.hibernate.Version] [main]- HHH000412: Hibernate ORM core version 5.6.11.Final
+2023-01-01 17:08:58.006 [INFO ] [org.hibernate.annotations.common.reflection.java.JavaReflectionManager] [main]- HCANN000001: Hibernate Commons Annotations {5.1.2.Final}
+2023-01-01 17:08:58.093 [INFO ] [com.zaxxer.hikari.HikariDataSource] [main]- HikariPool-1 - Starting...
+2023-01-01 17:08:58.576 [INFO ] [com.zaxxer.hikari.HikariDataSource] [main]- HikariPool-1 - Start completed.
+2023-01-01 17:08:58.603 [INFO ] [org.hibernate.dialect.Dialect] [main]- HHH000400: Using dialect: org.hibernate.dialect.MySQL57Dialect
+2023-01-01 17:08:58.818 [INFO ] [org.hibernate.engine.transaction.jta.platform.internal.JtaPlatformInitiator] [main]- HHH000490: Using JtaPlatform implementation: [org.hibernate.engine.transaction.jta.platform.internal.NoJtaPlatform]
+2023-01-01 17:08:58.825 [INFO ] [org.springframework.orm.jpa.AbstractEntityManagerFactoryBean] [main]- Initialized JPA EntityManagerFactory for persistence unit 'default'
+2023-01-01 17:08:58.989 [WARN ] [org.springframework.boot.autoconfigure.orm.jpa.JpaBaseConfiguration$JpaWebConfiguration] [main]- spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2023-01-01 17:08:59.395 [INFO ] [org.apache.juli.logging.DirectJDKLog] [main]- Starting ProtocolHandler ["http-nio-8080"]
+2023-01-01 17:08:59.418 [INFO ] [org.springframework.boot.web.embedded.tomcat.TomcatWebServer] [main]- Tomcat started on port(s): 8080 (http) with context path ''
+2023-01-01 17:08:59.454 [INFO ] [org.springframework.boot.StartupInfoLogger] [main]- Started MessageServerApplication in 3.746 seconds (JVM running for 5.744)
+2023-01-01 17:09:05.427 [INFO ] [org.springframework.orm.jpa.AbstractEntityManagerFactoryBean] [SpringApplicationShutdownHook]- Closing JPA EntityManagerFactory for persistence unit 'default'
+2023-01-01 17:09:05.429 [INFO ] [com.zaxxer.hikari.HikariDataSource] [SpringApplicationShutdownHook]- HikariPool-1 - Shutdown initiated...
+2023-01-01 17:09:05.435 [INFO ] [com.zaxxer.hikari.HikariDataSource] [SpringApplicationShutdownHook]- HikariPool-1 - Shutdown completed.
