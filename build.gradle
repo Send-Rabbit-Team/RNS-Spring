@@ -59,7 +59,7 @@ dependencies {
 	implementation 'io.springfox:springfox-boot-starter:3.0.0'
 }
 
-// test commit yena
+// test commit yena yena
 //querydsl 추가 시작
 def querydslDir = "$buildDir/generated/querydsl"
 
