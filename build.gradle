@@ -57,12 +57,8 @@ dependencies {
 
 	// swagger
 	implementation 'io.springfox:springfox-boot-starter:3.0.0'
-
-	// json
-	implementation 'com.googlecode.json-simple:json-simple:1.1.1'
 }
 
-// test commit yena yena
 //querydsl 추가 시작
 def querydslDir = "$buildDir/generated/querydsl"
 
@@ -88,5 +84,3 @@ configurations {
 tasks.named('test') {
 	useJUnitPlatform()
 }
-
-// test commit yena
