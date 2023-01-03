@@ -66,7 +66,15 @@ public class GoogleOAuthService {
                 .collect(joining("&", GOOGLE_OAUTH_REDIRECT_URL + "?", ""));
     }
 
-    public ResponseEntity<String> requestAccessToken(String code) {
+    public GoogleUserInfoDTO getGoogleUserInfo(String code) throws JsonProcessingException {
+        ResponseEntity<String> accessTokenResponse = requestAccessToken(code);
+        GoogleOAuthTokenDTO oAuthToken = getAccessToken(accessTokenResponse);
+        ResponseEntity<String> userInfoResponse = requestUserInfo(oAuthToken);
+        GoogleUserInfoDTO googleUserInfoDTO = getUserInfo(userInfoResponse);
+        return googleUserInfoDTO;
+    }
+
+    private ResponseEntity<String> requestAccessToken(String code) {
         log.info(code);
         Map<String, Object> params = new HashMap<>();
         params.put("code", code);
@@ -82,13 +90,13 @@ public class GoogleOAuthService {
         return null;
     }
 
-    public GoogleOAuthTokenDTO getAccessToken(ResponseEntity<String> response) throws JsonProcessingException {
+    private GoogleOAuthTokenDTO getAccessToken(ResponseEntity<String> response) throws JsonProcessingException {
         GoogleOAuthTokenDTO googleOAuthTokenDTO = objectMapper.readValue(response.getBody(), GoogleOAuthTokenDTO.class);
         log.info(googleOAuthTokenDTO);
         return googleOAuthTokenDTO;
     }
 
-    public ResponseEntity<String> requestUserInfo(GoogleOAuthTokenDTO oAuthTokenDTO) {
+    private ResponseEntity<String> requestUserInfo(GoogleOAuthTokenDTO oAuthTokenDTO) {
         HttpHeaders headers = new HttpHeaders();
         headers.add("Authorization", "Bearer " + oAuthTokenDTO.getAccess_token());
 
@@ -97,7 +105,7 @@ public class GoogleOAuthService {
         return response;
     }
 
-    public GoogleUserInfoDTO getUserInfo(ResponseEntity<String> response) throws JsonProcessingException {
+    private GoogleUserInfoDTO getUserInfo(ResponseEntity<String> response) throws JsonProcessingException {
         GoogleUserInfoDTO googleUserInfoDTO = objectMapper.readValue(response.getBody(), GoogleUserInfoDTO.class);
         log.info(googleUserInfoDTO);
         return googleUserInfoDTO;
