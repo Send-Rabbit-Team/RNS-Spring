@@ -1,23 +1,31 @@
 package com.srt.message.controller;
 
+import com.srt.message.dto.auth.register.google.GoogleOAuthTokenDTO;
+import com.srt.message.dto.auth.register.google.GoogleRegisterReq;
+import com.srt.message.dto.auth.register.google.GoogleRegisterRes;
+import com.srt.message.dto.auth.register.google.GoogleUserInfoDTO;
 import com.srt.message.dto.auth.register.post.PostRegisterReq;
 import com.srt.message.dto.auth.register.post.PostRegisterRes;
 import com.srt.message.jwt.NoIntercept;
-import com.srt.message.service.AuthService;
+import com.srt.message.service.*;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 
 @Log4j2
 @RestController
 @RequiredArgsConstructor
 public class AuthController {
     private final AuthService authService;
+
+    private final GoogleOAuthService googleOAuthService;
 
     // 회원가입
     @ApiOperation(
@@ -34,5 +42,30 @@ public class AuthController {
         log.info("Default Sign-Up: " + postRegisterRes.getEmail());
 
         return postRegisterRes;
+    }
+
+    // 구글 로그인 창 접근
+    @NoIntercept
+    @GetMapping("/google")
+    public void getGoogleAuthUrl(HttpServletResponse response) throws Exception {
+        response.sendRedirect(googleOAuthService.getOauthRedirectURL());
+    }
+
+    @NoIntercept
+    @GetMapping("/google/login")
+    public GoogleUserInfoDTO googleSignIn(@RequestParam(name="code") String code) throws IOException {
+        ResponseEntity<String> accessTokenResponse = googleOAuthService.requestAccessToken(code);
+        GoogleOAuthTokenDTO oAuthToken = googleOAuthService.getAccessToken(accessTokenResponse);
+        ResponseEntity<String> userInfoResponse = googleOAuthService.requestUserInfo(oAuthToken);
+        GoogleUserInfoDTO googleUserInfoDTO = googleOAuthService.getUserInfo(userInfoResponse);
+        return googleUserInfoDTO;
+    }
+
+    @PostMapping("/google/register")
+    public GoogleRegisterRes googleSignUp(@RequestBody GoogleRegisterReq googleRegisterReq){
+        GoogleRegisterRes googleRegisterRes = authService.googleSignUp(googleRegisterReq);
+        log.info("Google Sign-Up: " + googleRegisterRes.getEmail());
+
+        return googleRegisterRes;
     }
 }

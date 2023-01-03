@@ -2,6 +2,8 @@ package com.srt.message.service;
 
 import com.srt.message.config.exception.BaseException;
 import com.srt.message.domain.Member;
+import com.srt.message.dto.auth.register.google.GoogleRegisterReq;
+import com.srt.message.dto.auth.register.google.GoogleRegisterRes;
 import com.srt.message.dto.auth.register.post.PostRegisterReq;
 import com.srt.message.dto.auth.register.post.PostRegisterRes;
 import com.srt.message.repository.MemberRepository;
@@ -39,5 +41,15 @@ public class AuthService {
         memberRepository.save(member);
 
         return PostRegisterRes.toDto(member);
+    }
+
+    public GoogleRegisterRes googleSignUp(GoogleRegisterReq googleRegisterReq) {
+        if ((memberRepository.findMemberByEmail(googleRegisterReq.getEmail())).isPresent())
+            throw new BaseException(ALREADY_EXIST_EMAIL);
+
+        Member member = GoogleRegisterReq.toEntity(googleRegisterReq);
+        memberRepository.save(member);
+
+        return GoogleRegisterRes.toDto(member);
     }
 }
