@@ -41,7 +41,6 @@ class AuthServiceTest {
                 .loginType(LoginType.DEFAULT)
                 .build();
 
-
         // when
         PostRegisterRes res = authService.defaultSignUp(req);
         long memberId = memberRepository.findMemberByEmail(req.getEmail()).get().getId();

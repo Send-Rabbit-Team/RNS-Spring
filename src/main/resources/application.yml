@@ -1,0 +1,43 @@
+spring:
+  mvc:
+    pathmatch:
+      matching-strategy: ant_path_matcher
+  servlet:
+    multipart:
+      max-file-size: 30MB
+      max-request-size: 30MB
+
+  ## MYSQL ##
+  datasource:
+    url: jdbc:mysql://210.109.62.6:10001/rns_database
+    username: admin
+    password: 1q2w3e4r!
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update # 추후에 변경해야 함
+    properties:
+      hibernate:
+        format_sql: true
+        show_sql: true
+
+## Jwt Secret ##
+secret:
+  jwt_secret_key: dsafdfasdfsdasew2r-*k.ap9kje-wxBHb9wdXsdgsadgsdaerwrqwer-Nu
+
+## serverName ##
+server:
+  url: localhost
+  ## https
+  tomcat:
+    use-relative-redirects: true
+
+  ## timeout ??
+  servlet:
+    session:
+      timeout: 1800
+
+## log4j
+logging:
+  config: classpath:log4j2.yml
