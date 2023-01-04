@@ -38,4 +38,9 @@ public class Member extends BaseEntity {
 
     @Enumerated(EnumType.STRING)
     private LoginType loginType;
+
+    // 편의 메서드
+    public void changeLoginTypeToGoogle(){
+        this.loginType = LoginType.GOOGLE;
+    }
 }
