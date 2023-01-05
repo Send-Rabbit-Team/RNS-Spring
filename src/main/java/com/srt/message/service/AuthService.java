@@ -1,6 +1,7 @@
 package com.srt.message.service;
 
 import com.srt.message.config.exception.BaseException;
+import com.srt.message.config.type.LoginType;
 import com.srt.message.domain.Member;
 import com.srt.message.dto.auth.login.post.PostLoginReq;
 import com.srt.message.dto.auth.login.post.PostLoginRes;
@@ -29,7 +30,7 @@ public class AuthService {
     @Transactional(readOnly = false)
     public PostRegisterRes defaultSignUp(PostRegisterReq postRegisterReq){
         // 중복된 회원 확인
-        if(memberRepository.findMemberByEmail(postRegisterReq.getEmail()).isPresent())
+        if(memberRepository.findByEmailIgnoreCase(postRegisterReq.getEmail()).isPresent())
             throw new BaseException(ALREADY_EXIST_EMAIL);
 
         // 비밀번호, 비밀번호 같은지 확인
@@ -48,8 +49,9 @@ public class AuthService {
     }
 
     // 구글 회원가입
+    @Transactional(readOnly = false)
     public GoogleRegisterRes googleSignUp(GoogleRegisterReq googleRegisterReq) {
-        if ((memberRepository.findMemberByEmail(googleRegisterReq.getEmail())).isPresent())
+        if ((memberRepository.findByEmailIgnoreCase(googleRegisterReq.getEmail())).isPresent())
             throw new BaseException(ALREADY_EXIST_EMAIL);
 
         Member member = GoogleRegisterReq.toEntity(googleRegisterReq);
@@ -65,7 +67,7 @@ public class AuthService {
         String password = postLoginReq.getPassword();
 
         // 이메일 일치 X
-        Member member = memberRepository.findMemberByEmail(email)
+        Member member = memberRepository.findByEmailIgnoreCase(email)
                 .orElseThrow(() -> new BaseException(NOT_EXIST_EMAIL));
 
         // 비밀번호 일치 X
@@ -73,11 +75,32 @@ public class AuthService {
             throw new BaseException(NOT_MATCH_PASSWORD);
         }
 
+        // jwt
         JwtInfo jwtInfo = new JwtInfo(member.getId());
-
         JwtService jwtService = new JwtService();
         String jwt = jwtService.createJwt(jwtInfo);
 
         return new PostLoginRes(jwt, member.getId());
+    }
+
+    // 구글 로그인
+    public PostLoginRes googleSignIn(String email){
+        // 이메일 일치 X
+        Member member = memberRepository.findByEmailIgnoreCaseAndLoginType(email, LoginType.GOOGLE)
+                .orElseThrow(() -> new BaseException(NOT_EXIST_EMAIL));
+
+        // jwt
+        JwtInfo jwtInfo = new JwtInfo(member.getId());
+        JwtService jwtService = new JwtService();
+        String jwt = jwtService.createJwt(jwtInfo);
+
+        return new PostLoginRes(jwt, member.getId());
+    }
+
+    public boolean checkExistGoogleEmail(String email){
+        if(memberRepository.findByEmailIgnoreCaseAndLoginType(email, LoginType.GOOGLE).isPresent())
+            return true;
+
+        return false;
     }
 }

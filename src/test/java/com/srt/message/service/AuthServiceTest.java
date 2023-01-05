@@ -70,7 +70,7 @@ class AuthServiceTest {
 
         // when
         PostRegisterRes res = authService.defaultSignUp(req);
-        long memberId = memberRepository.findMemberByEmail(req.getEmail()).get().getId();
+        long memberId = memberRepository.findByEmailIgnoreCase(req.getEmail()).get().getId();
 
         // then
         assertThat(memberId).isEqualTo(res.getMemberId());
