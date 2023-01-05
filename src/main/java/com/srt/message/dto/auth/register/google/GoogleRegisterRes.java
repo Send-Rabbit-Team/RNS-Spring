@@ -50,7 +50,7 @@ public class GoogleRegisterRes {
     private BsType bsType;
 
     @ApiModelProperty(
-            example = "DEFAULT"
+            example = "GOOGLE"
     )
     private LoginType loginType;
 

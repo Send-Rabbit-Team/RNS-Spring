@@ -24,7 +24,7 @@ import static com.srt.message.config.response.BaseResponseStatus.*;
 @NoArgsConstructor
 public class JwtService {
     @Value("${secret.jwt_secret_key}")
-    private String secretKey;
+    private String secretKey = "dsafdfasdfsdasew2r-*k.ap9kje-wxBHb9wdXsdgsadgsdaerwrqwer-Nu";
 
     public static final String AUTHORIZATION = "Authorization";
 
@@ -98,5 +98,26 @@ public class JwtService {
                 .getBody()
                 .getExpiration().before(new Date());
         return !expiration;
+    }
+
+    // JWT 테스트 용
+    public LinkedHashMap getJwtInfo(String accessToken){
+        // 1. JWT parsing
+        Claims body;
+        try{
+            body = Jwts.parser()
+                    .setSigningKey(secretKey)
+                    .parseClaimsJws(accessToken)
+                    .getBody();
+        } catch(Exception ignored){
+            throw new BaseException(INVALID_JWT);
+        }
+
+        // 2. JWT 유효기간 확인
+        if(!validateToken(accessToken))
+            throw new BaseException(EXPIRED_JWT);
+
+        System.out.println("body = " + body.get("jwtInfo"));
+        return body.get("jwtInfo", LinkedHashMap.class);
     }
 }
