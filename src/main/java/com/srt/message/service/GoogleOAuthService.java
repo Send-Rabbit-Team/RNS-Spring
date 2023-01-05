@@ -93,6 +93,27 @@ public class GoogleOAuthService {
         }
     }
 
+//    public GoogleUserInfoDTO getGoogleUserInfo(String code, HttpServletResponse response) {
+//        GoogleUserInfoDTO googleUserInfoDTO;
+//
+//        try {
+//            ResponseEntity<String> accessTokenResponse = requestAccessToken(code);
+//            GoogleOAuthTokenDTO oAuthToken = getAccessToken(accessTokenResponse);
+//            ResponseEntity<String> userInfoResponse = requestUserInfo(oAuthToken);
+//            googleUserInfoDTO = getUserInfo(userInfoResponse);
+//
+//            // 구글 로그인
+//            String email = googleUserInfoDTO.getEmail();
+//            if(authService.checkExistGoogleEmail(email)){
+//                // TODO 구글 로그인 리다이렉트
+//            }
+//
+//        }catch(JsonProcessingException e){
+//            throw new BaseException(JSON_PROCESSING_ERROR);
+//        }
+//        return googleUserInfoDTO;
+//    }
+
     private ResponseEntity<String> requestAccessToken(String code) {
         log.info(code);
         Map<String, Object> params = new HashMap<>();
