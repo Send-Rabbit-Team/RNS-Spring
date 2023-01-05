@@ -42,6 +42,12 @@ server:
 logging:
   config: classpath:log4j2.yml
 
+## Kakao i Cloud Secret ##
+cloud:
+  kakao:
+    access_key: 12fa54725a7b4d77a8667c788ffee0ce
+    secret_key: hiVxHmMGoxipkiU6Mo4AVg1cqrfosLBaZv-ddP3BImrSbqNeGhd9lK9DDw6Ga5N1jydi0UHHvEM25fNFACaJAA
+
 ## GOOGLE LOGIN ##
 google:
   client-id: 835228927820-80mfcdq6p90s97pqbo582f9f1s0ng935.apps.googleusercontent.com

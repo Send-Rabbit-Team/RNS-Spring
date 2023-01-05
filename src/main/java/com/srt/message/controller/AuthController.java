@@ -31,6 +31,23 @@ public class AuthController {
 
     // 회원가입
     @ApiOperation(
+            value = "일반 회원가입",
+            notes = "일반 회원가입을 통해서 사용자 정보를 등록할 수 있다."
+    )
+    @ApiResponses({
+            @ApiResponse(code = 1000, message = "요청에 성공하였습니다.")
+    })
+    @PostMapping("/register")
+    @NoIntercept
+    public BaseResponse<PostRegisterRes> defaultSignUp(@RequestBody PostRegisterReq postRegisterReq){
+        PostRegisterRes postRegisterRes = authService.defaultSignUp(postRegisterReq);
+        log.info("Default Sign-Up: " + postRegisterRes.getEmail());
+
+        return new BaseResponse<>(postRegisterRes);
+    }
+
+    // 로그인
+    @ApiOperation(
             value = "일반 로그인",
             notes = "일반 로그인을 통해서 JWT를 반환 받는다."
     )
@@ -46,23 +63,6 @@ public class AuthController {
         log.info("Default Sign-In: " + postLoginRes.getJwt());
 
         return new BaseResponse<>(postLoginRes);
-    }
-
-    // 로그인
-    @ApiOperation(
-            value = "일반 회원가입",
-            notes = "일반 회원가입을 통해서 사용자 정보를 등록할 수 있다."
-    )
-    @ApiResponses({
-            @ApiResponse(code = 1000, message = "요청에 성공하였습니다.")
-    })
-    @PostMapping("/register")
-    @NoIntercept
-    public BaseResponse<PostRegisterRes> defaultSignUp(@RequestBody PostRegisterReq postRegisterReq){
-        PostRegisterRes postRegisterRes = authService.defaultSignUp(postRegisterReq);
-        log.info("Default Sign-Up: " + postRegisterRes.getEmail());
-
-        return new BaseResponse<>(postRegisterRes);
     }
 
     @NoIntercept
