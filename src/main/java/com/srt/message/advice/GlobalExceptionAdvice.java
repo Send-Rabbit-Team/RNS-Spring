@@ -38,10 +38,10 @@ public class GlobalExceptionAdvice {
         return new BaseResponse<>(e.getStatus());
     }
 
-    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    @ExceptionHandler(Exception.class)
-    public BaseResponse<BaseResponseStatus> allHandleException(Exception e) {
-        log.error("Handle All Exception: {}", e.getMessage());
-        return new BaseResponse<>(BaseResponseStatus.INTERNAL_SERVER_ERROR);
-    }
+//    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+//    @ExceptionHandler(Exception.class)
+//    public BaseResponse<BaseResponseStatus> allHandleException(Exception e) {
+//        log.error("Handle All Exception: {}", e.getMessage());
+//        return new BaseResponse<>(BaseResponseStatus.INTERNAL_SERVER_ERROR);
+//    }
 }
