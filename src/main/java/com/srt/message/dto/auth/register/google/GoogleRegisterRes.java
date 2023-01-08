@@ -2,16 +2,16 @@ package com.srt.message.dto.auth.register.google;
 
 import com.srt.message.config.type.BsType;
 import com.srt.message.config.type.LoginType;
+import com.srt.message.config.type.MemberType;
+import com.srt.message.domain.Company;
 import com.srt.message.domain.Member;
 import io.swagger.annotations.ApiModelProperty;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
+@Setter
 @Builder
 public class GoogleRegisterRes {
     @ApiModelProperty(
@@ -25,14 +25,19 @@ public class GoogleRegisterRes {
     private String email;
 
     @ApiModelProperty(
+            example = "김형준"
+    )
+    private String name;
+
+    @ApiModelProperty(
+            example = "01012341234"
+    )
+    private String phoneNumber;
+
+    @ApiModelProperty(
             example = "카카오 엔터프라이즈"
     )
     private String companyName;
-
-    @ApiModelProperty(
-            example = "카카오"
-    )
-    private String ceoName;
 
     @ApiModelProperty(
             example = "12345678901"
@@ -40,30 +45,31 @@ public class GoogleRegisterRes {
     private String bsNum;
 
     @ApiModelProperty(
-            example = "대한민국 경기도 성남시 분당구 판교역로 235"
+            example = "COMPANY"
     )
-    private String address;
+    private MemberType memberType;
 
     @ApiModelProperty(
-            example = "IT"
-    )
-    private BsType bsType;
-
-    @ApiModelProperty(
-            example = "GOOGLE"
+            example = "DEFAULT"
     )
     private LoginType loginType;
 
     public static GoogleRegisterRes toDto(Member member){
-        return GoogleRegisterRes.builder()
+        Company company = member.getCompany();
+
+        GoogleRegisterRes res = GoogleRegisterRes.builder()
                 .memberId(member.getId())
                 .email(member.getEmail())
-                .companyName(member.getCompanyName())
-                .ceoName(member.getCeoName())
-                .bsNum(member.getBsNum())
-                .address(member.getAddress())
-                .bsType(member.getBsType())
+                .name(member.getName())
+                .phoneNumber(member.getPhoneNumber())
                 .loginType(member.getLoginType())
                 .build();
+
+        if(company != null){
+            res.setCompanyName(company.getCompanyName());
+            res.setBsNum(company.getBsNum());
+        }
+
+        return res;
     }
 }

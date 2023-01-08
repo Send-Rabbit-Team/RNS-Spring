@@ -2,8 +2,8 @@ package com.srt.message.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.srt.message.config.exception.BaseException;
-import com.srt.message.config.type.BsType;
 import com.srt.message.config.type.LoginType;
+import com.srt.message.config.type.MemberType;
 import com.srt.message.dto.auth.login.post.PostLoginReq;
 import com.srt.message.dto.auth.login.post.PostLoginRes;
 import com.srt.message.dto.auth.register.google.GoogleRegisterReq;
@@ -37,19 +37,41 @@ class AuthServiceTest {
     @Autowired
     private ObjectMapper objectMapper;
 
-    // 회원 가입 테스트
+    // 회원 가입 테스트 (개인)
     @Test
-    public void defaultSignUp_SaveMember_True(){
+    public void defaultSignUp_SavePersonMember_True(){
         // given
         PostRegisterReq req = PostRegisterReq.builder()
-                .email("forceTlight@gmail.com")
+                .email("qeasd123asd@gmail.com")
                 .password("1q2w3e4r!")
                 .checkPassword("1q2w3e4r!")
-                .address("판교")
-                .ceoName("이길여")
-                .companyName("가천대학교")
-                .bsNum("12345678901")
-                .bsType(BsType.IT)
+                .name("김형준")
+                .phoneNumber("01012341234")
+                .memberType(MemberType.PERSON)
+                .loginType(LoginType.DEFAULT)
+                .build();
+
+        // when
+        PostRegisterRes res = authService.defaultSignUp(req);
+        long memberId = memberRepository.findByEmailIgnoreCase(req.getEmail()).get().getId();
+
+        // then
+        assertThat(memberId).isEqualTo(res.getMemberId());
+    }
+
+    // 회원 가입 테스트 (기업)
+    @Test
+    public void defaultSignUp_SaveCompanyMember_True(){
+        // given
+        PostRegisterReq req = PostRegisterReq.builder()
+                .email("qeasd123asd@gmail.com")
+                .password("1q2w3e4r!")
+                .checkPassword("1q2w3e4r!")
+                .name("김형준")
+                .companyName("카카오 엔터프라이즈")
+                .bsNum("1234512345")
+                .phoneNumber("01012341234")
+                .memberType(MemberType.COMPANY)
                 .loginType(LoginType.DEFAULT)
                 .build();
 
@@ -66,28 +88,28 @@ class AuthServiceTest {
     public void Should_ThrowBaseException_When_AlreadyExistEmail(){
         // given
         PostRegisterReq req1 = PostRegisterReq.builder()
-                .email("forceTlight@gmail.com")
+                .email("qeasd123asd@gmail.com")
                 .password("1q2w3e4r!")
                 .checkPassword("1q2w3e4r!")
-                .address("판교")
-                .ceoName("이길여")
-                .companyName("가천대학교")
-                .bsNum("12345678901")
-                .bsType(BsType.IT)
+                .name("김형준")
+                .companyName("카카오 엔터프라이즈")
+                .bsNum("1234512345")
+                .phoneNumber("01012341234")
+                .memberType(MemberType.COMPANY)
                 .loginType(LoginType.DEFAULT)
                 .build();
 
         authService.defaultSignUp(req1);
 
         PostRegisterReq req2 = PostRegisterReq.builder()
-                .email("forceTlight@gmail.com")
+                .email("qeasd123asd@gmail.com")
                 .password("1q2w3e4r!")
                 .checkPassword("1q2w3e4r!")
-                .address("판교")
-                .ceoName("이길여")
-                .companyName("가천대학교")
-                .bsNum("12345678901")
-                .bsType(BsType.IT)
+                .name("김형준")
+                .companyName("카카오 엔터프라이즈")
+                .bsNum("1234512345")
+                .phoneNumber("01012341234")
+                .memberType(MemberType.COMPANY)
                 .loginType(LoginType.DEFAULT)
                 .build();
 
@@ -106,7 +128,7 @@ class AuthServiceTest {
         initDefaultMember();
 
         PostLoginReq req = PostLoginReq.builder()
-                .email("test@gmail.com")
+                .email("qeasd123asd@gmail.com")
                 .password("1q2w3e4r!")
                 .build();
 
@@ -122,17 +144,37 @@ class AuthServiceTest {
         assertThat(res.getMemberId()).isEqualTo(convertJwtInfo.getMemberId());
     }
 
-    // 구글 회원가입 테스트
+    // 구글 회원가입 테스트 (개인)
     @Test
-    public void googleSignUp_SaveMember_True(){
+    public void googleSignUp_SavePersonMember_True(){
         // given
         GoogleRegisterReq req = GoogleRegisterReq.builder()
-                .email("test@gmail.com")
-                .address("판교")
-                .ceoName("김형준")
-                .companyName("코다리")
-                .bsNum("12345678901")
-                .bsType(BsType.IT)
+                .email("t123e23st123")
+                .name("오영주")
+                .phoneNumber("01012341234")
+                .memberType(MemberType.COMPANY)
+                .loginType(LoginType.GOOGLE)
+                .build();
+
+        // when
+        GoogleRegisterRes res = authService.googleSignUp(req);
+        long memberId = memberRepository.findByEmailIgnoreCase(req.getEmail()).get().getId();
+
+        // then
+        assertThat(memberId).isEqualTo(res.getMemberId());
+    }
+
+    // 구글 회원가입 테스트 (기업)
+    @Test
+    public void googleSignUp_SaveCompanyMember_True(){
+        // given
+        GoogleRegisterReq req = GoogleRegisterReq.builder()
+                .email("t123e23st123")
+                .name("오영주")
+                .phoneNumber("01012341234")
+                .companyName("네이버")
+                .bsNum("0123401234")
+                .memberType(MemberType.COMPANY)
                 .loginType(LoginType.GOOGLE)
                 .build();
 
@@ -150,7 +192,7 @@ class AuthServiceTest {
         // given
         initGoogleMember();
 
-        String email = "test@gmail.com";
+        String email = "t123e23st123@gmail.com";
 
         // when
         PostLoginRes res = authService.googleSignIn(email);
@@ -167,14 +209,12 @@ class AuthServiceTest {
     // 일반 멤버 초기호출
     public void initDefaultMember(){
         PostRegisterReq req = PostRegisterReq.builder()
-                .email("test@gmail.com")
+                .email("qeasd123asd@gmail.com")
                 .password("1q2w3e4r!")
                 .checkPassword("1q2w3e4r!")
-                .address("판교")
-                .ceoName("이길여")
-                .companyName("가천대학교")
-                .bsNum("12345678901")
-                .bsType(BsType.IT)
+                .name("김형준")
+                .phoneNumber("01012341234")
+                .memberType(MemberType.PERSON)
                 .loginType(LoginType.DEFAULT)
                 .build();
 
@@ -184,12 +224,12 @@ class AuthServiceTest {
     // 구글 멤버 초기호출
     public void initGoogleMember(){
         GoogleRegisterReq req = GoogleRegisterReq.builder()
-                .email("test@gmail.com")
-                .address("판교")
-                .ceoName("김형준")
-                .companyName("코다리")
-                .bsNum("12345678901")
-                .bsType(BsType.IT)
+                .email("t123e23st123@gmail.com")
+                .name("오영주")
+                .phoneNumber("01012341234")
+                .companyName("네이버")
+                .bsNum("0123401234")
+                .memberType(MemberType.COMPANY)
                 .loginType(LoginType.GOOGLE)
                 .build();
 

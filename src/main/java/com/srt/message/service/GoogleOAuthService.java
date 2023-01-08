@@ -102,6 +102,7 @@ public class GoogleOAuthService {
         params.put("redirect_uri", redirectUri);
         params.put("grant_type", "authorization_code");
 
+
         ResponseEntity<String> responseEntity = restTemplate.postForEntity(GOOGLE_TOKEN_REQUEST_URL, params, String.class);
         if (responseEntity.getStatusCode() == HttpStatus.OK) {
             return responseEntity;

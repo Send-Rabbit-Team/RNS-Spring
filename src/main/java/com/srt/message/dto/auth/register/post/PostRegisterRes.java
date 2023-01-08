@@ -2,17 +2,17 @@ package com.srt.message.dto.auth.register.post;
 
 import com.srt.message.config.type.BsType;
 import com.srt.message.config.type.LoginType;
+import com.srt.message.config.type.MemberType;
+import com.srt.message.domain.Company;
 import com.srt.message.domain.Member;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiModelProperty;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
+@Setter
 @Builder
 public class PostRegisterRes {
     @ApiModelProperty(
@@ -31,14 +31,19 @@ public class PostRegisterRes {
     private String password;
 
     @ApiModelProperty(
+            example = "김형준"
+    )
+    private String name;
+
+    @ApiModelProperty(
+            example = "01012341234"
+    )
+    private String phoneNumber;
+
+    @ApiModelProperty(
             example = "카카오 엔터프라이즈"
     )
     private String companyName;
-
-    @ApiModelProperty(
-            example = "카카오"
-    )
-    private String ceoName;
 
     @ApiModelProperty(
             example = "12345678901"
@@ -46,14 +51,9 @@ public class PostRegisterRes {
     private String bsNum;
 
     @ApiModelProperty(
-            example = "대한민국 경기도 성남시 분당구 판교역로 235"
+            example = "COMPANY"
     )
-    private String address;
-
-    @ApiModelProperty(
-            example = "IT"
-    )
-    private BsType bsType;
+    private MemberType memberType;
 
     @ApiModelProperty(
             example = "DEFAULT"
@@ -61,16 +61,23 @@ public class PostRegisterRes {
     private LoginType loginType;
 
     public static PostRegisterRes toDto(Member member){
-        return PostRegisterRes.builder()
+        Company company = member.getCompany();
+
+        PostRegisterRes res = PostRegisterRes.builder()
                 .memberId(member.getId())
                 .email(member.getEmail())
                 .password(member.getPassword())
-                .companyName(member.getCompanyName())
-                .ceoName(member.getCeoName())
-                .bsNum(member.getBsNum())
-                .address(member.getAddress())
-                .bsType(member.getBsType())
+                .name(member.getName())
+                .phoneNumber(member.getPhoneNumber())
+                .memberType(member.getMemberType())
                 .loginType(member.getLoginType())
                 .build();
+
+        if(company != null){
+            res.setCompanyName(company.getCompanyName());
+            res.setBsNum(company.getBsNum());
+        }
+
+        return res;
     }
 }
