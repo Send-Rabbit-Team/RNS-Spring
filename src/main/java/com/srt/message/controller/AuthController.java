@@ -121,4 +121,6 @@ public class AuthController {
 
         return new BaseResponse<>(postLoginRes);
     }
+
+    // 자동 로그인
 }

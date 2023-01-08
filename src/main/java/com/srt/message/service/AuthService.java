@@ -2,6 +2,8 @@ package com.srt.message.service;
 
 import com.srt.message.config.exception.BaseException;
 import com.srt.message.config.type.LoginType;
+import com.srt.message.config.type.MemberType;
+import com.srt.message.domain.Company;
 import com.srt.message.domain.Member;
 import com.srt.message.dto.auth.login.post.PostLoginReq;
 import com.srt.message.dto.auth.login.post.PostLoginRes;
@@ -11,6 +13,7 @@ import com.srt.message.dto.auth.register.post.PostRegisterReq;
 import com.srt.message.dto.auth.register.post.PostRegisterRes;
 import com.srt.message.dto.jwt.JwtInfo;
 import com.srt.message.jwt.JwtService;
+import com.srt.message.repository.CompanyRepository;
 import com.srt.message.repository.MemberRepository;
 import com.srt.message.utils.encrypt.SHA256;
 import lombok.RequiredArgsConstructor;
@@ -25,6 +28,8 @@ import static com.srt.message.config.response.BaseResponseStatus.*;
 @Transactional(readOnly = true)
 public class AuthService {
     private final MemberRepository memberRepository;
+
+    private final CompanyRepository companyRepository;
 
     // 회원가입
     @Transactional(readOnly = false)
@@ -42,7 +47,14 @@ public class AuthService {
         password = SHA256.encrypt(password);
         postRegisterReq.setPassword(password);
 
-        Member member = PostRegisterReq.toEntity(postRegisterReq);
+        Company company = null;
+
+        if(postRegisterReq.getMemberType() == MemberType.COMPANY){
+            company = PostRegisterReq.toCompanyEntity(postRegisterReq);
+            companyRepository.save(company);
+        }
+
+        Member member = PostRegisterReq.toMemberEntity(postRegisterReq, company);
         memberRepository.save(member);
 
         return PostRegisterRes.toDto(member);
@@ -54,7 +66,14 @@ public class AuthService {
         if ((memberRepository.findByEmailIgnoreCase(googleRegisterReq.getEmail())).isPresent())
             throw new BaseException(ALREADY_EXIST_EMAIL);
 
-        Member member = GoogleRegisterReq.toEntity(googleRegisterReq);
+        Company company = null;
+
+        if(googleRegisterReq.getMemberType() == MemberType.COMPANY){
+            company = GoogleRegisterReq.toCompanyEntity(googleRegisterReq);
+            companyRepository.save(company);
+        }
+
+        Member member = GoogleRegisterReq.toMemberEntity(googleRegisterReq, company);
         member.changeLoginTypeToGoogle();
         memberRepository.save(member);
 
