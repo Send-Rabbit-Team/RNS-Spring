@@ -16,7 +16,7 @@ spring:
 
   jpa:
     hibernate:
-      ddl-auto: create # 추후에 변경해야 함
+      ddl-auto: update # 추후에 변경해야 함
     properties:
       hibernate:
         format_sql: true
