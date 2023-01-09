@@ -16,7 +16,7 @@ spring:
 
   jpa:
     hibernate:
-      ddl-auto: update # 추후에 변경해야 함
+      ddl-auto: create # 추후에 변경해야 함
     properties:
       hibernate:
         format_sql: true
@@ -28,6 +28,7 @@ spring:
         210.109.63.84:30001,
         210.109.63.84:30002,
         210.109.63.84:30003
+      enabled: true
 
 ## Jwt Secret ##
 secret:
