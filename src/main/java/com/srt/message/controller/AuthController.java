@@ -79,14 +79,6 @@ public class AuthController {
         return new BaseResponse<>(response);
     }
 
-    @NoIntercept
-    @GetMapping("/google/userinfo")
-    public BaseResponse<GoogleUserInfoDTO> getGoogleUserInfo(@RequestBody GoogleUserInfoDTO googleUserInfoDTO) throws IOException {
-        System.out.println("test");
-        return new BaseResponse<>(googleUserInfoDTO);
-    }
-
-
     // 구글 회원가입
     @ApiOperation(
             value = "구글 회원가입",
