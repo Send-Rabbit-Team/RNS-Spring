@@ -2,6 +2,8 @@ package com.srt.message.dto.auth.register.post;
 
 import com.srt.message.config.type.BsType;
 import com.srt.message.config.type.LoginType;
+import com.srt.message.config.type.MemberType;
+import com.srt.message.domain.Company;
 import com.srt.message.domain.Member;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.*;
@@ -33,14 +35,19 @@ public class PostRegisterReq {
     private String checkPassword;
 
     @ApiModelProperty(
+            example = "김형준"
+    )
+    private String name;
+
+    @ApiModelProperty(
+            example = "01012341234"
+    )
+    private String phoneNumber;
+
+    @ApiModelProperty(
             example = "카카오 엔터프라이즈"
     )
     private String companyName;
-
-    @ApiModelProperty(
-            example = "카카오"
-    )
-    private String ceoName;
 
     @ApiModelProperty(
             example = "12345678901"
@@ -48,30 +55,31 @@ public class PostRegisterReq {
     private String bsNum;
 
     @ApiModelProperty(
-            example = "대한민국 경기도 성남시 분당구 판교역로 235"
+            example = "COMPANY"
     )
-    private String address;
-
-    @ApiModelProperty(
-            example = "IT"
-    )
-    private BsType bsType;
+    private MemberType memberType;
 
     @ApiModelProperty(
             example = "DEFAULT"
     )
     private LoginType loginType;
 
-    public static Member toEntity(PostRegisterReq req){
+    public static Member toMemberEntity(PostRegisterReq req, Company company){
         return Member.builder()
-                .address(req.getAddress())
-                .bsNum(req.getBsNum())
-                .ceoName(req.getCeoName())
-                .companyName(req.getCompanyName())
                 .email(req.getEmail())
-                .bsType(req.getBsType())
-                .loginType(req.getLoginType())
                 .password(req.getPassword())
+                .name(req.getName())
+                .phoneNumber(req.getPhoneNumber())
+                .company(company)
+                .memberType(req.getMemberType())
+                .loginType(req.getLoginType())
+                .build();
+    }
+
+    public static Company toCompanyEntity(PostRegisterReq req){
+        return Company.builder()
+                .companyName(req.getCompanyName())
+                .bsNum(req.getBsNum())
                 .build();
     }
 }

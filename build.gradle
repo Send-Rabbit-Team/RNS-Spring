@@ -57,7 +57,27 @@ dependencies {
 
 	// swagger
 	implementation 'io.springfox:springfox-boot-starter:3.0.0'
+
+	// json
+	implementation 'com.googlecode.json-simple:json-simple:1.1.1'
+
+	// redis
+	implementation group: 'org.springframework.boot', name: 'spring-boot-starter-data-redis', version: '2.4.10'
+
+	 // JASYPT
+	implementation 'com.github.ulisesbocchio:jasypt-spring-boot-starter:3.0.3'
+	test {
+		useJUnitPlatform()
+		systemProperty 'jasypt.encryptor.password', findProperty("jasypt.encryptor.password")
+	}
+
+	// sms
+	implementation group: 'org.apache.httpcomponents', name: 'httpclient', version: '4.5.13'
+
+	// random
+	implementation 'org.apache.commons:commons-text:1.10.0'
 }
+
 
 // test commit yena yena
 //querydsl 추가 시작

@@ -3,10 +3,8 @@ package com.srt.message.domain;
 import com.srt.message.config.domain.BaseEntity;
 import com.srt.message.config.type.BsType;
 import com.srt.message.config.type.LoginType;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import com.srt.message.config.type.MemberType;
+import lombok.*;
 
 import javax.persistence.*;
 
@@ -21,21 +19,26 @@ public class Member extends BaseEntity {
     @Column(name = "member_id")
     private long id;
 
+    @OneToOne
+    @JoinColumn(name = "company_id")
+    private Company company;
+
     private String email;
 
     private String password;
 
-    private String companyName;
+    private String name;
 
-    private String ceoName;
-
-    private String bsNum;
-
-    private String address;
+    private String phoneNumber;
 
     @Enumerated(EnumType.STRING)
-    private BsType bsType;
+    private MemberType memberType;
 
     @Enumerated(EnumType.STRING)
     private LoginType loginType;
+
+    // 편의 메서드
+    public void changeLoginTypeToGoogle(){
+        this.loginType = LoginType.GOOGLE;
+    }
 }

@@ -10,21 +10,29 @@ spring:
   ## MYSQL ##
   datasource:
     url: jdbc:mysql://210.109.62.6:10001/rns_database
-    username: admin
-    password: 1q2w3e4r!
+    username: ENC(w+H4HxQwUz+O1280P7NXAQ==)
+    password: ENC(r1Pbjwsdr5wWorYu+jCCBbn9uDSeFTkE)
     driver-class-name: com.mysql.cj.jdbc.Driver
 
   jpa:
     hibernate:
-      ddl-auto: update # 추후에 변경해야 함
+      ddl-auto: create # 추후에 변경해야 함
     properties:
       hibernate:
         format_sql: true
         show_sql: true
 
+  redis:
+    cluster:
+      nodes:
+        210.109.63.84:30001,
+        210.109.63.84:30002,
+        210.109.63.84:30003
+      enabled: true
+
 ## Jwt Secret ##
 secret:
-  jwt_secret_key: dsafdfasdfsdasew2r-*k.ap9kje-wxBHb9wdXsdgsadgsdaerwrqwer-Nu
+  jwt_secret_key: ENC(2f6Oity5sF8WkLDr2Mpds8cjktfyD2u1fY8iKMEP7Zj/SsgwJYkoTRh3KgBxvi3CyHb4uP2kucsNThImNOBzKgVsVCtxkf6J)
 
 ## serverName ##
 server:
@@ -42,9 +50,26 @@ server:
 logging:
   config: classpath:log4j2.yml
 
+## Naver, Kakao i Cloud Secret ##
+cloud:
+  kakao:
+    access_key: ENC(6gFOH9ncPgSZbI1dwSeFNPHegC/kfC9YP6tKEQ1JKih+0DRL9TghCGPk3xirNcII)
+    secret_key: ENC(lD8m1TPVEfrXOwZZSh81u8khM3MIg6W136YRmbUfAqfQP0qGD8s//9WJVx45FpkG0hPpg0j/F4CW0JA6c7fyDPojXuZq+oFjCnXCVantysjfyvBpyrbqZiG02ZTO0ga4)
+  naver:
+    access_key: ENC(t602Ydz+VBw2v27a5hwKPLLDC6sHsO4s95xtiTQOz+Q=)
+    secret_key: ENC(BIJAGR/HVKxbRfuKgEi0ag6QVE8u9DMumGERpG7Ly68ua0fXftBObvig56cDVjR8HuMxSB9SotA=)
+    service_id: ENC(OrXSy80smdbJH7LTtEGNOrNUblV6pB+pxifZHtOsrFhNXhb7hFKFdg==)
+    sender_phone: ENC(qeaNReAFWvI/JZkooadzlNCb5ybISmYD)
+
+
 ## GOOGLE LOGIN ##
 google:
   client-id: 835228927820-80mfcdq6p90s97pqbo582f9f1s0ng935.apps.googleusercontent.com
-  client-secret: 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
-  scope: profile
-  redirect-uri: http://localhost:8080/google/userinfo
+  client-secret: ENC(wXHk/fbb2D+cqVKxwJIcOpZrOSBcWO8GLrT+jdQ7CURSkBUJpv5KS+mJ1zLYbqcd)
+  scope: email
+  redirect-uri: http://localhost:8080/google/redirect
+
+## jasypt
+jasypt:
+  encryptor:
+    password: RknSA3#jkDS34*bkj$j3kl12@#
