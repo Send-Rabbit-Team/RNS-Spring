@@ -66,10 +66,6 @@ dependencies {
 
 	 // JASYPT
 	implementation 'com.github.ulisesbocchio:jasypt-spring-boot-starter:3.0.3'
-	test {
-		useJUnitPlatform()
-		systemProperty 'jasypt.encryptor.password', findProperty("jasypt.encryptor.password")
-	}
 
 	// sms
 	implementation group: 'org.apache.httpcomponents', name: 'httpclient', version: '4.5.13'

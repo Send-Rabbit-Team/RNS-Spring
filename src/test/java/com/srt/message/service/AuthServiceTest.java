@@ -24,7 +24,6 @@ import static com.srt.message.config.response.BaseResponseStatus.ALREADY_EXIST_E
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-
 @SpringBootTest
 @Transactional
 class AuthServiceTest {
