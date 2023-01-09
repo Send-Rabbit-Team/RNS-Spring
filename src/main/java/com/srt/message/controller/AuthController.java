@@ -15,6 +15,7 @@ import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
@@ -39,7 +40,7 @@ public class AuthController {
     })
     @PostMapping("/register")
     @NoIntercept
-    public BaseResponse<PostRegisterRes> defaultSignUp(@RequestBody PostRegisterReq postRegisterReq){
+    public BaseResponse<PostRegisterRes> defaultSignUp(@RequestBody @Validated PostRegisterReq postRegisterReq){
         PostRegisterRes postRegisterRes = authService.defaultSignUp(postRegisterReq);
         log.info("Default Sign-Up: " + postRegisterRes.getEmail());
 
@@ -77,14 +78,6 @@ public class AuthController {
         Object response = googleOAuthService.getGoogleRedirectURL(code);
         return new BaseResponse<>(response);
     }
-
-    @NoIntercept
-    @GetMapping("/google/userinfo")
-    public BaseResponse<GoogleUserInfoDTO> getGoogleUserInfo(@RequestBody GoogleUserInfoDTO googleUserInfoDTO) throws IOException {
-        System.out.println("test");
-        return new BaseResponse<>(googleUserInfoDTO);
-    }
-
 
     // 구글 회원가입
     @ApiOperation(
