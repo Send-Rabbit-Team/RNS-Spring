@@ -67,7 +67,7 @@ google:
   client-id: 835228927820-80mfcdq6p90s97pqbo582f9f1s0ng935.apps.googleusercontent.com
   client-secret: ENC(wXHk/fbb2D+cqVKxwJIcOpZrOSBcWO8GLrT+jdQ7CURSkBUJpv5KS+mJ1zLYbqcd)
   scope: email
-  redirect-uri: http://localhost:8080/google/redirect
+  redirect-uri: http://rabbitnotification.shop/google/redirect
 
 ## jasypt
 jasypt:
