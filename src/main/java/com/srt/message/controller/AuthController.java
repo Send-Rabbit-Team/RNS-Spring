@@ -16,6 +16,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import springfox.documentation.annotations.ApiIgnore;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -67,12 +68,14 @@ public class AuthController {
         return new BaseResponse<>(postLoginRes);
     }
 
+    @ApiIgnore
     @NoIntercept
     @GetMapping("/google")
     public void getGoogleAuthUrl(HttpServletResponse response) throws Exception {
         response.sendRedirect(googleOAuthService.getOauthRedirectURL());
     }
 
+    @ApiIgnore
     @NoIntercept
     @GetMapping("/google/redirect")
     public BaseResponse<Object> googleRedirect(@RequestParam(name="code") String code) throws IOException {

@@ -1,5 +1,6 @@
 package com.srt.message.service;
 
+import com.srt.message.config.auditor.LoginMember;
 import com.srt.message.config.exception.BaseException;
 import com.srt.message.config.status.AuthPhoneNumberStatus;
 import com.srt.message.config.type.LoginType;
@@ -35,6 +36,8 @@ public class AuthService {
     private final CompanyRepository companyRepository;
 
     private final AuthPhoneNumberRedisRepository authPhoneNumberRedisRepository;
+
+    private final LoginMember loginMember;
 
     // 회원가입
     @Transactional(readOnly = false)
@@ -136,5 +139,13 @@ public class AuthService {
             return true;
 
         return false;
+    }
+
+    // Audit
+    public void updateLoginMemberById(Long id){
+        Member member = memberRepository.findById(id)
+                .orElseThrow(() -> new BaseException(NOT_EXIST_MEMBER));
+
+        loginMember.updateLoginMember(member);
     }
 }

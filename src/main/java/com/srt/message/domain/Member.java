@@ -1,6 +1,7 @@
 package com.srt.message.domain;
 
 import com.srt.message.config.domain.BaseEntity;
+import com.srt.message.config.domain.BaseTimeEntity;
 import com.srt.message.config.type.BsType;
 import com.srt.message.config.type.LoginType;
 import com.srt.message.config.type.MemberType;
@@ -13,7 +14,7 @@ import javax.persistence.*;
 @Builder
 @Entity
 @Getter
-public class Member extends BaseEntity {
+public class Member extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "member_id")

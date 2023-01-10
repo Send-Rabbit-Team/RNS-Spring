@@ -26,6 +26,7 @@ public enum BaseResponseStatus {
     INVALID_AUTH_TOKEN(false, 2007,"유효하지 않은 인증번호입니다."),
     NOT_AUTH_PHONE_NUMBER(false, 2008,"인증이 되지 않은 전화번호입니다."),
     ALREADY_AUTH_PHONE_NUMBER(false, 2008,"이미 인증을 받은 전화번호입니다."),
+    NOT_EXIST_MEMBER(false, 2009,"존재하지 않는 멤버입니다."),
 
 
     /**
