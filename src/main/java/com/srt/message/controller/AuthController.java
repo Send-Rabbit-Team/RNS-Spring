@@ -63,6 +63,7 @@ public class AuthController {
         PostLoginRes postLoginRes = authService.defaultSignIn(postLoginReq);
         log.info("Default Sign-In: " + postLoginRes.getJwt());
 
+        System.out.println("postLoginRes Image = " + postLoginRes.getProfileImage());
         return new BaseResponse<>(postLoginRes);
     }
 

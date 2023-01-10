@@ -3,6 +3,7 @@ package com.srt.message.dto.jwt;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import javax.servlet.http.HttpServletRequest;
 
