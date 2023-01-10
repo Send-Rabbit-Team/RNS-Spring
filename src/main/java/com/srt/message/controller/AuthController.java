@@ -5,7 +5,6 @@ import com.srt.message.dto.auth.login.post.PostLoginReq;
 import com.srt.message.dto.auth.login.post.PostLoginRes;
 import com.srt.message.dto.auth.register.google.GoogleRegisterReq;
 import com.srt.message.dto.auth.register.google.GoogleRegisterRes;
-import com.srt.message.dto.auth.register.google.GoogleUserInfoDTO;
 import com.srt.message.dto.auth.register.post.PostRegisterReq;
 import com.srt.message.dto.auth.register.post.PostRegisterRes;
 import com.srt.message.jwt.NoIntercept;
@@ -17,7 +16,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -36,7 +34,10 @@ public class AuthController {
             notes = "일반 회원가입을 통해서 사용자 정보를 등록할 수 있다."
     )
     @ApiResponses({
-            @ApiResponse(code = 1000, message = "요청에 성공하였습니다.")
+            @ApiResponse(code = 1000, message = "요청에 성공하였습니다."),
+            @ApiResponse(code = 2003, message = "이미 존재하는 이메일입니다."),
+            @ApiResponse(code = 2004, message = "비밀번호 확인란을 다시 입력해주시기 바랍니다."),
+            @ApiResponse(code = 2008, message = "인증이 되지 않은 전화번호 입니다.")
     })
     @PostMapping("/register")
     @NoIntercept
