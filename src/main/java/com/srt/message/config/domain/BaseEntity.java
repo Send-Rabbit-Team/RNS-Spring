@@ -1,8 +1,11 @@
 package com.srt.message.config.domain;
 
 import com.srt.message.config.status.BaseStatus;
+import com.srt.message.domain.Member;
 import lombok.Getter;
+import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedBy;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
@@ -12,36 +15,14 @@ import java.time.LocalDateTime;
 @Getter
 @MappedSuperclass
 @EntityListeners(AuditingEntityListener.class)
-public abstract class BaseEntity {
-    @CreatedDate
-    private LocalDateTime createdAt;
+public abstract class BaseEntity extends BaseTimeEntity{
+    @CreatedBy
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "created_by", updatable = false)
+    private Member created_by;
 
-    @LastModifiedDate
-    private LocalDateTime updatedAt;
-
-    @Enumerated(EnumType.STRING)
-    private BaseStatus status = BaseStatus.ACTIVE;
-
-    protected void setStatus(BaseStatus status) {
-        this.status = status;
-    }
-
-    @PrePersist
-    public void onPrePersist(){
-        this.createdAt = LocalDateTime.now();
-        this.updatedAt = this.createdAt;
-    }
-
-    @PreUpdate
-    public void onPreUpdate(){
-        this.updatedAt = LocalDateTime.now();
-    }
-
-    public void changeStatusActive(){
-        setStatus(BaseStatus.ACTIVE);
-    }
-
-    public void changeStatusInActive(){
-        setStatus(BaseStatus.INACTIVE);
-    }
+    @LastModifiedBy
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "updated_by")
+    private Member updated_by;
 }

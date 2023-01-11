@@ -2,8 +2,10 @@ package com.srt.message.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.srt.message.config.exception.BaseException;
+import com.srt.message.config.status.AuthPhoneNumberStatus;
 import com.srt.message.config.type.LoginType;
 import com.srt.message.config.type.MemberType;
+import com.srt.message.domain.redis.AuthPhoneNumber;
 import com.srt.message.dto.auth.login.post.PostLoginReq;
 import com.srt.message.dto.auth.login.post.PostLoginRes;
 import com.srt.message.dto.auth.register.google.GoogleRegisterReq;
@@ -13,6 +15,7 @@ import com.srt.message.dto.auth.register.post.PostRegisterRes;
 import com.srt.message.dto.jwt.JwtInfo;
 import com.srt.message.jwt.JwtService;
 import com.srt.message.repository.MemberRepository;
+import com.srt.message.repository.redis.AuthPhoneNumberRedisRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -21,6 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.LinkedHashMap;
 
 import static com.srt.message.config.response.BaseResponseStatus.ALREADY_EXIST_EMAIL;
+import static com.srt.message.config.response.BaseResponseStatus.NOT_AUTH_PHONE_NUMBER;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -32,6 +36,9 @@ class AuthServiceTest {
 
     @Autowired
     private MemberRepository memberRepository;
+
+    @Autowired
+    private AuthPhoneNumberRedisRepository authPhoneNumberRedisRepository;
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -49,6 +56,8 @@ class AuthServiceTest {
                 .memberType(MemberType.PERSON)
                 .loginType(LoginType.DEFAULT)
                 .build();
+
+        saveAuthPhoneNumber("01012341234");
 
         // when
         PostRegisterRes res = authService.defaultSignUp(req);
@@ -74,6 +83,8 @@ class AuthServiceTest {
                 .loginType(LoginType.DEFAULT)
                 .build();
 
+        saveAuthPhoneNumber("01012341234");
+
         // when
         PostRegisterRes res = authService.defaultSignUp(req);
         long memberId = memberRepository.findByEmailIgnoreCase(req.getEmail()).get().getId();
@@ -98,9 +109,37 @@ class AuthServiceTest {
                 .loginType(LoginType.DEFAULT)
                 .build();
 
+        saveAuthPhoneNumber("01012341234");
+
         authService.defaultSignUp(req1);
 
         PostRegisterReq req2 = PostRegisterReq.builder()
+                .email("qeasd123asd@gmail.com")
+                .password("1q2w3e4r!")
+                .checkPassword("1q2w3e4r!")
+                .name("김형준")
+                .companyName("카카오 엔터프라이즈")
+                .bsNum("1234512345")
+                .phoneNumber("01012341235")
+                .memberType(MemberType.COMPANY)
+                .loginType(LoginType.DEFAULT)
+                .build();
+
+        saveAuthPhoneNumber("01012341235");
+
+        // when
+        BaseException exception = assertThrows(BaseException.class,
+                () -> authService.defaultSignUp(req2));
+
+        // then
+        assertThat(exception.getStatus()).isEqualTo(ALREADY_EXIST_EMAIL);
+    }
+
+    // 휴대폰 미 인증시 예외 테스트
+    @Test
+    public void Should_ThrowBaseException_When_NotAuthPhoneNumber(){
+        // given
+        PostRegisterReq req = PostRegisterReq.builder()
                 .email("qeasd123asd@gmail.com")
                 .password("1q2w3e4r!")
                 .checkPassword("1q2w3e4r!")
@@ -114,10 +153,10 @@ class AuthServiceTest {
 
         // when
         BaseException exception = assertThrows(BaseException.class,
-                () -> authService.defaultSignUp(req2));
+                () -> authService.defaultSignUp(req));
 
         // then
-        assertThat(exception.getStatus()).isEqualTo(ALREADY_EXIST_EMAIL);
+        assertThat(exception.getStatus()).isEqualTo(NOT_AUTH_PHONE_NUMBER);
     }
 
     // 일반 로그인 테스트
@@ -217,6 +256,8 @@ class AuthServiceTest {
                 .loginType(LoginType.DEFAULT)
                 .build();
 
+        saveAuthPhoneNumber("01012341234");
+
         authService.defaultSignUp(req);
     }
 
@@ -233,5 +274,14 @@ class AuthServiceTest {
                 .build();
 
         authService.googleSignUp(req);
+    }
+
+    // 레디스 휴대전화 정보 저장
+    public void saveAuthPhoneNumber(String phoneNumber){
+        AuthPhoneNumber authPhoneNumber = AuthPhoneNumber.builder()
+                .phoneNumber("01012341234")
+                .authPhoneNumberStatus(AuthPhoneNumberStatus.CONFIRM)
+                .build();
+        authPhoneNumberRedisRepository.save(authPhoneNumber);
     }
 }

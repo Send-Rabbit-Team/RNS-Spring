@@ -1,10 +1,13 @@
 package com.srt.message.service;
 
+import com.srt.message.config.auditor.LoginMember;
 import com.srt.message.config.exception.BaseException;
+import com.srt.message.config.status.AuthPhoneNumberStatus;
 import com.srt.message.config.type.LoginType;
 import com.srt.message.config.type.MemberType;
 import com.srt.message.domain.Company;
 import com.srt.message.domain.Member;
+import com.srt.message.domain.redis.AuthPhoneNumber;
 import com.srt.message.dto.auth.login.post.PostLoginReq;
 import com.srt.message.dto.auth.login.post.PostLoginRes;
 import com.srt.message.dto.auth.register.google.GoogleRegisterReq;
@@ -12,9 +15,11 @@ import com.srt.message.dto.auth.register.google.GoogleRegisterRes;
 import com.srt.message.dto.auth.register.post.PostRegisterReq;
 import com.srt.message.dto.auth.register.post.PostRegisterRes;
 import com.srt.message.dto.jwt.JwtInfo;
+import com.srt.message.dto.member.get.GetInfoMemberRes;
 import com.srt.message.jwt.JwtService;
 import com.srt.message.repository.CompanyRepository;
 import com.srt.message.repository.MemberRepository;
+import com.srt.message.repository.redis.AuthPhoneNumberRedisRepository;
 import com.srt.message.utils.encrypt.SHA256;
 import io.jsonwebtoken.Jwt;
 import lombok.RequiredArgsConstructor;
@@ -31,6 +36,10 @@ public class AuthService {
     private final MemberRepository memberRepository;
 
     private final CompanyRepository companyRepository;
+
+    private final AuthPhoneNumberRedisRepository authPhoneNumberRedisRepository;
+
+    private final LoginMember loginMember;
 
     // 회원가입
     @Transactional(readOnly = false)
@@ -55,8 +64,18 @@ public class AuthService {
             companyRepository.save(company);
         }
 
+        // 인증 번호 검증
+        AuthPhoneNumber authPhoneNumber =
+                authPhoneNumberRedisRepository.findById(postRegisterReq.getPhoneNumber())
+                        .orElseThrow(() -> new BaseException(NOT_AUTH_PHONE_NUMBER));
+
+        if(authPhoneNumber.getAuthPhoneNumberStatus() != AuthPhoneNumberStatus.CONFIRM)
+            throw new BaseException(NOT_AUTH_PHONE_NUMBER);
+
         Member member = PostRegisterReq.toMemberEntity(postRegisterReq, company);
         memberRepository.save(member);
+
+        authPhoneNumberRedisRepository.delete(authPhoneNumber);
 
         return PostRegisterRes.toDto(member);
     }
@@ -101,7 +120,7 @@ public class AuthService {
         JwtService jwtService = new JwtService();
         String jwt = jwtService.createJwt(jwtInfo);
 
-        return new PostLoginRes(jwt, member.getId(), member.getProfileImageURL(), member.getName());
+        return PostLoginRes.toDto(jwt, member);
     }
 
     // 구글 로그인
@@ -115,7 +134,18 @@ public class AuthService {
         JwtService jwtService = new JwtService();
         String jwt = jwtService.createJwt(jwtInfo);
 
-        return new PostLoginRes(jwt, member.getId(), member.getProfileImageURL(),member.getName());
+        return PostLoginRes.toDto(jwt, member);
+    }
+
+    // Jwt로 유저 정보 가져오기, 자동 로그인
+    public GetInfoMemberRes getUserInfoByJwt(Long memberId){
+        if(memberId == null)
+            throw new BaseException(NOT_EXIST_MEMBER);
+
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new BaseException(NOT_EXIST_MEMBER));
+
+        return GetInfoMemberRes.toDto(member);
     }
 
     public boolean checkExistGoogleEmail(String email){
@@ -123,5 +153,13 @@ public class AuthService {
             return true;
 
         return false;
+    }
+
+    // Audit
+    public void updateLoginMemberById(Long id){
+        Member member = memberRepository.findById(id)
+                .orElseThrow(() -> new BaseException(NOT_EXIST_MEMBER));
+
+        loginMember.updateLoginMember(member);
     }
 }

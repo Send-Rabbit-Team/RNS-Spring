@@ -3,6 +3,7 @@ package com.srt.message.service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.srt.message.config.exception.BaseException;
+import com.srt.message.config.status.AuthPhoneNumberStatus;
 import com.srt.message.domain.redis.AuthPhoneNumber;
 import com.srt.message.dto.sms.MessageDTO;
 import com.srt.message.dto.sms.PhoneNumberValidDTO;
@@ -30,6 +31,7 @@ import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.srt.message.config.response.BaseResponseStatus.ALREADY_AUTH_PHONE_NUMBER;
 import static com.srt.message.config.response.BaseResponseStatus.INVALID_AUTH_TOKEN;
 
 @RequiredArgsConstructor
@@ -92,6 +94,9 @@ public class SmsService {
         headers.set("x-ncp-iam-access-key", accessKey);
         headers.set("x-ncp-apigw-signature-v2", makeSignature(time));
 
+        String authToken = createAuthToken(messageDto.getTo());
+        messageDto.setContent("[Rabbit Notification Service] 인증번호 " + "[" + authToken + "] 를 입력해주세요.");
+
         List<MessageDTO> messages = new ArrayList<>();
         messages.add(messageDto);
 
@@ -112,12 +117,11 @@ public class SmsService {
         restTemplate.setRequestFactory(new HttpComponentsClientHttpRequestFactory());
         SmsResponseDTO response = restTemplate.postForObject(new URI("https://sens.apigw.ntruss.com/sms/v2/services/"+ serviceId +"/messages"), httpBody, SmsResponseDTO.class);
 
-        createAuthToken(senderPhoneNumber);
         return response;
     }
 
     // 인증번호 레디스에 저장 (유효기간 5분)
-    public void createAuthToken(String phoneNumber){
+    public String createAuthToken(String phoneNumber){
         AuthPhoneNumber authPhoneNumber = AuthPhoneNumber.builder()
                 .phoneNumber(phoneNumber)
                 .expiration(EXPIRATION_SECOND)
@@ -127,6 +131,8 @@ public class SmsService {
         authPhoneNumber.createAuthToken();
 
         authPhoneNumberRedisRepository.save(authPhoneNumber);
+
+        return authPhoneNumber.getAuthToken();
     }
 
     // 인증번호 검증
@@ -139,5 +145,11 @@ public class SmsService {
 
         if(!authPhoneNumber.getAuthToken().equals(authToken))
             throw new BaseException(INVALID_AUTH_TOKEN);
+
+        if(authPhoneNumber.getAuthPhoneNumberStatus() == AuthPhoneNumberStatus.CONFIRM)
+            throw new BaseException(ALREADY_AUTH_PHONE_NUMBER);
+
+        authPhoneNumber.changePhoneAuthStatusToConfirm();
+        authPhoneNumberRedisRepository.save(authPhoneNumber);
     }
 }

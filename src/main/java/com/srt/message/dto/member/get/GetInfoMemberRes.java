@@ -1,24 +1,20 @@
-package com.srt.message.dto.auth.register.post;
+package com.srt.message.dto.member.get;
 
-import com.srt.message.config.type.BsType;
 import com.srt.message.config.type.LoginType;
 import com.srt.message.config.type.MemberType;
 import com.srt.message.domain.Company;
 import com.srt.message.domain.Member;
-import io.swagger.annotations.Api;
+import com.srt.message.dto.company.CompanyDto;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.*;
 
+@Builder
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
 @Setter
-@Builder
-public class PostRegisterRes {
-    @ApiModelProperty(
-            example = "1"
-    )
-    private long memberId;
+public class GetInfoMemberRes {
+    private CompanyDto company;
 
     @ApiModelProperty(
             example = "forceTlight@gmail.com"
@@ -46,16 +42,6 @@ public class PostRegisterRes {
     private String profileImgUrl;
 
     @ApiModelProperty(
-            example = "카카오 엔터프라이즈"
-    )
-    private String companyName;
-
-    @ApiModelProperty(
-            example = "12345678901"
-    )
-    private String bsNum;
-
-    @ApiModelProperty(
             example = "COMPANY"
     )
     private MemberType memberType;
@@ -65,11 +51,10 @@ public class PostRegisterRes {
     )
     private LoginType loginType;
 
-    public static PostRegisterRes toDto(Member member){
+    public static GetInfoMemberRes toDto(Member member){
         Company company = member.getCompany();
 
-        PostRegisterRes res = PostRegisterRes.builder()
-                .memberId(member.getId())
+        GetInfoMemberRes getInfoMemberRes = GetInfoMemberRes.builder()
                 .email(member.getEmail())
                 .password(member.getPassword())
                 .name(member.getName())
@@ -79,11 +64,8 @@ public class PostRegisterRes {
                 .loginType(member.getLoginType())
                 .build();
 
-        if(company != null){
-            res.setCompanyName(company.getCompanyName());
-            res.setBsNum(company.getBsNum());
-        }
+        getInfoMemberRes.setCompany(CompanyDto.toDto(company));
 
-        return res;
+        return getInfoMemberRes;
     }
 }

@@ -1,8 +1,10 @@
 package com.srt.message.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.srt.message.config.auditor.LoginMember;
 import com.srt.message.interceptor.AuthenticationInterceptor;
 import com.srt.message.jwt.JwtService;
+import com.srt.message.service.AuthService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Configuration;
@@ -16,13 +18,15 @@ public class AppConfig implements WebMvcConfigurer {
     private final JwtService jwtService;
     private ObjectMapper objectMapper;
 
+    private final AuthService authService;
+
     // 인터셉터 등록
     @Override
     public void addInterceptors(InterceptorRegistry registry){
         objectMapper = new ObjectMapper();
 
         // JWT 인터셉터 등록
-        registry.addInterceptor(new AuthenticationInterceptor(jwtService, objectMapper))
+        registry.addInterceptor(new AuthenticationInterceptor(jwtService, objectMapper, authService))
                 .order(0) // order는 인터셉터의 우선 순위를 정의한다.
                 .addPathPatterns("/**")
                 .excludePathPatterns("/swagger-ui/**", "/swagger-resources/**", "/v3/api-docs");
