@@ -19,4 +19,14 @@ public class PostLoginRes {
             example = "1"
     )
     private Long memberId;
+
+    @ApiModelProperty(
+            example = "https://abcd1234.jpg"
+    )
+    private String profileImage;
+
+    @ApiModelProperty(
+            example = "Yena Shin"
+    )
+    private String name;
 }
