@@ -19,6 +19,7 @@ import com.srt.message.repository.CompanyRepository;
 import com.srt.message.repository.MemberRepository;
 import com.srt.message.repository.redis.AuthPhoneNumberRedisRepository;
 import com.srt.message.utils.encrypt.SHA256;
+import io.jsonwebtoken.Jwt;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -111,10 +112,11 @@ public class AuthService {
 
         // jwt
         JwtInfo jwtInfo = new JwtInfo(member.getId());
+
         JwtService jwtService = new JwtService();
         String jwt = jwtService.createJwt(jwtInfo);
 
-        return new PostLoginRes(jwt, member.getId());
+        return new PostLoginRes(jwt, member.getId(), member.getProfileImageURL(), member.getName());
     }
 
     // 구글 로그인
@@ -128,7 +130,7 @@ public class AuthService {
         JwtService jwtService = new JwtService();
         String jwt = jwtService.createJwt(jwtInfo);
 
-        return new PostLoginRes(jwt, member.getId());
+        return new PostLoginRes(jwt, member.getId(), member.getProfileImageURL(),member.getName());
     }
 
     public boolean checkExistGoogleEmail(String email){

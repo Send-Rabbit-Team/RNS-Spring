@@ -37,6 +37,9 @@ public class Member extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private LoginType loginType;
 
+    @Column(name = "profile_image_URL")
+    private String profileImageURL;
+
     // 편의 메서드
     public void changeLoginTypeToGoogle(){
         this.loginType = LoginType.GOOGLE;
