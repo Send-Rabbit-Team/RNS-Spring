@@ -15,7 +15,6 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.java.Log;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -69,6 +68,7 @@ public class AuthController {
         PostLoginRes postLoginRes = authService.defaultSignIn(postLoginReq);
         log.info("Default Sign-In - jwt: {}" + postLoginRes.getJwt());
 
+        System.out.println("postLoginRes Image = " + postLoginRes.getProfileImageURL());
         return new BaseResponse<>(postLoginRes);
     }
 

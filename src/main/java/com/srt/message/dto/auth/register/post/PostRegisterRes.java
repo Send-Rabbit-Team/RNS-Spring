@@ -41,6 +41,11 @@ public class PostRegisterRes {
     private String phoneNumber;
 
     @ApiModelProperty(
+            example = "https://objectstorage.kr-central-1.kakaoi.io/v1/586d691a32c5421b859e89fd7a7f8dcd/message/img%2Fprofile%2FprofileImg.png"
+    )
+    private String profileImgUrl;
+
+    @ApiModelProperty(
             example = "카카오 엔터프라이즈"
     )
     private String companyName;
@@ -69,6 +74,7 @@ public class PostRegisterRes {
                 .password(member.getPassword())
                 .name(member.getName())
                 .phoneNumber(member.getPhoneNumber())
+                .profileImgUrl(member.getProfileImageURL())
                 .memberType(member.getMemberType())
                 .loginType(member.getLoginType())
                 .build();
