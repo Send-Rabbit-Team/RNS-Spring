@@ -1,13 +1,17 @@
 package com.srt.message.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.srt.message.config.response.BaseResponse;
 import com.srt.message.dto.auth.login.post.PostLoginReq;
 import com.srt.message.dto.auth.login.post.PostLoginRes;
+import com.srt.message.dto.auth.register.google.CredentialResponse;
 import com.srt.message.dto.auth.register.google.GoogleRegisterReq;
 import com.srt.message.dto.auth.register.google.GoogleRegisterRes;
+import com.srt.message.dto.auth.register.google.GoogleUserInfoDTO;
 import com.srt.message.dto.auth.register.post.PostRegisterReq;
 import com.srt.message.dto.auth.register.post.PostRegisterRes;
 import com.srt.message.jwt.NoIntercept;
+import com.srt.message.repository.CompanyRepository;
 import com.srt.message.service.*;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
@@ -69,16 +73,10 @@ public class AuthController {
     }
 
     @NoIntercept
-    @GetMapping("/google")
-    public void getGoogleAuthUrl(HttpServletResponse response) throws Exception {
-        response.sendRedirect(googleOAuthService.getOauthRedirectURL());
-    }
-
-    @NoIntercept
-    @GetMapping("/google/redirect")
-    public BaseResponse<Object> googleRedirect(@RequestParam(name="code") String code) throws IOException {
-        Object response = googleOAuthService.getGoogleRedirectURL(code);
-        return new BaseResponse<>(response);
+    @PostMapping("/google")
+    public BaseResponse<Object> getGoogleUserInfo(@RequestBody CredentialResponse credentialResponse) throws JsonProcessingException {
+        GoogleUserInfoDTO googleUserInfoDTO = googleOAuthService.getUserInfo(credentialResponse);
+        return new BaseResponse<>(googleUserInfoDTO);
     }
 
     // 구글 회원가입
