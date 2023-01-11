@@ -19,4 +19,5 @@ public class PostLoginRes {
             example = "1"
     )
     private Long memberId;
+
 }

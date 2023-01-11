@@ -7,17 +7,21 @@ import com.srt.message.dto.auth.register.google.GoogleRegisterReq;
 import com.srt.message.dto.auth.register.google.GoogleRegisterRes;
 import com.srt.message.dto.auth.register.post.PostRegisterReq;
 import com.srt.message.dto.auth.register.post.PostRegisterRes;
+import com.srt.message.dto.jwt.JwtInfo;
+import com.srt.message.dto.member.get.GetInfoMemberRes;
 import com.srt.message.jwt.NoIntercept;
 import com.srt.message.service.*;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.java.Log;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
@@ -44,7 +48,7 @@ public class AuthController {
     @NoIntercept
     public BaseResponse<PostRegisterRes> defaultSignUp(@RequestBody @Validated PostRegisterReq postRegisterReq){
         PostRegisterRes postRegisterRes = authService.defaultSignUp(postRegisterReq);
-        log.info("Default Sign-Up: " + postRegisterRes.getEmail());
+        log.info("Default Sign-Up - email: {}" + postRegisterRes.getEmail());
 
         return new BaseResponse<>(postRegisterRes);
     }
@@ -63,7 +67,7 @@ public class AuthController {
     @NoIntercept
     public BaseResponse<PostLoginRes> defaultSignIn(@RequestBody PostLoginReq postLoginReq){
         PostLoginRes postLoginRes = authService.defaultSignIn(postLoginReq);
-        log.info("Default Sign-In: " + postLoginRes.getJwt());
+        log.info("Default Sign-In - jwt: {}" + postLoginRes.getJwt());
 
         return new BaseResponse<>(postLoginRes);
     }
@@ -96,7 +100,7 @@ public class AuthController {
     @PostMapping("/google/register")
     public BaseResponse<GoogleRegisterRes> googleSignUp(@RequestBody GoogleRegisterReq googleRegisterReq){
         GoogleRegisterRes googleRegisterRes = authService.googleSignUp(googleRegisterReq);
-        log.info("Google Sign-Up: " + googleRegisterRes.getEmail());
+        log.info("Google Sign-Up - email: {}" + googleRegisterRes.getEmail());
 
         return new BaseResponse<>(googleRegisterRes);
     }
@@ -114,10 +118,27 @@ public class AuthController {
     @PostMapping("/google/login")
     public BaseResponse<PostLoginRes> googleSignIn(@RequestParam String email){
         PostLoginRes postLoginRes = authService.googleSignIn(email);
-        log.info("Google Sign-In: " + postLoginRes.getJwt());
+        log.info("Google Sign-In - jwt: {}" + postLoginRes.getJwt());
 
         return new BaseResponse<>(postLoginRes);
     }
 
-    // 자동 로그인
+    // 자동 로그인, 사용자 정보 가져오기
+    @ApiOperation(
+            value = "JWT로 사용자 정보 가져오기",
+            notes = "JWT를 통해 사용자의 정보를 가져온다"
+    )
+    @ApiResponses({
+            @ApiResponse(code = 1000, message = "요청에 성공하였습니다."),
+            @ApiResponse(code = 2009, message = "존재하지 않는 사용자 입니다.")
+    })
+    @GetMapping("/userinfo")
+    public BaseResponse<GetInfoMemberRes> getUserInfoByJwt(HttpServletRequest request){
+        Long memberId = JwtInfo.getMemberId(request);
+
+        GetInfoMemberRes getInfoMemberRes = authService.getUserInfoByJwt(memberId);
+        log.info("userInfo - memberId: {}", memberId);
+
+        return new BaseResponse<>(getInfoMemberRes);
+    }
 }

@@ -15,6 +15,7 @@ import com.srt.message.dto.auth.register.google.GoogleRegisterRes;
 import com.srt.message.dto.auth.register.post.PostRegisterReq;
 import com.srt.message.dto.auth.register.post.PostRegisterRes;
 import com.srt.message.dto.jwt.JwtInfo;
+import com.srt.message.dto.member.get.GetInfoMemberRes;
 import com.srt.message.jwt.JwtService;
 import com.srt.message.repository.CompanyRepository;
 import com.srt.message.repository.MemberRepository;
@@ -132,6 +133,17 @@ public class AuthService {
         String jwt = jwtService.createJwt(jwtInfo);
 
         return new PostLoginRes(jwt, member.getId());
+    }
+
+    // Jwt로 유저 정보 가져오기, 자동 로그인
+    public GetInfoMemberRes getUserInfoByJwt(Long memberId){
+        if(memberId == null)
+            throw new BaseException(NOT_EXIST_MEMBER);
+
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new BaseException(NOT_EXIST_MEMBER));
+
+        return GetInfoMemberRes.toDto(member);
     }
 
     public boolean checkExistGoogleEmail(String email){
