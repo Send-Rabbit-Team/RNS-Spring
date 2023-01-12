@@ -47,6 +47,6 @@ public class Member extends BaseTimeEntity {
     }
 
     public String getDefaultProfileImg(){
-        return "[김형준] [오후 2:02] https://objectstorage.kr-central-1.kakaoi.io/v1/586d691a32c5421b859e89fd7a7f8dcd/message/img%2Fprofile%2FprofileImg.png";
+        return "https://objectstorage.kr-central-1.kakaoi.io/v1/586d691a32c5421b859e89fd7a7f8dcd/message/img%2Fprofile%2FprofileImg.png";
     }
 }

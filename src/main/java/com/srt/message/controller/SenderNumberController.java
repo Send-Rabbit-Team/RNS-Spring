@@ -19,11 +19,6 @@ import org.springframework.web.bind.annotation.*;
 public class SenderNumberController {
     private final SenderNumberService senderNumberService;
 
-    @GetMapping("/test")
-    public void auditTest(){
-        senderNumberService.testSave();
-    }
-
     @ApiOperation(
             value = "발신자 번호 등록",
             notes = "발신자 번호 등록 전에 휴대폰 인증 작업이 있어야합니다."

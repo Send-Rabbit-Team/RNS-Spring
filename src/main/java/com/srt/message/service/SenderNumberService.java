@@ -24,19 +24,6 @@ public class SenderNumberService {
 
     private final AuthPhoneNumberRedisRepository authPhoneNumberRedisRepository;
 
-    // audit 저장 확인 용 테스트 저장
-    // 나중에 무조건 지워야 함
-    @Transactional(readOnly = false)
-    public BaseResponse<String> testSave(){
-        SenderNumber senderNumber = SenderNumber.builder()
-                .phoneNumber("01012341234")
-                .build();
-
-        senderNumberRepository.save(senderNumber);
-
-        return new BaseResponse<>("OK");
-    }
-
     // 발신자 등록
     @Transactional(readOnly = false)
     public RegisterSenderNumberRes registerSenderNumber(RegisterSenderNumberReq registerSenderNumberReq){

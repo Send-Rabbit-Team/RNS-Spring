@@ -30,6 +30,13 @@ spring:
         210.109.63.84:30003
       enabled: true
 
+  ## Rabbit MQ
+  rabbitmq:
+    host: 210.109.62.6
+    port: 10015
+    username: admin
+    password: 1q2w3e4r!
+
 ## Jwt Secret ##
 secret:
   jwt_secret_key: ENC(2f6Oity5sF8WkLDr2Mpds8cjktfyD2u1fY8iKMEP7Zj/SsgwJYkoTRh3KgBxvi3CyHb4uP2kucsNThImNOBzKgVsVCtxkf6J)
