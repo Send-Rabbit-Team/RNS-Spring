@@ -33,6 +33,8 @@ public enum BaseResponseStatus {
     NOT_EXIST_CONTACT_NUMBER(false, 2014,"존재하지 않는 연락처입니다."),
     NOT_ACCESS_GOOGLE(false, 2015, "구글 회원 인증에 실패했습니다."),
     NOT_MATCH_MEMBER(false, 2016, "해당 사용자의 데이터가 아닙니다."),
+    NOT_EXIST_PHONE_NUMBER(false, 2017, "존재하지 않는 전화번호입니다."),
+    NOT_AUTH_MEMBER(false, 2018, "권한이 없는 사용자입니다."),
 
 
 
