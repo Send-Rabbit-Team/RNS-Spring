@@ -27,7 +27,15 @@ public enum BaseResponseStatus {
     NOT_AUTH_PHONE_NUMBER(false, 2008,"인증이 되지 않은 전화번호입니다."),
     ALREADY_AUTH_PHONE_NUMBER(false, 2008,"이미 인증을 받은 전화번호입니다."),
     NOT_EXIST_MEMBER(false, 2009,"존재하지 않는 사용자입니다."),
-    ALREADY_EXIST_PHONE_NUMBER(false, 2009,"이미 등록된 휴대전화 번호입니다."),
+    ALREADY_EXIST_PHONE_NUMBER(false, 2010,"이미 등록된 휴대전화 번호입니다."),
+    NOT_EXIST_GROUP(false, 2011,"존재하지 않는 그룹입니다."),
+    ALREADY_EXIST_CONTACT_NUMBER(false, 2013,"이미 등록된 연락처입니다."),
+    NOT_EXIST_CONTACT_NUMBER(false, 2014,"존재하지 않는 연락처입니다."),
+    NOT_ACCESS_GOOGLE(false, 2015, "구글 회원 인증에 실패했습니다."),
+    NOT_MATCH_MEMBER(false, 2016, "해당 사용자의 데이터가 아닙니다."),
+    NOT_EXIST_PHONE_NUMBER(false, 2017, "존재하지 않는 전화번호입니다."),
+    NOT_AUTH_MEMBER(false, 2018, "권한이 없는 사용자입니다."),
+
 
 
     /**

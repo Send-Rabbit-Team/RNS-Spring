@@ -1,15 +1,19 @@
 package com.srt.message.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.srt.message.config.response.BaseResponse;
 import com.srt.message.dto.auth.login.post.PostLoginReq;
 import com.srt.message.dto.auth.login.post.PostLoginRes;
+import com.srt.message.dto.auth.register.google.CredentialResponse;
 import com.srt.message.dto.auth.register.google.GoogleRegisterReq;
 import com.srt.message.dto.auth.register.google.GoogleRegisterRes;
+import com.srt.message.dto.auth.register.google.GoogleUserInfoDTO;
 import com.srt.message.dto.auth.register.post.PostRegisterReq;
 import com.srt.message.dto.auth.register.post.PostRegisterRes;
 import com.srt.message.dto.jwt.JwtInfo;
 import com.srt.message.dto.member.get.GetInfoMemberRes;
 import com.srt.message.jwt.NoIntercept;
+import com.srt.message.repository.CompanyRepository;
 import com.srt.message.service.*;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
@@ -74,17 +78,10 @@ public class AuthController {
 
     @ApiIgnore
     @NoIntercept
-    @GetMapping("/google")
-    public void getGoogleAuthUrl(HttpServletResponse response) throws Exception {
-        response.sendRedirect(googleOAuthService.getOauthRedirectURL());
-    }
-
-    @ApiIgnore
-    @NoIntercept
-    @GetMapping("/google/redirect")
-    public BaseResponse<Object> googleRedirect(@RequestParam(name="code") String code) throws IOException {
-        Object response = googleOAuthService.getGoogleRedirectURL(code);
-        return new BaseResponse<>(response);
+    @PostMapping("/google")
+    public BaseResponse<Object> getGoogleUserInfo(@RequestBody CredentialResponse credentialResponse) throws JsonProcessingException {
+        GoogleUserInfoDTO googleUserInfoDTO = googleOAuthService.getUserInfo(credentialResponse);
+        return new BaseResponse<>(googleUserInfoDTO);
     }
 
     // 구글 회원가입
@@ -112,12 +109,14 @@ public class AuthController {
     )
     @ApiResponses({
             @ApiResponse(code = 1000, message = "요청에 성공하였습니다."),
-            @ApiResponse(code = 2004, message = "존재하지 않는 이메일 주소입니다.")
+            @ApiResponse(code = 2004, message = "존재하지 않는 이메일 주소입니다."),
+            @ApiResponse(code = 2011, message = "구글 회원 인증에 실패했습니다.")
     })
     @NoIntercept
     @PostMapping("/google/login")
-    public BaseResponse<PostLoginRes> googleSignIn(@RequestParam String email){
-        PostLoginRes postLoginRes = authService.googleSignIn(email);
+    public BaseResponse<PostLoginRes> googleSignIn(@RequestBody CredentialResponse credentialResponse){
+        GoogleUserInfoDTO googleUserInfoDTO = googleOAuthService.getUserInfo(credentialResponse);
+        PostLoginRes postLoginRes = authService.googleSignIn(googleUserInfoDTO.getEmail());
         log.info("Google Sign-In - jwt: {}" + postLoginRes.getJwt());
 
         return new BaseResponse<>(postLoginRes);
