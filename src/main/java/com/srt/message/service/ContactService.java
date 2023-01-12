@@ -57,11 +57,11 @@ public class ContactService {
     }
 
     @Transactional(readOnly = false)
-    public PatchContactRes editContact(PatchContactReq patchContactReq){
-
+    public PatchContactRes editContact(PatchContactReq patchContactReq, long memberId){
         // 존재하는 연락처인지 확인
-        Contact contact = contactRepository.findById(patchContactReq.getContactId())
-                .orElseThrow(() -> new BaseException(NOT_EXIST_CONTACT_NUMBER));
+        Contact contact = getExistContact(patchContactReq.getContactId());
+
+        checkMatchMember(contact, memberId);
 
         // 그룹 찾기
         ContactGroup contactGroup = null;
@@ -77,9 +77,10 @@ public class ContactService {
     }
 
     @Transactional(readOnly = false)
-    public void deleteContact(long contactId){
-        Contact contact = contactRepository.findById(contactId)
-                .orElseThrow(()-> new BaseException(NOT_EXIST_CONTACT_NUMBER));
+    public void deleteContact(long contactId, long memberId){
+        Contact contact = getExistContact(contactId);
+
+        checkMatchMember(contact, memberId);
 
         // 연락처 삭제
         contact.changeStatusInActive();
@@ -87,12 +88,10 @@ public class ContactService {
 
     // 연락처 검색
     @Transactional
-    public List<ContactDTO> search(String keyword, int currentPage) {
+    public Page<ContactDTO> search(String phoneNumber, int currentPage) {
         PageRequest pageRequest = PageRequest.of(currentPage, 10, Sort.by("id").descending());
-        List<Contact> contactList = contactRepository.findByPhoneNumberContaining(keyword, pageRequest)
-                .orElseThrow(()-> new BaseException(NOT_EXIST_CONTACT_NUMBER));
-        List<ContactDTO> contactListDTO = contactList.stream().map(
-                m-> Contact.toDto(m)).collect(Collectors.toList());
+        Page<Contact> contactList = contactRepository.findByPhoneNumberContaining(phoneNumber, pageRequest);
+        Page<ContactDTO> contactListDTO = contactList.map(m-> Contact.toDto(m));
 
         return contactListDTO;
     }
@@ -100,5 +99,17 @@ public class ContactService {
     @Transactional
     public Page<Contact> getContactList(Pageable pageable) {
         return contactRepository.findAll(pageable);
+    }
+
+    // 편의 메서드
+    public void checkMatchMember(Contact contact, long memberId){
+        if(contact.getMember().getId() != memberId)
+            throw new BaseException(NOT_MATCH_MEMBER);
+    }
+
+    public Contact getExistContact(long contactId){
+        Contact contact = contactRepository.findById(contactId)
+                .orElseThrow(()-> new BaseException(NOT_EXIST_CONTACT_NUMBER));
+        return contact;
     }
 }

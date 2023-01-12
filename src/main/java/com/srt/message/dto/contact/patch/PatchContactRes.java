@@ -42,5 +42,4 @@ public class PatchContactRes {
                 .memo(contact.getMemo())
                 .build();
     }
-
 }

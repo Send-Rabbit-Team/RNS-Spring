@@ -8,9 +8,11 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 
 import javax.persistence.*;
 
+@Log4j2
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
@@ -52,12 +54,15 @@ public class Contact extends BaseEntity {
     }
 
     public static ContactDTO toDto(Contact contact){
-        return ContactDTO.builder()
+        ContactDTO contactDTO =
+        ContactDTO.builder()
                 .id(contact.getId())
                 .memberId(contact.getMember().getId())
                 .groupId(contact.getContactGroup().getId())
                 .phoneNumber(contact.getPhoneNumber())
                 .memo(contact.getMemo())
                 .build();
+        log.info("contactDTO = " + contactDTO);
+        return contactDTO;
     }
 }

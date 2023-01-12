@@ -1,6 +1,7 @@
 package com.srt.message.repository;
 
 import com.srt.message.domain.Contact;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
@@ -11,5 +12,5 @@ public interface ContactRepository extends JpaRepository<Contact, Long> {
     Optional<Contact> findByPhoneNumber(String phoneNumber);
 
     // 전화번호로 검색
-    Optional<List<Contact>> findByPhoneNumberContaining(String keyword, Pageable pageable);
+    Page<Contact> findByPhoneNumberContaining(String phoneNumber, Pageable pageable);
 }

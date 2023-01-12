@@ -15,6 +15,7 @@ import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
@@ -47,14 +48,11 @@ public class ContactController {
         return new BaseResponse<>(postContactRes);
     }
 
-
-
-
     // 연락처 수정
     @PatchMapping("/edit")
     @NoIntercept
-    public BaseResponse<PatchContactRes> editContact(@RequestBody PatchContactReq patchContactReq){
-        PatchContactRes patchContactRes = contactService.editContact(patchContactReq); // 수정
+    public BaseResponse<PatchContactRes> editContact(@RequestBody PatchContactReq patchContactReq, HttpServletRequest request){
+        PatchContactRes patchContactRes = contactService.editContact(patchContactReq, JwtInfo.getMemberId(request)); // 수정
 
         return new BaseResponse<>(patchContactRes);
     }
@@ -63,16 +61,17 @@ public class ContactController {
     //연락처 삭제
     @PatchMapping("/delete/{contactId}")
     @NoIntercept
-    public BaseResponse<String> deleteContact(@PathVariable long contactId){
-        contactService.deleteContact(contactId);
+    public BaseResponse<String> deleteContact(@PathVariable long contactId, HttpServletRequest request){
+        contactService.deleteContact(contactId, JwtInfo.getMemberId(request));
 
         return new BaseResponse<>("삭제가 되었습니다.");
     }
 
+
+    // 연락처 검색
     @GetMapping("/search/{currentPage}")
     @NoIntercept
-    public List<ContactDTO> search(@PathVariable int currentPage,@RequestParam String phoneNumber){
-        List<ContactDTO> searchList = contactService.search(phoneNumber,currentPage);
-        return searchList;
+    public Page<ContactDTO> search(@PathVariable int currentPage, @RequestParam String phoneNumber){
+        return contactService.search(phoneNumber,currentPage);
     };
 }
