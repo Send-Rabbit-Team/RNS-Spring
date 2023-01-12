@@ -4,6 +4,7 @@ import com.srt.message.config.exception.BaseException;
 import com.srt.message.domain.Contact;
 import com.srt.message.domain.ContactGroup;
 import com.srt.message.domain.Member;
+import com.srt.message.dto.contact.ContactDTO;
 import com.srt.message.dto.contact.patch.PatchContactReq;
 import com.srt.message.dto.contact.patch.PatchContactRes;
 import com.srt.message.dto.contact.post.PostContactReq;
@@ -12,8 +13,15 @@ import com.srt.message.repository.ContactRepository;
 import com.srt.message.repository.ContactGroupRepository;
 import com.srt.message.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 import static com.srt.message.config.response.BaseResponseStatus.*;
 
@@ -75,5 +83,22 @@ public class ContactService {
 
         // 연락처 삭제
         contact.changeStatusInActive();
+    }
+
+    // 연락처 검색
+    @Transactional
+    public List<ContactDTO> search(String keyword, int currentPage) {
+        PageRequest pageRequest = PageRequest.of(currentPage, 10, Sort.by("id").descending());
+        List<Contact> contactList = contactRepository.findByPhoneNumberContaining(keyword, pageRequest)
+                .orElseThrow(()-> new BaseException(NOT_EXIST_CONTACT_NUMBER));
+        List<ContactDTO> contactListDTO = contactList.stream().map(
+                m-> Contact.toDto(m)).collect(Collectors.toList());
+
+        return contactListDTO;
+    }
+
+    @Transactional
+    public Page<Contact> getContactList(Pageable pageable) {
+        return contactRepository.findAll(pageable);
     }
 }

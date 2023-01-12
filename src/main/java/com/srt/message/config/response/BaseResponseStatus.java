@@ -31,6 +31,7 @@ public enum BaseResponseStatus {
     NOT_EXIST_GROUP(false, 2011,"존재하지 않는 그룹입니다."),
     ALREADY_EXIST_CONTACT_NUMBER(false, 2012,"이미 등록된 연락처입니다."),
     NOT_EXIST_CONTACT_NUMBER(false, 2012,"존재하지 않는 연락처입니다."),
+    NOT_ACCESS_GOOGLE(false, 2011, "구글 회원 인증에 실패했습니다."),
 
 
 

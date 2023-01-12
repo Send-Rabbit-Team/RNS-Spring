@@ -1,6 +1,8 @@
 package com.srt.message.controller;
 
 import com.srt.message.config.response.BaseResponse;
+import com.srt.message.domain.Contact;
+import com.srt.message.dto.contact.ContactDTO;
 import com.srt.message.dto.contact.patch.PatchContactReq;
 import com.srt.message.dto.contact.patch.PatchContactRes;
 import com.srt.message.dto.contact.post.PostContactReq;
@@ -13,9 +15,13 @@ import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.List;
 
 @Log4j2
 @RestController
@@ -62,4 +68,11 @@ public class ContactController {
 
         return new BaseResponse<>("삭제가 되었습니다.");
     }
+
+    @GetMapping("/search/{currentPage}")
+    @NoIntercept
+    public List<ContactDTO> search(@PathVariable int currentPage,@RequestParam String phoneNumber){
+        List<ContactDTO> searchList = contactService.search(phoneNumber,currentPage);
+        return searchList;
+    };
 }

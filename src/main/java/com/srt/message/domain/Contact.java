@@ -2,6 +2,7 @@ package com.srt.message.domain;
 
 import com.srt.message.config.domain.BaseEntity;
 import com.srt.message.config.status.BaseStatus;
+import com.srt.message.dto.contact.ContactDTO;
 import com.srt.message.dto.contact.patch.PatchContactReq;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -48,5 +49,15 @@ public class Contact extends BaseEntity {
             this.changeMemo(contactDto.getMemo());
 
         return this;
+    }
+
+    public static ContactDTO toDto(Contact contact){
+        return ContactDTO.builder()
+                .id(contact.getId())
+                .memberId(contact.getMember().getId())
+                .groupId(contact.getContactGroup().getId())
+                .phoneNumber(contact.getPhoneNumber())
+                .memo(contact.getMemo())
+                .build();
     }
 }
