@@ -4,6 +4,7 @@ import com.srt.message.config.page.PageResult;
 import com.srt.message.config.response.BaseResponse;
 import com.srt.message.domain.SenderNumber;
 import com.srt.message.dto.jwt.JwtInfo;
+import com.srt.message.dto.sender_number.get.GetSenderNumberRes;
 import com.srt.message.dto.sender_number.post.RegisterSenderNumberReq;
 import com.srt.message.dto.sender_number.post.RegisterSenderNumberRes;
 import com.srt.message.jwt.NoIntercept;
@@ -62,9 +63,11 @@ public class SenderNumberController {
             @ApiResponse(code = 2012, message = "존재하지 않는 전화번호입니다.")
     })
     @GetMapping("/list/{page}")
-    public BaseResponse<PageResult<RegisterSenderNumberRes, SenderNumber>> getMemberSenderNumber(
-            @RequestParam("member_id") long memberId, @PathVariable("page") int page) {
-        PageResult<RegisterSenderNumberRes, SenderNumber> memberSenderNumber = senderNumberService.getMemberSenderNumber(memberId, page);
+    public BaseResponse<PageResult<GetSenderNumberRes, SenderNumber>> getMemberSenderNumber(
+            HttpServletRequest request,
+            @PathVariable("page") int page) {
+        Long memberId = JwtInfo.getMemberId(request);
+        PageResult<GetSenderNumberRes, SenderNumber> memberSenderNumber = senderNumberService.getMemberSenderNumber(memberId, page);
         return new BaseResponse<>(memberSenderNumber);
     }
 
