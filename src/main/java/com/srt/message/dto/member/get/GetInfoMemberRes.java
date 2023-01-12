@@ -4,7 +4,7 @@ import com.srt.message.config.type.LoginType;
 import com.srt.message.config.type.MemberType;
 import com.srt.message.domain.Company;
 import com.srt.message.domain.Member;
-import com.srt.message.dto.company.CompanyDto;
+import com.srt.message.dto.company.CompanyDTO;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.*;
 
@@ -14,7 +14,7 @@ import lombok.*;
 @Getter
 @Setter
 public class GetInfoMemberRes {
-    private CompanyDto company;
+    private CompanyDTO company;
 
     @ApiModelProperty(
             example = "forceTlight@gmail.com"
@@ -64,7 +64,7 @@ public class GetInfoMemberRes {
                 .loginType(member.getLoginType())
                 .build();
 
-        getInfoMemberRes.setCompany(CompanyDto.toDto(company));
+        getInfoMemberRes.setCompany(CompanyDTO.toDto(company));
 
         return getInfoMemberRes;
     }

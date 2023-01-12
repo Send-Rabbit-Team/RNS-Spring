@@ -10,7 +10,6 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.http.*;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
-
 import static com.srt.message.config.response.BaseResponseStatus.NOT_ACCESS_GOOGLE;
 
 @Log4j2
