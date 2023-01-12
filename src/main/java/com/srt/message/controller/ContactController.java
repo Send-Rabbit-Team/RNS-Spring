@@ -62,11 +62,10 @@ public class ContactController {
         return new BaseResponse<>("삭제가 되었습니다.");
     }
 
-
     // 연락처 검색
     @GetMapping("/search/{currentPage}")
     public Page<ContactDTO> search(@PathVariable int currentPage, @RequestParam String phoneNumber){
-        return contactService.searchByNumber(phoneNumber,currentPage);
+        return contactService.search(phoneNumber,currentPage);
     };
 
     // 연락처 그룹 필터링

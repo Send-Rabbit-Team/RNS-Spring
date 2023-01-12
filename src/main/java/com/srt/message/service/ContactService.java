@@ -85,10 +85,10 @@ public class ContactService {
 
     // 연락처 검색
     @Transactional
-    public Page<ContactDTO> searchByNumber(String phoneNumber, int currentPage) {
+    public Page<ContactDTO> search(String phoneNumber, int currentPage) {
         PageRequest pageRequest = PageRequest.of(currentPage, 10, Sort.by("id").descending());
         Page<Contact> contactList = contactRepository.findByPhoneNumberContaining(phoneNumber, pageRequest);
-        Page<ContactDTO> contactListDTO = contactList.map(m-> Contact.toDto(m));
+        Page<ContactDTO> contactListDTO = contactList.map(m-> ContactDTO.toDto(m));
 
         return contactListDTO;
     }
@@ -98,7 +98,7 @@ public class ContactService {
     public Page<ContactDTO> filterByGroup(long groupId, int currentPage){
         PageRequest pageRequest = PageRequest.of(currentPage, 10, Sort.by("id").descending());
         Page<Contact> contactList = contactRepository.findByContactGroupId(groupId, pageRequest);
-        Page<ContactDTO> contactListDTO = contactList.map(m->Contact.toDto(m));
+        Page<ContactDTO> contactListDTO = contactList.map(m->ContactDTO.toDto(m));
 
         return contactListDTO;
     };
