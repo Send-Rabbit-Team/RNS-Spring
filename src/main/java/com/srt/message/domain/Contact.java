@@ -1,13 +1,14 @@
 package com.srt.message.domain;
 
 import com.srt.message.config.domain.BaseEntity;
+import com.srt.message.config.status.BaseStatus;
+import com.srt.message.dto.contact.patch.PatchContactReq;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
-import java.time.LocalDateTime;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -20,15 +21,32 @@ public class Contact extends BaseEntity {
     @Column(name = "contact_id")
     private long id;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="member_id")
-    private long memberId;
+    private Member member;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="group_id")
-    private long groupId;
+    private ContactGroup contactGroup;
 
     private String phoneNumber;
 
     private String memo;
+
+    private BaseStatus status;
+
+    private void changeContactGroup(ContactGroup contactGroup){this.contactGroup = contactGroup;}
+    private void changePhoneNumber(String phoneNumber){this.phoneNumber = phoneNumber;}
+    private void changeMemo(String memo){this.memo = memo;}
+
+    public Contact editContact(PatchContactReq contactDto, ContactGroup contactGroup){ // dto 수정
+        if(contactDto.getContactGroupId()!=null)
+            this.changeContactGroup(contactGroup);
+        if(contactDto.getPhoneNumber()!=null)
+            this.changePhoneNumber(contactDto.getPhoneNumber());
+        if(contactDto.getMemo()!=null)
+            this.changeMemo(contactDto.getMemo());
+
+        return this;
+    }
 }
