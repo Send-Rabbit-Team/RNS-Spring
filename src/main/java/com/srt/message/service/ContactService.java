@@ -20,9 +20,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-import java.util.stream.Collectors;
-
 import static com.srt.message.config.response.BaseResponseStatus.*;
 
 @Service
@@ -88,7 +85,7 @@ public class ContactService {
 
     // 연락처 검색
     @Transactional
-    public Page<ContactDTO> search(String phoneNumber, int currentPage) {
+    public Page<ContactDTO> searchByNumber(String phoneNumber, int currentPage) {
         PageRequest pageRequest = PageRequest.of(currentPage, 10, Sort.by("id").descending());
         Page<Contact> contactList = contactRepository.findByPhoneNumberContaining(phoneNumber, pageRequest);
         Page<ContactDTO> contactListDTO = contactList.map(m-> Contact.toDto(m));
@@ -96,6 +93,18 @@ public class ContactService {
         return contactListDTO;
     }
 
+    // 연락처 그룹으로 필터링
+    @Transactional
+    public Page<ContactDTO> filterByGroup(long groupId, int currentPage){
+        PageRequest pageRequest = PageRequest.of(currentPage, 10, Sort.by("id").descending());
+        Page<Contact> contactList = contactRepository.findByContactGroupId(groupId, pageRequest);
+        Page<ContactDTO> contactListDTO = contactList.map(m->Contact.toDto(m));
+
+        return contactListDTO;
+    };
+
+
+    // 모든 연락처 검색
     @Transactional
     public Page<Contact> getContactList(Pageable pageable) {
         return contactRepository.findAll(pageable);

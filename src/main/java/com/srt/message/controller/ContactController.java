@@ -1,7 +1,6 @@
 package com.srt.message.controller;
 
 import com.srt.message.config.response.BaseResponse;
-import com.srt.message.domain.Contact;
 import com.srt.message.dto.contact.ContactDTO;
 import com.srt.message.dto.contact.patch.PatchContactReq;
 import com.srt.message.dto.contact.patch.PatchContactRes;
@@ -16,13 +15,9 @@ import io.swagger.annotations.ApiResponses;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.List;
 
 @Log4j2
 @RestController
@@ -70,11 +65,14 @@ public class ContactController {
 
     // 연락처 검색
     @GetMapping("/search/{currentPage}")
-    @NoIntercept
     public Page<ContactDTO> search(@PathVariable int currentPage, @RequestParam String phoneNumber){
-        return contactService.search(phoneNumber,currentPage);
+        return contactService.searchByNumber(phoneNumber,currentPage);
     };
-//
-//    //연락처 모두 불러오기
-//    @GetMapping("/allcontacts")
+
+    // 연락처 그룹 필터링
+    @GetMapping("/group/{currentPage}")
+    @NoIntercept
+    public Page<ContactDTO> filterByGroup(@PathVariable int currentPage,@RequestParam long groupId){
+        return contactService.filterByGroup(groupId,currentPage);
+    }
 }
