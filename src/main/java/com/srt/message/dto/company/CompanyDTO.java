@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
-public class CompanyDto {
+public class CompanyDTO {
     @ApiModelProperty(
             example = "카카오 엔터프라이즈"
     )
@@ -22,8 +22,8 @@ public class CompanyDto {
     )
     private String bsNum;
 
-    public static CompanyDto toDto(Company company){
-        return CompanyDto.builder()
+    public static CompanyDTO toDto(Company company){
+        return CompanyDTO.builder()
                 .companyName(company.getCompanyName())
                 .bsNum(company.getBsNum())
                 .build();
