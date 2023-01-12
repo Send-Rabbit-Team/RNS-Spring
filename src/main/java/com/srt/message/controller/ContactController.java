@@ -74,4 +74,7 @@ public class ContactController {
     public Page<ContactDTO> search(@PathVariable int currentPage, @RequestParam String phoneNumber){
         return contactService.search(phoneNumber,currentPage);
     };
+//
+//    //연락처 모두 불러오기
+//    @GetMapping("/allcontacts")
 }
