@@ -28,6 +28,7 @@ public enum BaseResponseStatus {
     ALREADY_AUTH_PHONE_NUMBER(false, 2008,"이미 인증을 받은 전화번호입니다."),
     NOT_EXIST_MEMBER(false, 2009,"존재하지 않는 사용자입니다."),
     ALREADY_EXIST_PHONE_NUMBER(false, 2009,"이미 등록된 휴대전화 번호입니다."),
+    NOT_ACCESS_GOOGLE(false, 2011, "구글 회원 인증에 실패했습니다"),
 
 
     /**

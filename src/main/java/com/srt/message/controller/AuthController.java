@@ -109,12 +109,14 @@ public class AuthController {
     )
     @ApiResponses({
             @ApiResponse(code = 1000, message = "요청에 성공하였습니다."),
-            @ApiResponse(code = 2004, message = "존재하지 않는 이메일 주소입니다.")
+            @ApiResponse(code = 2004, message = "존재하지 않는 이메일 주소입니다."),
+            @ApiResponse(code = 2011, message = "구글 회원 인증에 실패했습니다.")
     })
     @NoIntercept
     @PostMapping("/google/login")
-    public BaseResponse<PostLoginRes> googleSignIn(@RequestParam String email){
-        PostLoginRes postLoginRes = authService.googleSignIn(email);
+    public BaseResponse<PostLoginRes> googleSignIn(@RequestBody CredentialResponse credentialResponse){
+        GoogleUserInfoDTO googleUserInfoDTO = googleOAuthService.getUserInfo(credentialResponse);
+        PostLoginRes postLoginRes = authService.googleSignIn(googleUserInfoDTO.getEmail());
         log.info("Google Sign-In - jwt: {}" + postLoginRes.getJwt());
 
         return new BaseResponse<>(postLoginRes);
