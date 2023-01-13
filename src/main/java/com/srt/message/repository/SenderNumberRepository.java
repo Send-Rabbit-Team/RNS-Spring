@@ -13,7 +13,7 @@ import java.util.Optional;
 
 public interface SenderNumberRepository extends JpaRepository<SenderNumber, Long> {
     Optional<SenderNumber> findByPhoneNumberAndStatus(String phoneNumber, BaseStatus status);
-    Optional<Page<SenderNumber>> findByMemberIdAndStatus(Long memberId, BaseStatus status, Pageable pageable);
+    Page<SenderNumber> findByMemberIdAndStatus(Long memberId, BaseStatus status, Pageable pageable);
     Optional<SenderNumber> findByIdAndStatus(Long senderNumberId, BaseStatus status);
 
 }
