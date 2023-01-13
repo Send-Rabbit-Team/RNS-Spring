@@ -1,5 +1,6 @@
 package com.srt.message.repository;
 
+import com.srt.message.config.status.BaseStatus;
 import com.srt.message.domain.Contact;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -16,4 +17,7 @@ public interface ContactRepository extends JpaRepository<Contact, Long> {
 
     // 그룹으로 힐터링
     Page<Contact> findByContactGroupId(Long groupId, Pageable pageable);
+
+    // 그룹으로 연락처 조회 (페이지네이션 없음)
+    Optional<List<Contact>> findByContactGroupIdAndStatus(Long groupId, BaseStatus status);
 }

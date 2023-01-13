@@ -1,7 +1,10 @@
 package com.srt.message.controller;
 
+import com.srt.message.config.page.PageResult;
 import com.srt.message.config.response.BaseResponse;
+import com.srt.message.domain.ContactGroup;
 import com.srt.message.dto.contact.patch.PatchContactRes;
+import com.srt.message.dto.contact_group.get.GetContactGroupRes;
 import com.srt.message.dto.contact_group.patch.PatchContactGroupReq;
 import com.srt.message.dto.contact_group.patch.PatchContactGroupRes;
 import com.srt.message.dto.contact_group.post.PostContactGroupReq;
@@ -9,6 +12,9 @@ import com.srt.message.dto.contact_group.post.PostContactGroupRes;
 import com.srt.message.dto.jwt.JwtInfo;
 import com.srt.message.jwt.NoIntercept;
 import com.srt.message.service.ContactGroupService;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.web.bind.annotation.*;
@@ -48,5 +54,21 @@ public class ContactGroupController {
         contactGroupService.deleteContactGroup(contactGroupId, JwtInfo.getMemberId(request));
 
         return new BaseResponse<>("그룹이 정상적으로 삭제 되었습니다.");
+    }
+
+
+    @ApiOperation(
+            value = "수신자 그룹 조회",
+            notes = "발신자 아이디를 통해 보유한 수신자 그룹을 조회하는 API"
+    )
+    @ApiResponses({
+            @ApiResponse(code = 1000, message = "요청에 성공하였습니다."),
+    })
+    @GetMapping("/list/{page}")
+    public BaseResponse<PageResult<GetContactGroupRes, ContactGroup>> getMemberGroup(
+            HttpServletRequest request,
+            @PathVariable("page") int page) {
+        Long memberId = JwtInfo.getMemberId(request);
+        return new BaseResponse<>(contactGroupService.getMemberContactGroup(memberId, page));
     }
 }

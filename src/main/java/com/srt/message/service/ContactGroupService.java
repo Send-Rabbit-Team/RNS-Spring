@@ -1,10 +1,14 @@
 package com.srt.message.service;
 
 import com.srt.message.config.exception.BaseException;
+import com.srt.message.config.page.PageResult;
+import com.srt.message.config.status.BaseStatus;
 import com.srt.message.domain.Contact;
 import com.srt.message.domain.ContactGroup;
 import com.srt.message.domain.Member;
+import com.srt.message.dto.contact.ContactDTO;
 import com.srt.message.dto.contact_group.ContactGroupDTO;
+import com.srt.message.dto.contact_group.get.GetContactGroupRes;
 import com.srt.message.dto.contact_group.patch.PatchContactGroupReq;
 import com.srt.message.dto.contact_group.patch.PatchContactGroupRes;
 import com.srt.message.dto.contact_group.post.PostContactGroupReq;
@@ -13,8 +17,15 @@ import com.srt.message.repository.ContactGroupRepository;
 import com.srt.message.repository.ContactRepository;
 import com.srt.message.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.Function;
 
 import static com.srt.message.config.response.BaseResponseStatus.*;
 import static com.srt.message.config.response.BaseResponseStatus.NOT_EXIST_CONTACT_NUMBER;
@@ -27,6 +38,8 @@ public class ContactGroupService {
     private final ContactGroupRepository contactGroupRepository;
 
     private final MemberRepository memberRepository;
+
+    private final ContactRepository contactRepository;
 
 
     // 그룹 저장
@@ -82,5 +95,29 @@ public class ContactGroupService {
         ContactGroup contactGroup = contactGroupRepository.findById(contactGroupId)
                 .orElseThrow(()-> new BaseException(NOT_EXIST_GROUP));
         return contactGroup;
+    }
+
+    // 그룹 조회
+    public PageResult<GetContactGroupRes, ContactGroup> getMemberContactGroup(long memberId, int page) {
+        PageRequest pageRequest = PageRequest.of(page-1, 5, Sort.by("id").descending());
+
+        // 그룹 조회
+        Page<ContactGroup> contactGroupPage = contactGroupRepository.findByMemberIdAndStatus(memberId, BaseStatus.ACTIVE, pageRequest);
+
+        // Domain -> DTO 변환 함수 생성
+        Function<ContactGroup, GetContactGroupRes> fn = contactGroup -> {
+            // 그룹 ID를 통해 그룹에 속한 연락처 조회
+            long groupId = contactGroup.getId();
+            List<Contact> contactList = contactRepository.findByContactGroupIdAndStatus(groupId, BaseStatus.ACTIVE).orElse(null);
+
+            // Contact -> ContactDTO로 변환
+            List<ContactDTO> contactDTOList = new ArrayList<>();
+            for (Contact contact : contactList) {
+                contactDTOList.add(ContactDTO.toDto(contact));
+            }
+
+            return GetContactGroupRes.toDto(contactGroup, contactDTOList);
+        };
+        return new PageResult<>(contactGroupPage, fn);
     }
 }
