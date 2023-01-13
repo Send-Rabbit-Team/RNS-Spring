@@ -52,17 +52,4 @@ public class Contact extends BaseEntity {
 
         return this;
     }
-
-    public static ContactDTO toDto(Contact contact){
-        ContactDTO contactDTO =
-        ContactDTO.builder()
-                .id(contact.getId())
-                .memberId(contact.getMember().getId())
-                .groupId(contact.getContactGroup().getId())
-                .phoneNumber(contact.getPhoneNumber())
-                .memo(contact.getMemo())
-                .build();
-        log.info("contactDTO = " + contactDTO);
-        return contactDTO;
-    }
 }

@@ -35,6 +35,8 @@ public enum BaseResponseStatus {
     NOT_MATCH_MEMBER(false, 2016, "해당 사용자의 데이터가 아닙니다."),
     NOT_EXIST_PHONE_NUMBER(false, 2017, "존재하지 않는 전화번호입니다."),
     NOT_AUTH_MEMBER(false, 2018, "권한이 없는 사용자입니다."),
+    NOT_VALID_BROKER_RATE(false, 2019, "중계사 비율 설정이 올바르지 않습니다."),
+    NOT_EXIST_BROKER(false, 2020, "존재하지 않는 중계사입니다."),
 
 
 

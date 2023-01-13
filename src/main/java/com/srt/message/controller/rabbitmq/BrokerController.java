@@ -1,4 +1,4 @@
-package com.srt.message.controller;
+package com.srt.message.controller.rabbitmq;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.RequestMapping;

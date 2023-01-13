@@ -1,5 +1,6 @@
 package com.srt.message.dto.contact;
 
+import com.srt.message.domain.Contact;
 import lombok.*;
 
 @AllArgsConstructor
@@ -8,13 +9,26 @@ import lombok.*;
 @Getter
 @Builder
 public class ContactDTO {
-    long id;
+    private long id;
 
-    long memberId;
+    private long memberId;
 
-    long groupId;
+    private long groupId;
 
-    String phoneNumber;
+    private String phoneNumber;
 
-    String memo;
+    private String memo;
+
+    public static ContactDTO toDto(Contact contact){
+        ContactDTO contactDTO =
+                ContactDTO.builder()
+                        .id(contact.getId())
+                        .memberId(contact.getMember().getId())
+                        .groupId(contact.getContactGroup().getId())
+                        .phoneNumber(contact.getPhoneNumber())
+                        .memo(contact.getMemo())
+                        .build();
+
+        return contactDTO;
+    }
 }

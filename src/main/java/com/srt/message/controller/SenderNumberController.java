@@ -6,18 +6,12 @@ import com.srt.message.domain.SenderNumber;
 import com.srt.message.dto.jwt.JwtInfo;
 import com.srt.message.dto.sender_number.post.RegisterSenderNumberReq;
 import com.srt.message.dto.sender_number.post.RegisterSenderNumberRes;
-import com.srt.message.jwt.NoIntercept;
-import com.srt.message.repository.SenderNumberRepository;
 import com.srt.message.service.SenderNumberService;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -57,9 +51,9 @@ public class SenderNumberController {
             @ApiResponse(code = 2012, message = "존재하지 않는 전화번호입니다.")
     })
     @GetMapping("/list/{page}")
-    public BaseResponse<PageResult<RegisterSenderNumberRes, SenderNumber>> getMemberSenderNumber(
-            @RequestParam("member_id") long memberId, @PathVariable("page") int page) {
-        PageResult<RegisterSenderNumberRes, SenderNumber> memberSenderNumber = senderNumberService.getMemberSenderNumber(memberId, page);
+    public BaseResponse<PageResult<RegisterSenderNumberRes, SenderNumber>> getMemberSenderNumber(@PathVariable("page") int page
+    , HttpServletRequest request) {
+        PageResult<RegisterSenderNumberRes, SenderNumber> memberSenderNumber = senderNumberService.getMemberSenderNumber(page, JwtInfo.getMemberId(request));
         return new BaseResponse<>(memberSenderNumber);
     }
 
@@ -74,8 +68,7 @@ public class SenderNumberController {
     })
     @PatchMapping("/delete/{senderNumberId}")
     public BaseResponse<String> deleteSenderNumber(@PathVariable long senderNumberId, HttpServletRequest request) {
-        Long memberId = JwtInfo.getMemberId(request);
-        senderNumberService.deleteSenderNumber(senderNumberId, memberId);
+        senderNumberService.deleteSenderNumber(senderNumberId, JwtInfo.getMemberId(request));
         return new BaseResponse<>("성공");
     }
 }

@@ -8,7 +8,7 @@ import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import static com.srt.message.utils.rabbit.RabbitSMSUtil.*;
+import static com.srt.message.utils.rabbitmq.RabbitSMSUtil.*;
 
 @Configuration
 public class RabbitConfig {

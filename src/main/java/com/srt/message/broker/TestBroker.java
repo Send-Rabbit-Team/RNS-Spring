@@ -7,10 +7,11 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.amqp.core.*;
 import org.springframework.amqp.rabbit.core.RabbitAdmin;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import static com.srt.message.utils.rabbit.RabbitSMSUtil.*;
+import static com.srt.message.utils.rabbitmq.RabbitSMSUtil.*;
 
 @RestController
 @RequiredArgsConstructor
