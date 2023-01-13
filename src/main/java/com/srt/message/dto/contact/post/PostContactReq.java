@@ -27,7 +27,7 @@ public class PostContactReq {
     )
     private String memo;
 
-    public static Contact toContactEntity(PostContactReq req, ContactGroup contactGroup, Member member){
+    public static Contact toEntity(PostContactReq req, ContactGroup contactGroup, Member member){
         return Contact.builder()
                 .member(member)
                 .contactGroup(contactGroup)
