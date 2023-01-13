@@ -1,7 +1,7 @@
 package com.srt.message.service;
 
 import com.srt.message.config.exception.BaseException;
-import com.srt.message.domain.Contact;
+import com.srt.message.config.status.BaseStatus;
 import com.srt.message.domain.ContactGroup;
 import com.srt.message.domain.Member;
 import com.srt.message.dto.contact_group.ContactGroupDTO;
@@ -10,14 +10,12 @@ import com.srt.message.dto.contact_group.patch.PatchContactGroupRes;
 import com.srt.message.dto.contact_group.post.PostContactGroupReq;
 import com.srt.message.dto.contact_group.post.PostContactGroupRes;
 import com.srt.message.repository.ContactGroupRepository;
-import com.srt.message.repository.ContactRepository;
 import com.srt.message.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import static com.srt.message.config.response.BaseResponseStatus.*;
-import static com.srt.message.config.response.BaseResponseStatus.NOT_EXIST_CONTACT_NUMBER;
 
 @Service
 @Transactional(readOnly = true)
@@ -43,7 +41,7 @@ public class ContactGroupService {
         String name = req.getName();
 
         // 그룹 기존 등록 여부
-        if(contactGroupRepository.findByName(name).isPresent())
+        if(contactGroupRepository.findByNameAndStatus(name, BaseStatus.ACTIVE).isPresent())
             throw new BaseException(ALREADY_EXIST_GROUP);
 
         // 멤버 존재 여부

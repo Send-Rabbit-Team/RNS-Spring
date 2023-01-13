@@ -80,8 +80,7 @@ public class ContactController {
 
         return new BaseResponse<>("연락처가 정상적으로 삭제 되었습니다.");
     }
-
-
+    
     // 연락처 검색
     @ApiOperation(
             value = "연락처 검색 (페이징)",

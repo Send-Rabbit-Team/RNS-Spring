@@ -2,16 +2,15 @@ package com.srt.message.service;
 
 import com.srt.message.config.exception.BaseException;
 import com.srt.message.config.page.PageResult;
+import com.srt.message.config.status.BaseStatus;
 import com.srt.message.domain.Contact;
 import com.srt.message.domain.ContactGroup;
 import com.srt.message.domain.Member;
-import com.srt.message.domain.SenderNumber;
 import com.srt.message.dto.contact.ContactDTO;
 import com.srt.message.dto.contact.patch.PatchContactReq;
 import com.srt.message.dto.contact.patch.PatchContactRes;
 import com.srt.message.dto.contact.post.PostContactReq;
 import com.srt.message.dto.contact.post.PostContactRes;
-import com.srt.message.dto.sender_number.get.GetSenderNumberRes;
 import com.srt.message.repository.ContactRepository;
 import com.srt.message.repository.ContactGroupRepository;
 import com.srt.message.repository.MemberRepository;
@@ -51,7 +50,7 @@ public class ContactService {
         long groupId = req.getContactGroupId();
 
         // 핸드폰 기존 등록 여부
-        if(contactRepository.findByPhoneNumber(req.getPhoneNumber()).isPresent())
+        if(contactRepository.findByPhoneNumberAndStatus(req.getPhoneNumber(), BaseStatus.ACTIVE).isPresent())
             throw new BaseException(ALREADY_EXIST_CONTACT_NUMBER);
 
         // 멤버 존재 여부
@@ -102,7 +101,7 @@ public class ContactService {
     // 연락처 검색
     public PageResult<ContactDTO, Contact> searchContact(String phoneNumber, int currentPage) {
         PageRequest pageRequest = PageRequest.of(currentPage-1, 5, Sort.by("id").descending());
-        Page<Contact> contactPage = contactRepository.findByPhoneNumberContaining(phoneNumber, pageRequest);
+        Page<Contact> contactPage = contactRepository.findByPhoneNumberAndStatusContaining(phoneNumber, pageRequest,BaseStatus.ACTIVE);
         Function<Contact, ContactDTO> fn = (contact -> ContactDTO.toDto(contact));
         return new PageResult<>(contactPage, fn);
     }
@@ -110,7 +109,7 @@ public class ContactService {
     // 연락처 그룹으로 필터링
     public PageResult<ContactDTO, Contact> filterContactByGroup(long groupId, int currentPage){
         PageRequest pageRequest = PageRequest.of(currentPage-1, 5, Sort.by("id").descending());
-        Page<Contact> contactPage = contactRepository.findByContactGroupId(groupId, pageRequest);
+        Page<Contact> contactPage = contactRepository.findByContactGroupIdAndStatus(groupId, pageRequest,BaseStatus.ACTIVE);
         Function<Contact, ContactDTO> fn = (contact -> ContactDTO.toDto(contact));
         return new PageResult<>(contactPage, fn);
     };
