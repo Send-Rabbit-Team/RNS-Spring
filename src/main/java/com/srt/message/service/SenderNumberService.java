@@ -7,6 +7,7 @@ import com.srt.message.config.status.AuthPhoneNumberStatus;
 import com.srt.message.config.status.BaseStatus;
 import com.srt.message.domain.SenderNumber;
 import com.srt.message.domain.redis.AuthPhoneNumber;
+import com.srt.message.dto.sender_number.get.GetSenderNumberRes;
 import com.srt.message.dto.sender_number.post.RegisterSenderNumberReq;
 import com.srt.message.dto.sender_number.post.RegisterSenderNumberRes;
 import com.srt.message.repository.SenderNumberRepository;
@@ -66,11 +67,11 @@ public class SenderNumberService {
     }
 
     // 발신자 조회
-    public PageResult<RegisterSenderNumberRes, SenderNumber> getMemberSenderNumber(long memberId, int page) {
-        PageRequest pageRequest = PageRequest.of(page, 3, Sort.by("id").descending());
+    public PageResult<GetSenderNumberRes, SenderNumber> getMemberSenderNumber(long memberId, int page) {
+        PageRequest pageRequest = PageRequest.of(page-1, 1, Sort.by("id").descending());
         Page<SenderNumber> senderNumberPage = senderNumberRepository.findByMemberIdAndStatus(memberId, BaseStatus.ACTIVE, pageRequest)
                 .orElseThrow(() -> new BaseException(NOT_EXIST_PHONE_NUMBER));
-        Function<SenderNumber, RegisterSenderNumberRes> fn = (senderNumber -> RegisterSenderNumberRes.toDto(senderNumber));
+        Function<SenderNumber, GetSenderNumberRes> fn = (senderNumber -> GetSenderNumberRes.toDto(senderNumber));
         return new PageResult<>(senderNumberPage, fn);
 //        return senderNumberPage.map(senderNumber -> RegisterSenderNumberRes.toDto(senderNumber));
     }
