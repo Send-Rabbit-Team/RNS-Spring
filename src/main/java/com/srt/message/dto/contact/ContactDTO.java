@@ -21,11 +21,11 @@ public class ContactDTO {
 
     public static ContactDTO toDto(Contact contact){
         return ContactDTO.builder()
-                        .id(contact.getId())
-                        .memberId(contact.getMember().getId())
-                        .groupId(contact.getContactGroup().getId())
-                        .phoneNumber(contact.getPhoneNumber())
-                        .memo(contact.getMemo())
-                        .build();
+                    .id(contact.getId())
+                    .memberId(contact.getMember().getId())
+                    .groupId(contact.getContactGroup().getId())
+                    .phoneNumber(contact.getPhoneNumber())
+                    .memo(contact.getMemo())
+                    .build();
     }
 }

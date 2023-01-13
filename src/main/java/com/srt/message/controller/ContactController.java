@@ -59,19 +59,19 @@ public class ContactController {
     public BaseResponse<String> deleteContact(@PathVariable long contactId, HttpServletRequest request){
         contactService.deleteContact(contactId, JwtInfo.getMemberId(request));
 
-        return new BaseResponse<>("삭제가 되었습니다.");
+        return new BaseResponse<>("연락처가 정상적으로 삭제 되었습니다.");
     }
 
     // 연락처 검색
     @GetMapping("/search/{currentPage}")
     public Page<ContactDTO> search(@PathVariable int currentPage, @RequestParam String phoneNumber){
-        return contactService.search(phoneNumber,currentPage);
+        return contactService.searchContact(phoneNumber,currentPage);
     };
 
     // 연락처 그룹 필터링
-    @GetMapping("/group/{currentPage}")
+    @GetMapping("/byGroup/{currentPage}")
     @NoIntercept
     public Page<ContactDTO> filterByGroup(@PathVariable int currentPage,@RequestParam long groupId){
-        return contactService.filterByGroup(groupId,currentPage);
+        return contactService.filterContactByGroup(groupId,currentPage);
     }
 }

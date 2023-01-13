@@ -35,21 +35,26 @@ public class ContactService {
 
     @Transactional(readOnly = false)
     public PostContactRes saveContact(PostContactReq req, long memberId){
-            long groupId = req.getContactGroupId();
+        long groupId = req.getContactGroupId();
 
-            Member member = memberRepository.findById(memberId).get();
+        // 핸드폰 기존 등록 여부
+        if(contactRepository.findByPhoneNumber(req.getPhoneNumber()).isPresent())
+            throw new BaseException(ALREADY_EXIST_CONTACT_NUMBER);
 
-            ContactGroup contactGroup = contactGroupRepository.findById(groupId)
-                    .orElseThrow(() -> new BaseException(NOT_EXIST_GROUP));
+        // 멤버 존재 여부
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new BaseException(NOT_EXIST_MEMBER));
 
-            //핸드폰 기존 등록 여부
-            if(contactRepository.findByPhoneNumber(req.getPhoneNumber()).isPresent())
-                throw new BaseException(ALREADY_EXIST_CONTACT_NUMBER);
+        // 그룹 존재 여부
+        ContactGroup contactGroup = contactGroupRepository.findById(groupId)
+                .orElseThrow(() -> new BaseException(NOT_EXIST_GROUP));
 
-            Contact contact = PostContactReq.toContactEntity(req, contactGroup,member);
-            contactRepository.save(contact);
 
-            return PostContactRes.toDto(contact, contactGroup);
+
+        Contact contact = PostContactReq.toEntity(req, contactGroup,member);
+        contactRepository.save(contact);
+
+        return PostContactRes.toDto(contact, contactGroup);
 
     }
 
@@ -57,7 +62,6 @@ public class ContactService {
     public PatchContactRes editContact(PatchContactReq patchContactReq, long memberId){
         // 존재하는 연락처인지 확인
         Contact contact = getExistContact(patchContactReq.getContactId());
-
         checkMatchMember(contact, memberId);
 
         // 그룹 찾기
@@ -70,7 +74,7 @@ public class ContactService {
         Contact editedContact = contact.editContact(patchContactReq, contactGroup);
         contactRepository.save(editedContact);
 
-        return PatchContactRes.toDto(contact);
+        return PatchContactRes.toDto(editedContact);
     }
 
     @Transactional(readOnly = false)
@@ -85,7 +89,7 @@ public class ContactService {
 
     // 연락처 검색
     @Transactional
-    public Page<ContactDTO> search(String phoneNumber, int currentPage) {
+    public Page<ContactDTO> searchContact(String phoneNumber, int currentPage) {
         PageRequest pageRequest = PageRequest.of(currentPage, 10, Sort.by("id").descending());
         Page<Contact> contactList = contactRepository.findByPhoneNumberContaining(phoneNumber, pageRequest);
         Page<ContactDTO> contactListDTO = contactList.map(m-> ContactDTO.toDto(m));
@@ -95,7 +99,7 @@ public class ContactService {
 
     // 연락처 그룹으로 필터링
     @Transactional
-    public Page<ContactDTO> filterByGroup(long groupId, int currentPage){
+    public Page<ContactDTO> filterContactByGroup(long groupId, int currentPage){
         PageRequest pageRequest = PageRequest.of(currentPage, 10, Sort.by("id").descending());
         Page<Contact> contactList = contactRepository.findByContactGroupId(groupId, pageRequest);
         Page<ContactDTO> contactListDTO = contactList.map(m->ContactDTO.toDto(m));
