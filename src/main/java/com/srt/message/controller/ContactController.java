@@ -35,8 +35,7 @@ public class ContactController {
             @ApiResponse(code = 2011, message = "존재하지 않는 그룹입니다."),
             @ApiResponse(code = 2012, message = "이미 등록된 연락처입니다."),
     })
-    @PostMapping("/save")
-    @NoIntercept
+    @PostMapping("/create")
     public BaseResponse<PostContactRes> saveContact(@RequestBody PostContactReq postContactReq, HttpServletRequest request){
         PostContactRes postContactRes = contactService.saveContact(postContactReq, JwtInfo.getMemberId(request));
 
@@ -44,6 +43,15 @@ public class ContactController {
     }
 
     // 연락처 수정
+    @ApiOperation(
+            value = "연락처 수정",
+            notes = "저장된 연락처를 수정하는 API"
+    )
+    @ApiResponses({
+            @ApiResponse(code = 1000, message = "요청에 성공하였습니다."),
+            @ApiResponse(code = 2014, message = "존재하지 않는 연락처입니다."),
+            @ApiResponse(code = 2016, message = "해당 사용자의 데이터가 아닙니다.")
+    })
     @PatchMapping("/edit")
     @NoIntercept
     public BaseResponse<PatchContactRes> editContact(@RequestBody PatchContactReq patchContactReq, HttpServletRequest request){
@@ -54,6 +62,15 @@ public class ContactController {
 
 
     //연락처 삭제
+    @ApiOperation(
+            value = "연락처 삭제",
+            notes = "저장된 연락처를 삭제하는 API"
+    )
+    @ApiResponses({
+            @ApiResponse(code = 1000, message = "요청에 성공하였습니다."),
+            @ApiResponse(code = 2011, message = "존재하지 않는 그룹입니다."),
+            @ApiResponse(code = 2012, message = "이미 등록된 연락처입니다."),
+    })
     @PatchMapping("/delete/{contactId}")
     @NoIntercept
     public BaseResponse<String> deleteContact(@PathVariable long contactId, HttpServletRequest request){
@@ -62,7 +79,15 @@ public class ContactController {
         return new BaseResponse<>("연락처가 정상적으로 삭제 되었습니다.");
     }
 
+
     // 연락처 검색
+    @ApiOperation(
+            value = "연락처 검색 (페이징)",
+            notes = "연락처 검색 API - 페이징 처리"
+    )
+    @ApiResponses({
+            @ApiResponse(code = 1000, message = "요청에 성공하였습니다.")
+    })
     @GetMapping("/search/{currentPage}")
     public Page<ContactDTO> search(@PathVariable int currentPage, @RequestParam String phoneNumber){
         return contactService.searchContact(phoneNumber,currentPage);

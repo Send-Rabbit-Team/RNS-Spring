@@ -7,18 +7,12 @@ import com.srt.message.dto.jwt.JwtInfo;
 import com.srt.message.dto.sender_number.get.GetSenderNumberRes;
 import com.srt.message.dto.sender_number.post.RegisterSenderNumberReq;
 import com.srt.message.dto.sender_number.post.RegisterSenderNumberRes;
-import com.srt.message.jwt.NoIntercept;
-import com.srt.message.repository.SenderNumberRepository;
 import com.srt.message.service.SenderNumberService;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -29,11 +23,6 @@ import javax.servlet.http.HttpServletRequest;
 @RequestMapping("/sender")
 public class SenderNumberController {
     private final SenderNumberService senderNumberService;
-
-    @GetMapping("/test")
-    public void auditTest(){
-        senderNumberService.testSave();
-    }
 
     @ApiOperation(
             value = "발신자 번호 등록",
@@ -82,8 +71,7 @@ public class SenderNumberController {
     })
     @PatchMapping("/delete/{senderNumberId}")
     public BaseResponse<String> deleteSenderNumber(@PathVariable long senderNumberId, HttpServletRequest request) {
-        Long memberId = JwtInfo.getMemberId(request);
-        senderNumberService.deleteSenderNumber(senderNumberId, memberId);
+        senderNumberService.deleteSenderNumber(senderNumberId, JwtInfo.getMemberId(request));
         return new BaseResponse<>("성공");
     }
 }

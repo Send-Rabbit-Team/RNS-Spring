@@ -17,20 +17,14 @@ public class PostContactGroupRes {
     private long contactGroupId;
 
     @ApiModelProperty(
-            example = "남성 회원 그룹"
+            example = "카카오"
     )
     private String name;
-
-    @ApiModelProperty(
-            example = "오영주"
-    )
-    private Member member;
 
     public static PostContactGroupRes toDto(ContactGroup contactGroup){
         return PostContactGroupRes.builder()
                 .contactGroupId(contactGroup.getId())
                 .name(contactGroup.getName())
-                .member(contactGroup.getMember())
                 .build();
     };
 }
