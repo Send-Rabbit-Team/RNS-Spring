@@ -15,13 +15,9 @@ import com.srt.message.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
-import java.util.stream.Collectors;
 
 import static com.srt.message.config.response.BaseResponseStatus.*;
 
@@ -29,12 +25,9 @@ import static com.srt.message.config.response.BaseResponseStatus.*;
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class ContactService {
-
-        private final ContactRepository contactRepository;
-
-        private final ContactGroupRepository contactGroupRepository;
-
-        private final MemberRepository memberRepository;
+    private final ContactRepository contactRepository;
+    private final ContactGroupRepository contactGroupRepository;
+    private final MemberRepository memberRepository;
 
     @Transactional(readOnly = false)
     public PostContactRes saveContact(PostContactReq req, long memberId){
@@ -93,10 +86,6 @@ public class ContactService {
         Page<ContactDTO> contactListDTO = contactList.map(m-> ContactDTO.toDto(m));
 
         return contactListDTO;
-    }
-
-    public Page<Contact> getContactList(Pageable pageable) {
-        return contactRepository.findAll(pageable);
     }
 
     // 편의 메서드

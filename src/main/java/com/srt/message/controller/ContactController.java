@@ -40,7 +40,7 @@ public class ContactController {
             @ApiResponse(code = 2011, message = "존재하지 않는 그룹입니다."),
             @ApiResponse(code = 2012, message = "이미 등록된 연락처입니다."),
     })
-    @PostMapping("/save")
+    @PostMapping("/create")
     public BaseResponse<PostContactRes> saveContact(@RequestBody PostContactReq postContactReq, HttpServletRequest request){
         PostContactRes postContactRes = contactService.saveContact(postContactReq, JwtInfo.getMemberId(request));
 
