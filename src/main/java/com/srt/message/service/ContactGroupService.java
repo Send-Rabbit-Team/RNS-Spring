@@ -28,6 +28,14 @@ public class ContactGroupService {
 
     private final MemberRepository memberRepository;
 
+    //그룹 찾기
+    @Transactional(readOnly = false)
+    public ContactGroupDTO findContactGroupById(long contactGroupId){
+        ContactGroup contactGroup = contactGroupRepository.findById(contactGroupId)
+                .orElseThrow(()-> new BaseException(NOT_EXIST_GROUP));
+        Member member = contactGroup.getMember();
+        return ContactGroupDTO.toDTO(contactGroup,member);
+    }
 
     // 그룹 저장
     @Transactional(readOnly = false)

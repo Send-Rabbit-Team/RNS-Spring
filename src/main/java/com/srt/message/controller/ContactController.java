@@ -1,6 +1,7 @@
 package com.srt.message.controller;
 
 import com.srt.message.config.response.BaseResponse;
+import com.srt.message.domain.Contact;
 import com.srt.message.dto.contact.ContactDTO;
 import com.srt.message.dto.contact.patch.PatchContactReq;
 import com.srt.message.dto.contact.patch.PatchContactRes;
@@ -52,6 +53,7 @@ public class ContactController {
             @ApiResponse(code = 2014, message = "존재하지 않는 연락처입니다."),
             @ApiResponse(code = 2016, message = "해당 사용자의 데이터가 아닙니다.")
     })
+
     @PatchMapping("/edit")
     @NoIntercept
     public BaseResponse<PatchContactRes> editContact(@RequestBody PatchContactReq patchContactReq, HttpServletRequest request){
@@ -94,9 +96,31 @@ public class ContactController {
     };
 
     // 연락처 그룹 필터링
+    @ApiOperation(
+            value = "연락처 그룹 필터링 (페이징)",
+            notes = "연락처 그룹 필터링 API - 페이징 처리"
+    )
+    @ApiResponses({
+            @ApiResponse(code = 1000, message = "요청에 성공하였습니다.")
+    })
     @GetMapping("/byGroup/{currentPage}")
     @NoIntercept
     public Page<ContactDTO> filterByGroup(@PathVariable int currentPage,@RequestParam long groupId){
         return contactService.filterContactByGroup(groupId,currentPage);
+    }
+
+    // 연락처 찾기
+    @ApiOperation(
+            value = "연락처 찾기",
+            notes = "연락처 찾기 API"
+    )
+    @ApiResponses({
+            @ApiResponse(code = 1000, message = "요청에 성공하였습니다.")
+    })
+    @GetMapping("/{contactId}")
+    @NoIntercept
+    public BaseResponse<ContactDTO> find(@PathVariable long contactId){
+        ContactDTO contactDTO = contactService.findContactById(contactId);
+        return new BaseResponse<>(contactDTO);
     }
 }

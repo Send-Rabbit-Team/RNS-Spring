@@ -29,6 +29,18 @@ public class ContactService {
     private final ContactGroupRepository contactGroupRepository;
     private final MemberRepository memberRepository;
 
+
+    // 연락처 찾기
+    @Transactional(readOnly = false)
+    public ContactDTO findContactById(long contactId){
+        Contact contact = contactRepository.findById(contactId)
+                .orElseThrow(()-> new BaseException(NOT_EXIST_CONTACT_NUMBER));
+
+        return ContactDTO.toDto(contact);
+    }
+
+
+    // 연락처 추가
     @Transactional(readOnly = false)
     public PostContactRes saveContact(PostContactReq req, long memberId){
         long groupId = req.getContactGroupId();
@@ -52,6 +64,8 @@ public class ContactService {
 
     }
 
+
+    // 연락처 수정
     @Transactional(readOnly = false)
     public PatchContactRes editContact(PatchContactReq patchContactReq, long memberId){
         // 존재하는 연락처인지 확인
