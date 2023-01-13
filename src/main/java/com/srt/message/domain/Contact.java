@@ -42,14 +42,14 @@ public class Contact extends BaseEntity {
     private void changePhoneNumber(String phoneNumber){this.phoneNumber = phoneNumber;}
     private void changeMemo(String memo){this.memo = memo;}
 
-    public Contact editContact(PatchContactReq contactDto, ContactGroup contactGroup){ // dto 수정
+    public void editContact(PatchContactReq contactDto, ContactGroup contactGroup){ // dto 수정
         if(contactDto.getContactGroupId()!=null)
             this.changeContactGroup(contactGroup);
+
         if(contactDto.getPhoneNumber()!=null)
             this.changePhoneNumber(contactDto.getPhoneNumber());
+
         if(contactDto.getMemo()!=null)
             this.changeMemo(contactDto.getMemo());
-
-        return this;
     }
 }

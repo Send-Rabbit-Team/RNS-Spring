@@ -1,7 +1,6 @@
 package com.srt.message.controller;
 
 import com.srt.message.config.response.BaseResponse;
-import com.srt.message.domain.Contact;
 import com.srt.message.dto.contact.ContactDTO;
 import com.srt.message.dto.contact.patch.PatchContactReq;
 import com.srt.message.dto.contact.patch.PatchContactRes;
@@ -16,13 +15,9 @@ import io.swagger.annotations.ApiResponses;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.List;
 
 @Log4j2
 @RestController
@@ -58,6 +53,7 @@ public class ContactController {
             @ApiResponse(code = 2016, message = "해당 사용자의 데이터가 아닙니다.")
     })
     @PatchMapping("/edit")
+    @NoIntercept
     public BaseResponse<PatchContactRes> editContact(@RequestBody PatchContactReq patchContactReq, HttpServletRequest request){
         PatchContactRes patchContactRes = contactService.editContact(patchContactReq, JwtInfo.getMemberId(request)); // 수정
 
@@ -76,11 +72,13 @@ public class ContactController {
             @ApiResponse(code = 2012, message = "이미 등록된 연락처입니다."),
     })
     @PatchMapping("/delete/{contactId}")
+    @NoIntercept
     public BaseResponse<String> deleteContact(@PathVariable long contactId, HttpServletRequest request){
         contactService.deleteContact(contactId, JwtInfo.getMemberId(request));
 
-        return new BaseResponse<>("성공적으로 삭제 처리 되었습니다.");
+        return new BaseResponse<>("연락처가 정상적으로 삭제 되었습니다.");
     }
+
 
     // 연락처 검색
     @ApiOperation(
@@ -91,7 +89,14 @@ public class ContactController {
             @ApiResponse(code = 1000, message = "요청에 성공하였습니다.")
     })
     @GetMapping("/search/{currentPage}")
-    public BaseResponse<Page<ContactDTO>> search(@PathVariable int currentPage, @RequestParam String phoneNumber){
-        return new BaseResponse<>(contactService.search(phoneNumber,currentPage));
+    public Page<ContactDTO> search(@PathVariable int currentPage, @RequestParam String phoneNumber){
+        return contactService.searchContact(phoneNumber,currentPage);
     };
+
+    // 연락처 그룹 필터링
+    @GetMapping("/byGroup/{currentPage}")
+    @NoIntercept
+    public Page<ContactDTO> filterByGroup(@PathVariable int currentPage,@RequestParam long groupId){
+        return contactService.filterContactByGroup(groupId,currentPage);
+    }
 }

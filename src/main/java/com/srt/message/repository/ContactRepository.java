@@ -13,4 +13,7 @@ public interface ContactRepository extends JpaRepository<Contact, Long> {
 
     // 전화번호로 검색
     Page<Contact> findByPhoneNumberContaining(String phoneNumber, Pageable pageable);
+
+    // 그룹으로 힐터링
+    Page<Contact> findByContactGroupId(Long groupId, Pageable pageable);
 }
