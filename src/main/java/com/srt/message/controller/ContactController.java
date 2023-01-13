@@ -103,10 +103,15 @@ public class ContactController {
     @ApiResponses({
             @ApiResponse(code = 1000, message = "요청에 성공하였습니다.")
     })
-    // memberId 별 조회 필요!
     @GetMapping("/byGroup/{currentPage}")
     @NoIntercept
     public BaseResponse<PageResult<ContactDTO, Contact>> filterByGroup(@PathVariable int currentPage,@RequestParam long groupId){
         return new BaseResponse<>(contactService.filterContactByGroup(groupId,currentPage));
+    }
+
+    @GetMapping("/{contactId}")
+    @NoIntercept
+    public BaseResponse<ContactDTO> find(@PathVariable int contactId){
+        return new BaseResponse<>(contactService.findContactById(contactId));
     }
 }
