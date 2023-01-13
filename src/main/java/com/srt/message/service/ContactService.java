@@ -1,14 +1,17 @@
 package com.srt.message.service;
 
 import com.srt.message.config.exception.BaseException;
+import com.srt.message.config.page.PageResult;
 import com.srt.message.domain.Contact;
 import com.srt.message.domain.ContactGroup;
 import com.srt.message.domain.Member;
+import com.srt.message.domain.SenderNumber;
 import com.srt.message.dto.contact.ContactDTO;
 import com.srt.message.dto.contact.patch.PatchContactReq;
 import com.srt.message.dto.contact.patch.PatchContactRes;
 import com.srt.message.dto.contact.post.PostContactReq;
 import com.srt.message.dto.contact.post.PostContactRes;
+import com.srt.message.dto.sender_number.get.GetSenderNumberRes;
 import com.srt.message.repository.ContactRepository;
 import com.srt.message.repository.ContactGroupRepository;
 import com.srt.message.repository.MemberRepository;
@@ -18,6 +21,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.function.Function;
 
 import static com.srt.message.config.response.BaseResponseStatus.*;
 
@@ -95,21 +100,19 @@ public class ContactService {
     }
 
     // 연락처 검색
-    public Page<ContactDTO> searchContact(String phoneNumber, int currentPage) {
-        PageRequest pageRequest = PageRequest.of(currentPage, 10, Sort.by("id").descending());
-        Page<Contact> contactList = contactRepository.findByPhoneNumberContaining(phoneNumber, pageRequest);
-        Page<ContactDTO> contactListDTO = contactList.map(m-> ContactDTO.toDto(m));
-
-        return contactListDTO;
+    public PageResult<ContactDTO, Contact> searchContact(String phoneNumber, int currentPage) {
+        PageRequest pageRequest = PageRequest.of(currentPage-1, 5, Sort.by("id").descending());
+        Page<Contact> contactPage = contactRepository.findByPhoneNumberContaining(phoneNumber, pageRequest);
+        Function<Contact, ContactDTO> fn = (contact -> ContactDTO.toDto(contact));
+        return new PageResult<>(contactPage, fn);
     }
 
     // 연락처 그룹으로 필터링
-    public Page<ContactDTO> filterContactByGroup(long groupId, int currentPage){
-        PageRequest pageRequest = PageRequest.of(currentPage, 10, Sort.by("id").descending());
-        Page<Contact> contactList = contactRepository.findByContactGroupId(groupId, pageRequest);
-        Page<ContactDTO> contactListDTO = contactList.map(m->ContactDTO.toDto(m));
-
-        return contactListDTO;
+    public PageResult<ContactDTO, Contact> filterContactByGroup(long groupId, int currentPage){
+        PageRequest pageRequest = PageRequest.of(currentPage-1, 5, Sort.by("id").descending());
+        Page<Contact> contactPage = contactRepository.findByContactGroupId(groupId, pageRequest);
+        Function<Contact, ContactDTO> fn = (contact -> ContactDTO.toDto(contact));
+        return new PageResult<>(contactPage, fn);
     };
 
     // 편의 메서드

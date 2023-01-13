@@ -34,8 +34,11 @@ public class SenderNumberController {
             @ApiResponse(code = 2007, message = "유효하지 않은 인증번호입니다.")
     })
     @PostMapping("/register")
-    public BaseResponse<RegisterSenderNumberRes> registerSenderNumber(@RequestBody RegisterSenderNumberReq registerSenderNumberReq){
-        RegisterSenderNumberRes registerSenderNumberRes = senderNumberService.registerSenderNumber(registerSenderNumberReq);
+    public BaseResponse<RegisterSenderNumberRes> registerSenderNumber(
+            HttpServletRequest request,
+            @RequestBody RegisterSenderNumberReq registerSenderNumberReq){
+        Long memberId = JwtInfo.getMemberId(request);
+        RegisterSenderNumberRes registerSenderNumberRes = senderNumberService.registerSenderNumber(memberId, registerSenderNumberReq);
 
         log.info("SenderNumber-register: ", registerSenderNumberRes.getPhoneNumber());
 
