@@ -5,11 +5,13 @@ import com.srt.message.config.page.PageResult;
 import com.srt.message.config.response.BaseResponse;
 import com.srt.message.config.status.AuthPhoneNumberStatus;
 import com.srt.message.config.status.BaseStatus;
+import com.srt.message.domain.Member;
 import com.srt.message.domain.SenderNumber;
 import com.srt.message.domain.redis.AuthPhoneNumber;
 import com.srt.message.dto.sender_number.get.GetSenderNumberRes;
 import com.srt.message.dto.sender_number.post.RegisterSenderNumberReq;
 import com.srt.message.dto.sender_number.post.RegisterSenderNumberRes;
+import com.srt.message.repository.MemberRepository;
 import com.srt.message.repository.SenderNumberRepository;
 import com.srt.message.repository.redis.AuthPhoneNumberRedisRepository;
 import lombok.RequiredArgsConstructor;
@@ -30,6 +32,7 @@ public class SenderNumberService {
     private final SenderNumberRepository senderNumberRepository;
 
     private final AuthPhoneNumberRedisRepository authPhoneNumberRedisRepository;
+    private final MemberRepository memberRepository;
 
     // audit 저장 확인 용 테스트 저장
     // 나중에 무조건 지워야 함
@@ -46,7 +49,7 @@ public class SenderNumberService {
 
     // 발신자 등록
     @Transactional(readOnly = false)
-    public RegisterSenderNumberRes registerSenderNumber(RegisterSenderNumberReq registerSenderNumberReq){
+    public RegisterSenderNumberRes registerSenderNumber(Long memberId, RegisterSenderNumberReq registerSenderNumberReq){
         String phoneNumber = registerSenderNumberReq.getPhoneNumber();
 
         if(senderNumberRepository.findByPhoneNumberAndStatus(phoneNumber, BaseStatus.ACTIVE).isPresent())
@@ -59,7 +62,9 @@ public class SenderNumberService {
         if(authPhoneNumber.getAuthPhoneNumberStatus() != AuthPhoneNumberStatus.CONFIRM)
             throw new BaseException(NOT_AUTH_PHONE_NUMBER);
 
-        SenderNumber senderNumber = RegisterSenderNumberReq.toEntity(registerSenderNumberReq);
+        Member member = memberRepository.findById(memberId).orElseThrow(() -> new BaseException(NOT_EXIST_MEMBER));
+
+        SenderNumber senderNumber = RegisterSenderNumberReq.toEntity(registerSenderNumberReq, member);
 
         senderNumberRepository.save(senderNumber);
 
@@ -68,9 +73,8 @@ public class SenderNumberService {
 
     // 발신자 조회
     public PageResult<GetSenderNumberRes, SenderNumber> getMemberSenderNumber(long memberId, int page) {
-        PageRequest pageRequest = PageRequest.of(page-1, 1, Sort.by("id").descending());
-        Page<SenderNumber> senderNumberPage = senderNumberRepository.findByMemberIdAndStatus(memberId, BaseStatus.ACTIVE, pageRequest)
-                .orElseThrow(() -> new BaseException(NOT_EXIST_PHONE_NUMBER));
+        PageRequest pageRequest = PageRequest.of(page-1, 5, Sort.by("id").descending());
+        Page<SenderNumber> senderNumberPage = senderNumberRepository.findByMemberIdAndStatus(memberId, BaseStatus.ACTIVE, pageRequest);
         Function<SenderNumber, GetSenderNumberRes> fn = (senderNumber -> GetSenderNumberRes.toDto(senderNumber));
         return new PageResult<>(senderNumberPage, fn);
 //        return senderNumberPage.map(senderNumber -> RegisterSenderNumberRes.toDto(senderNumber));
