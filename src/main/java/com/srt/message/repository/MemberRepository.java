@@ -9,6 +9,5 @@ import java.util.Optional;
 public interface MemberRepository extends JpaRepository<Member, Long> {
     Optional<Member> findByEmailIgnoreCase(String email);
 
-
     Optional<Member> findByEmailIgnoreCaseAndLoginType(String email, LoginType loginType);
 }
