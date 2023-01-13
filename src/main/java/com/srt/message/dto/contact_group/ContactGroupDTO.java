@@ -10,11 +10,11 @@ import lombok.*;
 @NoArgsConstructor
 @Builder
 public class ContactGroupDTO {
-    long id;
+    private long id;
 
-    long memberId;
+    private long memberId;
 
-    String name;
+    private String name;
 
     public static ContactGroupDTO toDTO(ContactGroup contactGroup, Member member){
         return ContactGroupDTO.builder()

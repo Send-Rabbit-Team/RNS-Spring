@@ -24,13 +24,9 @@ import static com.srt.message.config.response.BaseResponseStatus.NOT_EXIST_CONTA
 @RequiredArgsConstructor
 public class ContactGroupService {
 
-    private ContactGroupRepository contactGroupRepository;
+    private final ContactGroupRepository contactGroupRepository;
 
-    private ContactGroupDTO contactGroupDTO;
-
-    private MemberRepository memberRepository;
-
-    private ContactRepository contactRepository;
+    private final MemberRepository memberRepository;
 
 
     // 그룹 저장
@@ -61,9 +57,9 @@ public class ContactGroupService {
         checkMatchMember(contactGroup, memberId);
 
         // 연락처 수정
-        ContactGroup editedContactGroup = contactGroup.editContactGroup(patchContactGroupReq);
-        contactGroupRepository.save(editedContactGroup);
-        return PatchContactGroupRes.toDto(editedContactGroup);
+        contactGroup.changeName(patchContactGroupReq.getName());
+
+        return PatchContactGroupRes.toDto(contactGroup);
     }
 
     // 그룹 삭제
@@ -87,5 +83,4 @@ public class ContactGroupService {
                 .orElseThrow(()-> new BaseException(NOT_EXIST_GROUP));
         return contactGroup;
     }
-
 }

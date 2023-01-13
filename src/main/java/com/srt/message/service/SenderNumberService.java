@@ -2,7 +2,6 @@ package com.srt.message.service;
 
 import com.srt.message.config.exception.BaseException;
 import com.srt.message.config.page.PageResult;
-import com.srt.message.config.response.BaseResponse;
 import com.srt.message.config.status.AuthPhoneNumberStatus;
 import com.srt.message.config.status.BaseStatus;
 import com.srt.message.domain.Member;
@@ -34,19 +33,6 @@ public class SenderNumberService {
     private final AuthPhoneNumberRedisRepository authPhoneNumberRedisRepository;
     private final MemberRepository memberRepository;
 
-    // audit 저장 확인 용 테스트 저장
-    // 나중에 무조건 지워야 함
-    @Transactional(readOnly = false)
-    public BaseResponse<String> testSave(){
-        SenderNumber senderNumber = SenderNumber.builder()
-                .phoneNumber("01012341234")
-                .build();
-
-        senderNumberRepository.save(senderNumber);
-
-        return new BaseResponse<>("OK");
-    }
-
     // 발신자 등록
     @Transactional(readOnly = false)
     public RegisterSenderNumberRes registerSenderNumber(Long memberId, RegisterSenderNumberReq registerSenderNumberReq){
@@ -77,7 +63,6 @@ public class SenderNumberService {
         Page<SenderNumber> senderNumberPage = senderNumberRepository.findByMemberIdAndStatus(memberId, BaseStatus.ACTIVE, pageRequest);
         Function<SenderNumber, GetSenderNumberRes> fn = (senderNumber -> GetSenderNumberRes.toDto(senderNumber));
         return new PageResult<>(senderNumberPage, fn);
-//        return senderNumberPage.map(senderNumber -> RegisterSenderNumberRes.toDto(senderNumber));
     }
 
     // 발신자 삭제
@@ -86,12 +71,10 @@ public class SenderNumberService {
         SenderNumber senderNumber = senderNumberRepository.findByIdAndStatus(senderNumberId, BaseStatus.ACTIVE)
                 .orElseThrow(() -> new BaseException(NOT_EXIST_PHONE_NUMBER));
 
-        if (senderNumber.getMember().getId() == memberId) {
-            senderNumber.changeStatusInActive();
-            senderNumberRepository.save(senderNumber);
-        } else {
+        if (senderNumber.getMember().getId() != memberId)
             throw new BaseException(NOT_AUTH_MEMBER);
-        }
 
+        senderNumber.changeStatusInActive();
+        senderNumberRepository.save(senderNumber);
     }
 }

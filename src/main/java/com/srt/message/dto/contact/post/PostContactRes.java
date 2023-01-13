@@ -20,11 +20,6 @@ public class PostContactRes {
     private long contactId;
 
     @ApiModelProperty(
-            example = "1"
-    )
-    private Member member;
-
-    @ApiModelProperty(
             example = "10"
     )
     private ContactGroup contactGroup;
@@ -43,7 +38,6 @@ public class PostContactRes {
         PostContactRes postContactRes = PostContactRes.builder()
                 .contactId(contact.getId())
                 .contactGroup(contactGroup)
-                .member(contact.getMember())
                 .phoneNumber(contact.getPhoneNumber())
                 .memo(contact.getMemo())
                 .build();

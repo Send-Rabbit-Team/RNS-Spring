@@ -26,19 +26,12 @@ public class ContactGroup extends BaseEntity {
 
     private String name;
 
-    private void changeName(String name){this.name = name;}
+    public void changeName(String name){this.name = name;}
 
     public static ContactGroup toEntity(PostContactGroupReq contactGroupDTO, Member member){
         return ContactGroup.builder()
                 .member(member)
                 .name(contactGroupDTO.getName())
                 .build();
-    }
-
-    public ContactGroup editContactGroup(PatchContactGroupReq contactGroupDto){ // dto 수정
-        if(contactGroupDto.getName()!=null)
-            this.changeName(contactGroupDto.getName());
-
-        return this;
     }
 }

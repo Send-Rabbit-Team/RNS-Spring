@@ -11,7 +11,7 @@ import lombok.*;
 @Builder
 public class PostContactGroupReq {
     @ApiModelProperty(
-            example = "남성 회원 그룹"
+            example = "카카오"
     )
     private String name;
 

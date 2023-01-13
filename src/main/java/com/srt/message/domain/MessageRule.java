@@ -27,5 +27,5 @@ public class MessageRule extends BaseEntity {
     @JoinColumn(name = "broker_id")
     private Broker broker;
 
-    private double brokerRate;
+    private int brokerRate;
 }

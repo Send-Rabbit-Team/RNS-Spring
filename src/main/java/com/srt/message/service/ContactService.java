@@ -15,7 +15,6 @@ import com.srt.message.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,12 +25,9 @@ import static com.srt.message.config.response.BaseResponseStatus.*;
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class ContactService {
-
-        private final ContactRepository contactRepository;
-
-        private final ContactGroupRepository contactGroupRepository;
-
-        private final MemberRepository memberRepository;
+    private final ContactRepository contactRepository;
+    private final ContactGroupRepository contactGroupRepository;
+    private final MemberRepository memberRepository;
 
     @Transactional(readOnly = false)
     public PostContactRes saveContact(PostContactReq req, long memberId){
@@ -48,8 +44,6 @@ public class ContactService {
         // 그룹 존재 여부
         ContactGroup contactGroup = contactGroupRepository.findById(groupId)
                 .orElseThrow(() -> new BaseException(NOT_EXIST_GROUP));
-
-
 
         Contact contact = PostContactReq.toEntity(req, contactGroup,member);
         contactRepository.save(contact);
@@ -71,10 +65,9 @@ public class ContactService {
             contactGroup = contactGroupRepository.findById(contactGroupId).get();
 
         // 연락처 수정
-        Contact editedContact = contact.editContact(patchContactReq, contactGroup);
-        contactRepository.save(editedContact);
+        contact.editContact(patchContactReq, contactGroup);
 
-        return PatchContactRes.toDto(editedContact);
+        return PatchContactRes.toDto(contact);
     }
 
     @Transactional(readOnly = false)
@@ -88,7 +81,6 @@ public class ContactService {
     }
 
     // 연락처 검색
-    @Transactional
     public Page<ContactDTO> searchContact(String phoneNumber, int currentPage) {
         PageRequest pageRequest = PageRequest.of(currentPage, 10, Sort.by("id").descending());
         Page<Contact> contactList = contactRepository.findByPhoneNumberContaining(phoneNumber, pageRequest);
@@ -98,7 +90,6 @@ public class ContactService {
     }
 
     // 연락처 그룹으로 필터링
-    @Transactional
     public Page<ContactDTO> filterContactByGroup(long groupId, int currentPage){
         PageRequest pageRequest = PageRequest.of(currentPage, 10, Sort.by("id").descending());
         Page<Contact> contactList = contactRepository.findByContactGroupId(groupId, pageRequest);
@@ -106,13 +97,6 @@ public class ContactService {
 
         return contactListDTO;
     };
-
-
-    // 모든 연락처 검색
-    @Transactional
-    public Page<Contact> getContactList(Pageable pageable) {
-        return contactRepository.findAll(pageable);
-    }
 
     // 편의 메서드
     public void checkMatchMember(Contact contact, long memberId){
