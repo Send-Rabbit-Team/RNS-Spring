@@ -18,7 +18,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
-
+import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 
 @Log4j2
@@ -55,7 +55,6 @@ public class ContactController {
             @ApiResponse(code = 2016, message = "해당 사용자의 데이터가 아닙니다.")
     })
     @PatchMapping("/edit")
-    @NoIntercept
     public BaseResponse<PatchContactRes> editContact(@RequestBody PatchContactReq patchContactReq, HttpServletRequest request){
         PatchContactRes patchContactRes = contactService.editContact(patchContactReq, JwtInfo.getMemberId(request)); // 수정
 
@@ -74,16 +73,13 @@ public class ContactController {
             @ApiResponse(code = 2012, message = "이미 등록된 연락처입니다."),
     })
     @PatchMapping("/delete/{contactId}")
-    @NoIntercept
     public BaseResponse<String> deleteContact(@PathVariable long contactId, HttpServletRequest request){
         contactService.deleteContact(contactId, JwtInfo.getMemberId(request));
 
         return new BaseResponse<>("연락처가 정상적으로 삭제 되었습니다.");
     }
-
-
+    
     // 연락처 검색
-    // memberId 별 조회 필요!
     @ApiOperation(
             value = "연락처 검색 (페이징)",
             notes = "연락처 검색 API - 페이징 처리"
@@ -92,15 +88,25 @@ public class ContactController {
             @ApiResponse(code = 1000, message = "요청에 성공하였습니다.")
     })
     @GetMapping("/search/{currentPage}")
-    public BaseResponse<PageResult<ContactDTO, Contact>> search(@PathVariable int currentPage, @RequestParam String phoneNumber){
-        return new BaseResponse<>(contactService.searchContact(phoneNumber,currentPage));
+    public BaseResponse<PageResult<ContactDTO, Contact>> search(@PathVariable int currentPage, @RequestParam String phoneNumber, HttpServletRequest request){
+        return new BaseResponse<>(contactService.searchContact(phoneNumber,currentPage,JwtInfo.getMemberId(request)));
     };
 
     // 연락처 그룹 필터링
-    // memberId 별 조회 필요!
+    @ApiOperation(
+            value = "연락처 그룹 필터링 (페이징)",
+            notes = "연락처 그룹 필터링 API - 페이징 처리"
+    )
+    @ApiResponses({
+            @ApiResponse(code = 1000, message = "요청에 성공하였습니다.")
+    })
     @GetMapping("/byGroup/{currentPage}")
-    @NoIntercept
-    public BaseResponse<PageResult<ContactDTO, Contact>> filterByGroup(@PathVariable int currentPage,@RequestParam long groupId){
-        return new BaseResponse<>(contactService.filterContactByGroup(groupId,currentPage));
+    public BaseResponse<PageResult<ContactDTO, Contact>> filterByGroup(@PathVariable int currentPage,@RequestParam long groupId, HttpServletRequest request){
+        return new BaseResponse<>(contactService.filterContactByGroup(groupId,currentPage,JwtInfo.getMemberId(request)));
+    }
+
+    @GetMapping("/{contactId}")
+    public BaseResponse<ContactDTO> find(@PathVariable int contactId){
+        return new BaseResponse<>(contactService.findContactById(contactId));
     }
 }
