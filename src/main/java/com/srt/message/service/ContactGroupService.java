@@ -15,6 +15,7 @@ import com.srt.message.dto.contact_group.patch.PatchContactGroupRes;
 import com.srt.message.dto.contact_group.post.PostContactGroupReq;
 import com.srt.message.dto.contact_group.post.PostContactGroupRes;
 import com.srt.message.repository.ContactGroupRepository;
+import com.srt.message.repository.ContactRepository;
 import com.srt.message.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -115,7 +116,7 @@ public class ContactGroupService {
 
     // 그룹 조회
     public PageResult<GetContactGroupRes, ContactGroup> getMemberContactGroup(long memberId, int page) {
-        PageRequest pageRequest = PageRequest.of(page-1, 5, Sort.by("id").descending());
+        PageRequest pageRequest = PageRequest.of(page - 1, 5, Sort.by("id").descending());
 
         // 그룹 조회
         Page<ContactGroup> contactGroupPage = contactGroupRepository.findByMemberIdAndStatus(memberId, BaseStatus.ACTIVE, pageRequest);
@@ -135,6 +136,7 @@ public class ContactGroupService {
             return GetContactGroupRes.toDto(contactGroup, contactDTOList);
         };
         return new PageResult<>(contactGroupPage, fn);
+    }
 
     public Member getExistMember(long memberId){
         Member member = memberRepository.findById(memberId)
