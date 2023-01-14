@@ -17,5 +17,10 @@ public interface ContactRepository extends JpaRepository<Contact, Long> {
     Page<Contact> findByPhoneNumberContainingAndMemberIdAndStatus(String phoneNumber, Pageable pageable,long memberId,BaseStatus status);
 
     // 그룹으로 힐터링
+    Page<Contact> findByContactGroupId(Long groupId, Pageable pageable);
+
+    // 그룹으로 연락처 조회 (페이지네이션 없음)
+    Optional<List<Contact>> findByContactGroupIdAndStatus(Long groupId, BaseStatus status);
     Page<Contact> findByContactGroupIdAndMemberIdAndStatus(Long groupId,Long memberId, Pageable pageable, BaseStatus status);
+
 }
