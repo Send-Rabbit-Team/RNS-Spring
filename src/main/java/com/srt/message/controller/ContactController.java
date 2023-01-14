@@ -18,7 +18,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
-
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 
@@ -89,8 +88,8 @@ public class ContactController {
             @ApiResponse(code = 1000, message = "요청에 성공하였습니다.")
     })
     @GetMapping("/search/{currentPage}")
-    public BaseResponse<PageResult<ContactDTO, Contact>> search(@PathVariable int currentPage, @RequestParam String phoneNumber){
-        return new BaseResponse<>(contactService.searchContact(phoneNumber,currentPage));
+    public BaseResponse<PageResult<ContactDTO, Contact>> search(@PathVariable int currentPage, @RequestParam String phoneNumber, HttpServletRequest request){
+        return new BaseResponse<>(contactService.searchContact(phoneNumber,currentPage,JwtInfo.getMemberId(request)));
     };
 
     // 연락처 그룹 필터링
@@ -109,11 +108,5 @@ public class ContactController {
     @GetMapping("/{contactId}")
     public BaseResponse<ContactDTO> find(@PathVariable int contactId){
         return new BaseResponse<>(contactService.findContactById(contactId));
-    }
-
-
-    @GetMapping("/test")
-    public BaseResponse<Long> test(HttpServletRequest request){
-        return new BaseResponse<>(JwtInfo.getMemberId(request));
     }
 }

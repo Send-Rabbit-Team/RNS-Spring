@@ -11,6 +11,7 @@ import com.srt.message.dto.contact.patch.PatchContactReq;
 import com.srt.message.dto.contact.patch.PatchContactRes;
 import com.srt.message.dto.contact.post.PostContactReq;
 import com.srt.message.dto.contact.post.PostContactRes;
+import com.srt.message.dto.jwt.JwtInfo;
 import com.srt.message.repository.ContactRepository;
 import com.srt.message.repository.ContactGroupRepository;
 import com.srt.message.repository.MemberRepository;
@@ -21,6 +22,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.function.Function;
 
 import static com.srt.message.config.response.BaseResponseStatus.*;
@@ -99,9 +101,9 @@ public class ContactService {
     }
 
     // 연락처 검색
-    public PageResult<ContactDTO, Contact> searchContact(String phoneNumber, int currentPage) {
+    public PageResult<ContactDTO, Contact> searchContact(String phoneNumber, int currentPage, long memberId) {
         PageRequest pageRequest = PageRequest.of(currentPage-1, 5, Sort.by("id").descending());
-        Page<Contact> contactPage = contactRepository.findByPhoneNumberAndStatusContaining(phoneNumber, pageRequest,BaseStatus.ACTIVE);
+        Page<Contact> contactPage = contactRepository.findByPhoneNumberContainingAndMemberIdAndStatus(phoneNumber, pageRequest, memberId,BaseStatus.ACTIVE);
         Function<Contact, ContactDTO> fn = (contact -> ContactDTO.toDto(contact));
         return new PageResult<>(contactPage, fn);
     }
