@@ -15,6 +15,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 import static com.srt.message.config.response.BaseResponseStatus.*;
 
 @Service
@@ -25,6 +28,14 @@ public class ContactGroupService {
     private final ContactGroupRepository contactGroupRepository;
 
     private final MemberRepository memberRepository;
+
+    @Transactional(readOnly = false)
+    public List<ContactGroupDTO>  getAllContactGroup(long memberId){
+        Member member = getExistMember(memberId);
+
+        return contactGroupRepository.findByMemberId(memberId).orElseThrow(()->new BaseException(NOT_EXIST_MEMBER))
+                .stream().map(m-> ContactGroupDTO.toDTO(m,member)) .collect(Collectors.toList());
+    }
 
     //그룹 찾기
     @Transactional(readOnly = false)
@@ -45,8 +56,7 @@ public class ContactGroupService {
             throw new BaseException(ALREADY_EXIST_GROUP);
 
         // 멤버 존재 여부
-        Member member = memberRepository.findById(memberId)
-                .orElseThrow(()-> new BaseException(NOT_EXIST_MEMBER));
+        Member member = getExistMember(memberId);
 
         ContactGroup contactGroup = ContactGroup.toEntity(req, member);
         contactGroupRepository.save(contactGroup);
@@ -88,5 +98,11 @@ public class ContactGroupService {
         ContactGroup contactGroup = contactGroupRepository.findById(contactGroupId)
                 .orElseThrow(()-> new BaseException(NOT_EXIST_GROUP));
         return contactGroup;
+    }
+
+    public Member getExistMember(long memberId){
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(()-> new BaseException(NOT_EXIST_MEMBER));
+        return member;
     }
 }

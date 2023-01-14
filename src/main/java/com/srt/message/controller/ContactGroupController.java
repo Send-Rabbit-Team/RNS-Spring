@@ -20,6 +20,7 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.List;
 
 @Log4j2
 @RestController
@@ -31,16 +32,13 @@ public class ContactGroupController {
 
     // 그룹 저장
     @PostMapping("/save")
-    @NoIntercept
     public BaseResponse<PostContactGroupRes> saveGroup(@RequestBody PostContactGroupReq postContactGroupReq, HttpServletRequest request) {
-        PostContactGroupRes postContactGroupRes = contactGroupService.saveContactGroup(postContactGroupReq, JwtInfo.getMemberId(request));
 
-        return new BaseResponse<>(postContactGroupRes);
+        return new BaseResponse<>(contactGroupService.saveContactGroup(postContactGroupReq, JwtInfo.getMemberId(request)));
     }
 
     // 그룹 수정
     @PostMapping("/edit")
-    @NoIntercept
     public BaseResponse<PatchContactGroupRes> editGroup(@RequestBody PatchContactGroupReq patchContactGroupReq, HttpServletRequest request) {
         PatchContactGroupRes patchContactGroupRes = contactGroupService.editContactGroup(patchContactGroupReq, JwtInfo.getMemberId(request)); // 수정
 
@@ -49,7 +47,6 @@ public class ContactGroupController {
 
     // 그룹 삭제
     @PostMapping("/delete/{groupId}")
-    @NoIntercept
     public BaseResponse<String> deleteGroup(@PathVariable long contactGroupId, HttpServletRequest request) {
         contactGroupService.deleteContactGroup(contactGroupId, JwtInfo.getMemberId(request));
 
@@ -65,9 +62,21 @@ public class ContactGroupController {
             @ApiResponse(code = 1000, message = "요청에 성공하였습니다.")
     })
     @GetMapping("/{groupId}")
-    @NoIntercept
     public BaseResponse<ContactGroupDTO> find(@PathVariable long groupId) {
-        ContactGroupDTO contactGroupDTO = contactGroupService.findContactGroupById(groupId);
-        return new BaseResponse<>(contactGroupDTO);
+
+        return new BaseResponse<>(contactGroupService.findContactGroupById(groupId));
     }
+
+    @ApiOperation(
+            value= "그룹 목록 불러오기",
+            notes = "그룹 목록 불러오기 API"
+    )
+    @ApiResponses({
+            @ApiResponse(code = 1000, message = "요청에 성공하였습니다.")
+    })
+    @GetMapping("/getAll")
+    public BaseResponse<List<ContactGroupDTO>> getAll(HttpServletRequest request){
+        return new BaseResponse<>(contactGroupService.getAllContactGroup(JwtInfo.getMemberId((request))));
+    }
+
 }
