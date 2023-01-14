@@ -41,7 +41,7 @@ public class ContactGroupController {
     }
 
     // 그룹 수정
-    @PostMapping("/edit")
+    @PatchMapping("/edit")
     public BaseResponse<PatchContactGroupRes> editGroup(@RequestBody PatchContactGroupReq patchContactGroupReq, HttpServletRequest request) {
         PatchContactGroupRes patchContactGroupRes = contactGroupService.editContactGroup(patchContactGroupReq, JwtInfo.getMemberId(request)); // 수정
 
@@ -49,8 +49,8 @@ public class ContactGroupController {
     }
 
     // 그룹 삭제
-    @PostMapping("/delete/{groupId}")
-    public BaseResponse<String> deleteGroup(@PathVariable long contactGroupId, HttpServletRequest request) {
+    @PatchMapping("/delete/{groupId}")
+    public BaseResponse<String> deleteGroup(@PathVariable("groupId") long contactGroupId, HttpServletRequest request) {
         contactGroupService.deleteContactGroup(contactGroupId, JwtInfo.getMemberId(request));
 
         return new BaseResponse<>("그룹이 정상적으로 삭제 되었습니다.");
