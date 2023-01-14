@@ -37,7 +37,7 @@ public class ContactService {
     // 연락처 찾기
     @Transactional(readOnly = false)
     public ContactDTO findContactById(long contactId){
-        Contact contact = contactRepository.findById(contactId)
+        Contact contact = contactRepository.findByIdAndStatus(contactId,BaseStatus.ACTIVE)
                 .orElseThrow(()-> new BaseException(NOT_EXIST_CONTACT_NUMBER));
 
         return ContactDTO.toDto(contact);
@@ -91,11 +91,11 @@ public class ContactService {
     @Transactional(readOnly = false)
     public void deleteContact(long contactId, long memberId){
         Contact contact = getExistContact(contactId);
-
         checkMatchMember(contact, memberId);
 
         // 연락처 삭제
         contact.changeStatusInActive();
+        contactRepository.save(contact);
     }
 
     // 연락처 검색
@@ -121,7 +121,7 @@ public class ContactService {
     }
 
     public Contact getExistContact(long contactId){
-        Contact contact = contactRepository.findById(contactId)
+        Contact contact = contactRepository.findByIdAndStatus(contactId,BaseStatus.ACTIVE)
                 .orElseThrow(()-> new BaseException(NOT_EXIST_CONTACT_NUMBER));
         return contact;
     }

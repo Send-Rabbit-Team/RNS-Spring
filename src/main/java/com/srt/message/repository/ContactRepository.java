@@ -9,6 +9,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.Optional;
 
 public interface ContactRepository extends JpaRepository<Contact, Long> {
+    Optional<Contact> findByIdAndStatus(long contactId, BaseStatus status);
+
     Optional<Contact> findByPhoneNumberAndStatus(String phoneNumber, BaseStatus status);
 
     // 전화번호로 검색

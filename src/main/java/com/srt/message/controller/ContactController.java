@@ -19,6 +19,7 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 
 @Log4j2
@@ -55,7 +56,6 @@ public class ContactController {
             @ApiResponse(code = 2016, message = "해당 사용자의 데이터가 아닙니다.")
     })
     @PatchMapping("/edit")
-    @NoIntercept
     public BaseResponse<PatchContactRes> editContact(@RequestBody PatchContactReq patchContactReq, HttpServletRequest request){
         PatchContactRes patchContactRes = contactService.editContact(patchContactReq, JwtInfo.getMemberId(request)); // 수정
 
@@ -74,7 +74,6 @@ public class ContactController {
             @ApiResponse(code = 2012, message = "이미 등록된 연락처입니다."),
     })
     @PatchMapping("/delete/{contactId}")
-    @NoIntercept
     public BaseResponse<String> deleteContact(@PathVariable long contactId, HttpServletRequest request){
         contactService.deleteContact(contactId, JwtInfo.getMemberId(request));
 
@@ -103,14 +102,18 @@ public class ContactController {
             @ApiResponse(code = 1000, message = "요청에 성공하였습니다.")
     })
     @GetMapping("/byGroup/{currentPage}")
-    @NoIntercept
     public BaseResponse<PageResult<ContactDTO, Contact>> filterByGroup(@PathVariable int currentPage,@RequestParam long groupId){
         return new BaseResponse<>(contactService.filterContactByGroup(groupId,currentPage));
     }
 
     @GetMapping("/{contactId}")
-    @NoIntercept
     public BaseResponse<ContactDTO> find(@PathVariable int contactId){
         return new BaseResponse<>(contactService.findContactById(contactId));
+    }
+
+
+    @GetMapping("/test")
+    public BaseResponse<Long> test(HttpServletRequest request){
+        return new BaseResponse<>(JwtInfo.getMemberId(request));
     }
 }

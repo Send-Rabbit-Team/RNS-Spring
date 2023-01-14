@@ -1,5 +1,6 @@
 package com.srt.message.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.srt.message.config.domain.BaseEntity;
 import com.srt.message.config.status.BaseStatus;
 import com.srt.message.dto.contact.ContactDTO;
@@ -30,13 +31,12 @@ public class Contact extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="group_id")
+    @JsonIgnore
     private ContactGroup contactGroup;
 
     private String phoneNumber;
 
     private String memo;
-
-    private BaseStatus status;
 
     private void changeContactGroup(ContactGroup contactGroup){this.contactGroup = contactGroup;}
     private void changePhoneNumber(String phoneNumber){this.phoneNumber = phoneNumber;}
