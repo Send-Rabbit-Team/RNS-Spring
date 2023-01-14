@@ -1,16 +1,12 @@
 package com.srt.message.controller;
 
 import com.srt.message.config.response.BaseResponse;
-import com.srt.message.domain.ContactGroup;
-import com.srt.message.dto.contact.ContactDTO;
-import com.srt.message.dto.contact.patch.PatchContactRes;
 import com.srt.message.dto.contact_group.ContactGroupDTO;
 import com.srt.message.dto.contact_group.patch.PatchContactGroupReq;
 import com.srt.message.dto.contact_group.patch.PatchContactGroupRes;
 import com.srt.message.dto.contact_group.post.PostContactGroupReq;
 import com.srt.message.dto.contact_group.post.PostContactGroupRes;
 import com.srt.message.dto.jwt.JwtInfo;
-import com.srt.message.jwt.NoIntercept;
 import com.srt.message.service.ContactGroupService;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
@@ -78,5 +74,4 @@ public class ContactGroupController {
     public BaseResponse<List<ContactGroupDTO>> getAll(HttpServletRequest request){
         return new BaseResponse<>(contactGroupService.getAllContactGroup(JwtInfo.getMemberId((request))));
     }
-
 }
