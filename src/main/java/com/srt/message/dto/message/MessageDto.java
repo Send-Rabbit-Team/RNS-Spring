@@ -1,20 +1,16 @@
-package com.srt.message.dto.broker.sms;
+package com.srt.message.dto.message;
 
-import com.srt.message.config.type.SMSType;
+import com.srt.message.config.type.MessageType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.util.List;
-
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
-public class SmsMessageDto {
-    private SMSType smsType;
-
+public class MessageDto {
     private String from;
 
     private String to;
@@ -23,9 +19,11 @@ public class SmsMessageDto {
 
     private String content;
 
-    private List<FileDto> files;
+    private String image;
 
     private String reserveTime;
+
+    private MessageType messageType;
 
     private String scheduleCode;
 }

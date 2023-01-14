@@ -1,5 +1,5 @@
 package com.srt.message.config.type;
 
-public enum SMSType {
+public enum MessageType {
     SMS, LMS, MMS
 }

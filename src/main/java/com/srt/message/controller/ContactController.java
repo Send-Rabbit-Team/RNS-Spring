@@ -94,8 +94,14 @@ public class ContactController {
     };
 
     // 연락처 그룹 필터링
+    @ApiOperation(
+            value = "연락처 필터링 (페이징)",
+            notes = "연락처 필터 API - 페이징 처리"
+    )
+    @ApiResponses({
+            @ApiResponse(code = 1000, message = "요청에 성공하였습니다.")
+    })
     @GetMapping("/byGroup/{currentPage}")
-    @NoIntercept
     public Page<ContactDTO> filterByGroup(@PathVariable int currentPage,@RequestParam long groupId){
         return contactService.filterContactByGroup(groupId,currentPage);
     }

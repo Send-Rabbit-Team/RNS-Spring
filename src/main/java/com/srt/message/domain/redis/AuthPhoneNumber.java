@@ -1,5 +1,6 @@
 package com.srt.message.domain.redis;
 
+import com.srt.message.config.domain.BaseTimeEntity;
 import com.srt.message.config.status.AuthPhoneNumberStatus;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -18,7 +19,7 @@ import javax.persistence.Enumerated;
 @Getter
 @Builder
 @RedisHash("phoneNumber") // Redis Repository 이용하기 위해 선언
-public class AuthPhoneNumber {
+public class AuthPhoneNumber extends BaseTimeEntity {
     @Id
     private String phoneNumber;
 

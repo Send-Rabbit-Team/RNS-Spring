@@ -1,13 +1,12 @@
 package com.srt.message.broker;
 
-import com.srt.message.config.type.SMSType;
-import com.srt.message.dto.broker.sms.SmsMessageDto;
+import com.srt.message.config.type.MessageType;
+import com.srt.message.dto.message.MessageDto;
 import com.srt.message.jwt.NoIntercept;
 import lombok.RequiredArgsConstructor;
 import org.springframework.amqp.core.*;
 import org.springframework.amqp.rabbit.core.RabbitAdmin;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -37,7 +36,7 @@ public class TestBroker {
         sendToAllBroker(getTestMessageDto(), 1000);
     }
 
-    public void sendToAllBroker(SmsMessageDto messageDto, int count){
+    public void sendToAllBroker(MessageDto messageDto, int count){
         int value = (count / 100);
         int kt_count = value * KT_RATE;
         int skt_count = value * SKT_RATE;
@@ -65,9 +64,9 @@ public class TestBroker {
         }
     }
 
-    public SmsMessageDto getTestMessageDto(){
-        return SmsMessageDto.builder()
-                .smsType(SMSType.SMS)
+    public MessageDto getTestMessageDto(){
+        return MessageDto.builder()
+                .messageType(MessageType.SMS)
                 .to("010123441234")
                 .from("01025291674")
                 .subject("메시지 분배 테스트")

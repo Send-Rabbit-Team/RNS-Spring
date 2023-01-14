@@ -76,7 +76,6 @@ public class AuthController {
         return new BaseResponse<>(postLoginRes);
     }
 
-    @ApiIgnore
     @NoIntercept
     @PostMapping("/google")
     public BaseResponse<Object> getGoogleUserInfo(@RequestBody CredentialResponse credentialResponse) throws JsonProcessingException {
