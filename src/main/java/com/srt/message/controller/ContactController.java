@@ -101,8 +101,8 @@ public class ContactController {
             @ApiResponse(code = 1000, message = "요청에 성공하였습니다.")
     })
     @GetMapping("/byGroup/{currentPage}")
-    public BaseResponse<PageResult<ContactDTO, Contact>> filterByGroup(@PathVariable int currentPage,@RequestParam long groupId){
-        return new BaseResponse<>(contactService.filterContactByGroup(groupId,currentPage));
+    public BaseResponse<PageResult<ContactDTO, Contact>> filterByGroup(@PathVariable int currentPage,@RequestParam long groupId, HttpServletRequest request){
+        return new BaseResponse<>(contactService.filterContactByGroup(groupId,currentPage,JwtInfo.getMemberId(request)));
     }
 
     @GetMapping("/{contactId}")

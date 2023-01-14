@@ -109,9 +109,9 @@ public class ContactService {
     }
 
     // 연락처 그룹으로 필터링
-    public PageResult<ContactDTO, Contact> filterContactByGroup(long groupId, int currentPage){
+    public PageResult<ContactDTO, Contact> filterContactByGroup(long groupId, int currentPage, long memberId){
         PageRequest pageRequest = PageRequest.of(currentPage-1, 5, Sort.by("id").descending());
-        Page<Contact> contactPage = contactRepository.findByContactGroupIdAndStatus(groupId, pageRequest,BaseStatus.ACTIVE);
+        Page<Contact> contactPage = contactRepository.findByContactGroupIdAndMemberIdAndStatus(groupId,memberId, pageRequest,BaseStatus.ACTIVE);
         Function<Contact, ContactDTO> fn = (contact -> ContactDTO.toDto(contact));
         return new PageResult<>(contactPage, fn);
     };
