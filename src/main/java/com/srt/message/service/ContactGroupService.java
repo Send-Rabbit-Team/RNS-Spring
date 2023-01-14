@@ -86,8 +86,10 @@ public class ContactGroupService {
         ContactGroup contactGroup = getExistContactGroup(patchContactGroupReq.getContactGroupId());
         checkMatchMember(contactGroup, memberId);
 
-        // 연락처 수정
+        // 그룹 이름 수정
         contactGroup.changeName(patchContactGroupReq.getName());
+
+        contactGroupRepository.save(contactGroup);
 
         return PatchContactGroupRes.toDto(contactGroup);
     }
@@ -100,6 +102,7 @@ public class ContactGroupService {
 
         // 연락처 삭제
         contactGroup.changeStatusInActive();
+        contactGroupRepository.save(contactGroup);
     }
 
     // 편의 메서드
