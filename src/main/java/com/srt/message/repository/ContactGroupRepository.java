@@ -17,4 +17,6 @@ public interface ContactGroupRepository extends JpaRepository<ContactGroup,Long>
     Optional<ContactGroup> findByName(String name);
     Page<ContactGroup> findByMemberIdAndStatus(long memberId, BaseStatus status, Pageable pageable);
     Optional<List<ContactGroup>> findByMemberId(long memberId);
+
+    Optional<ContactGroup> findByIdAndStatus(long id, BaseStatus status);
 }

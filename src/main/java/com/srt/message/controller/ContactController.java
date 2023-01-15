@@ -79,6 +79,24 @@ public class ContactController {
         return new BaseResponse<>("연락처가 정상적으로 삭제 되었습니다.");
     }
 
+    //연락처에서 그룹 해제
+    @ApiOperation(
+            value = "연락처에서 그룹 해제",
+            notes = "연락처에 연결된 그룹을 해제하는 API"
+    )
+    @ApiResponses({
+            @ApiResponse(code = 1000, message = "요청에 성공하였습니다."),
+            @ApiResponse(code = 2011, message = "존재하지 않는 그룹입니다."),
+            @ApiResponse(code = 2014, message = "존재하지 않는 연락처입니다."),
+            @ApiResponse(code = 2021, message = "연락처에 연결된 그룹이 아닙니다.")
+    })
+    @PatchMapping("/quit/{contactId}")
+    public BaseResponse<String> quitContactGroup(@PathVariable("contactId") long contactId, HttpServletRequest request){
+        contactService.quitContactGroup(contactId, JwtInfo.getMemberId(request));
+
+        return new BaseResponse<>("연락처가 그룹에서 해제 되었습니다.");
+    }
+
     // 연락처 검색
     @ApiOperation(
             value = "연락처 검색 (페이징)",
