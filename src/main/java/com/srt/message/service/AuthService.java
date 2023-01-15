@@ -156,10 +156,11 @@ public class AuthService {
     }
 
     // Audit
-    public void updateLoginMemberById(Long id){
-        Member member = memberRepository.findById(id)
+    public void updateLoginMember(Long memberId){
+        // TODO 이부분 때문에 현재 쿼리문 하나 더 나가고있음, 추후에 Redis에 Member 저장해보는거 검토
+        Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new BaseException(NOT_EXIST_MEMBER));
 
-        loginMember.updateLoginMember(member);
+        loginMember.updateLoginMember(memberId);
     }
 }

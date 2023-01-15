@@ -57,7 +57,7 @@ public class SenderNumberService {
         PageRequest pageRequest = PageRequest.of(page-1, 1, Sort.by("id").descending());
 
         Page<SenderNumber> senderNumberPage = senderNumberRepository.findByMemberIdAndStatus(memberId, BaseStatus.ACTIVE, pageRequest)
-                .orElseThrow(() -> new BaseException(NOT_EXIST_PHONE_NUMBER));
+                .orElseThrow(() -> new BaseException(NOT_EXIST_SENDER_NUMBER));
 
         Function<SenderNumber, GetSenderNumberRes> fn = (senderNumber -> GetSenderNumberRes.toDto(senderNumber));
         return new PageResult<>(senderNumberPage, fn);
@@ -67,7 +67,7 @@ public class SenderNumberService {
     @Transactional(readOnly = false)
     public void deleteSenderNumber(long senderNumberId, long memberId) {
         SenderNumber senderNumber = senderNumberRepository.findByIdAndStatus(senderNumberId, BaseStatus.ACTIVE)
-                .orElseThrow(() -> new BaseException(NOT_EXIST_PHONE_NUMBER));
+                .orElseThrow(() -> new BaseException(NOT_EXIST_SENDER_NUMBER));
 
         if (senderNumber.getMember().getId() != memberId)
             throw new BaseException(NOT_AUTH_MEMBER);

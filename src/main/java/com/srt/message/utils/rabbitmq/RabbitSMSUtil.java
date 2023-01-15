@@ -1,7 +1,7 @@
 package com.srt.message.utils.rabbitmq;
 
 public class RabbitSMSUtil {
-    public static final String EXCHANGE_NAME = "sms";
+    public static final String SMS_EXCHANGE_NAME = "direct.sms";
 
     // KT
     public static final String KT_QUEUE_NAME = "sms.kt";

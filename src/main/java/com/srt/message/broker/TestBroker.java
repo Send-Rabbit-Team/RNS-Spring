@@ -1,7 +1,7 @@
 package com.srt.message.broker;
 
 import com.srt.message.config.type.MessageType;
-import com.srt.message.dto.message.MessageDto;
+import com.srt.message.dto.message.SMSMessageDto;
 import com.srt.message.jwt.NoIntercept;
 import lombok.RequiredArgsConstructor;
 import org.springframework.amqp.core.*;
@@ -36,7 +36,7 @@ public class TestBroker {
         sendToAllBroker(getTestMessageDto(), 1000);
     }
 
-    public void sendToAllBroker(MessageDto messageDto, int count){
+    public void sendToAllBroker(SMSMessageDto SMSMessageDto, int count){
         int value = (count / 100);
         int kt_count = value * KT_RATE;
         int skt_count = value * SKT_RATE;
@@ -49,23 +49,23 @@ public class TestBroker {
 
         // kt
         for(int i = 0; i < kt_count; i++){
-            rabbitTemplate.convertAndSend(EXCHANGE_NAME, KT_ROUTING_KEY, messageDto);
+            rabbitTemplate.convertAndSend(EXCHANGE_NAME, KT_ROUTING_KEY, SMSMessageDto);
             System.out.println((i+1) + " 번째 메시지가 전송되었습니다 - " + KT_ROUTING_KEY);
         }
         // skt
         for(int i = 0; i < skt_count; i++){
-            rabbitTemplate.convertAndSend(EXCHANGE_NAME, SKT_ROUTING_KEY, messageDto);
+            rabbitTemplate.convertAndSend(EXCHANGE_NAME, SKT_ROUTING_KEY, SMSMessageDto);
             System.out.println((i+1) + " 번째 메시지가 전송되었습니다 - " + SKT_ROUTING_KEY);
         }
         // lg
         for(int i = 0; i < lg_count; i++){
-            rabbitTemplate.convertAndSend(EXCHANGE_NAME, LG_ROUTING_KEY, messageDto);
+            rabbitTemplate.convertAndSend(EXCHANGE_NAME, LG_ROUTING_KEY, SMSMessageDto);
             System.out.println((i+1) + " 번째 메시지가 전송되었습니다 - " + LG_ROUTING_KEY);
         }
     }
 
-    public MessageDto getTestMessageDto(){
-        return MessageDto.builder()
+    public SMSMessageDto getTestMessageDto(){
+        return SMSMessageDto.builder()
                 .messageType(MessageType.SMS)
                 .to("010123441234")
                 .from("01025291674")

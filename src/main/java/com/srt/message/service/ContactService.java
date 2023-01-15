@@ -31,8 +31,6 @@ public class ContactService {
 
     @Transactional(readOnly = false)
     public PostContactRes saveContact(PostContactReq req, long memberId){
-        long groupId = req.getContactGroupId();
-
         // 핸드폰 기존 등록 여부
         if(contactRepository.findByPhoneNumber(req.getPhoneNumber()).isPresent())
             throw new BaseException(ALREADY_EXIST_CONTACT_NUMBER);
@@ -42,7 +40,7 @@ public class ContactService {
                 .orElseThrow(() -> new BaseException(NOT_EXIST_MEMBER));
 
         // 그룹 존재 여부
-        ContactGroup contactGroup = contactGroupRepository.findById(groupId)
+        ContactGroup contactGroup = contactGroupRepository.findByName(req.getGroupName())
                 .orElseThrow(() -> new BaseException(NOT_EXIST_GROUP));
 
         Contact contact = PostContactReq.toEntity(req, contactGroup,member);

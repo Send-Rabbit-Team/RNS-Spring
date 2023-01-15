@@ -20,7 +20,7 @@ public class Member extends BaseTimeEntity {
     @Column(name = "member_id")
     private long id;
 
-    @OneToOne
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "company_id")
     private Company company;
 

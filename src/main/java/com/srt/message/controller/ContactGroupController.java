@@ -25,7 +25,6 @@ public class ContactGroupController {
 
     // 그룹 저장
     @PostMapping("/save")
-    @NoIntercept
     public BaseResponse<PostContactGroupRes> saveGroup(@RequestBody PostContactGroupReq postContactGroupReq, HttpServletRequest request){
         PostContactGroupRes postContactGroupRes = contactGroupService.saveContactGroup(postContactGroupReq, JwtInfo.getMemberId(request));
 
@@ -34,7 +33,6 @@ public class ContactGroupController {
 
     // 그룹 수정
     @PostMapping("/edit")
-    @NoIntercept
     public BaseResponse<PatchContactGroupRes> editGroup(@RequestBody PatchContactGroupReq patchContactGroupReq,  HttpServletRequest request){
         PatchContactGroupRes patchContactGroupRes = contactGroupService.editContactGroup(patchContactGroupReq, JwtInfo.getMemberId(request)); // 수정
 
@@ -43,7 +41,6 @@ public class ContactGroupController {
 
     // 그룹 삭제
     @PostMapping("/delete/{groupId}")
-    @NoIntercept
     public BaseResponse<String> deleteGroup(@PathVariable long contactGroupId, HttpServletRequest request){
         contactGroupService.deleteContactGroup(contactGroupId, JwtInfo.getMemberId(request));
 

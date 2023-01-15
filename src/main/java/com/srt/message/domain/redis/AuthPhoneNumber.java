@@ -19,7 +19,7 @@ import javax.persistence.Enumerated;
 @Getter
 @Builder
 @RedisHash("phoneNumber") // Redis Repository 이용하기 위해 선언
-public class AuthPhoneNumber extends BaseTimeEntity {
+public class AuthPhoneNumber {
     @Id
     private String phoneNumber;
 

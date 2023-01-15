@@ -57,6 +57,6 @@ public class AuthenticationInterceptor implements HandlerInterceptor {
         request.setAttribute("jwtInfo", convertJwtInfo);
 
         // auditor
-        authService.updateLoginMemberById(convertJwtInfo.getMemberId());
+        authService.updateLoginMember(convertJwtInfo.getMemberId());
     }
 }

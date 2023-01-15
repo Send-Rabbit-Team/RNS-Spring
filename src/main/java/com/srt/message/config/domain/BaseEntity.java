@@ -17,12 +17,10 @@ import java.time.LocalDateTime;
 @EntityListeners(AuditingEntityListener.class)
 public abstract class BaseEntity extends BaseTimeEntity{
     @CreatedBy
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "created_by", updatable = false)
-    private Member created_by;
+    @Column(name = "created_by", updatable = false)
+    private long createdBy;
 
     @LastModifiedBy
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "updated_by")
-    private Member updated_by;
+    @Column(name = "updated_by")
+    private long updatedBy;
 }

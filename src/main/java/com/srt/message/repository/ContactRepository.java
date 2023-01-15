@@ -16,4 +16,6 @@ public interface ContactRepository extends JpaRepository<Contact, Long> {
 
     // 그룹으로 힐터링
     Page<Contact> findByContactGroupId(Long groupId, Pageable pageable);
+
+    List<Contact> findByPhoneNumberIn(List<String> phoneNumber);
 }

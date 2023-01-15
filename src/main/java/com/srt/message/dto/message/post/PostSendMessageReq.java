@@ -1,29 +1,25 @@
 package com.srt.message.dto.message.post;
 
-import com.srt.message.config.domain.MessageType;
+import com.srt.message.dto.message.SMSMessageDto;
+import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+
+import java.util.List;
 
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
 public class PostSendMessageReq {
-    private String from;
+    private SMSMessageDto message;
 
-    private String to;
+    private String senderNumber;
 
-    private String subject;
+    private List<String> receivers;
 
-    private String content;
-
-    private String image;
-
-    private String reserveTime;
-
-    private String scheduleCode;
-
-    private MessageType messageType;
+    @ApiModelProperty(example = "100")
+    private int count;
 }

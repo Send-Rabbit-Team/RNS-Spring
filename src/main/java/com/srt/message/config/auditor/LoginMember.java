@@ -15,43 +15,9 @@ import javax.persistence.*;
 @Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
 @Getter
 public class LoginMember {
-    private long id;
+    private Long id;
 
-    private Company company;
-
-    private String email;
-
-    private String password;
-
-    private String name;
-
-    private String phoneNumber;
-
-    private MemberType memberType;
-
-    private LoginType loginType;
-
-    public void updateLoginMember(Member member){
-        this.id = member.getId();
-        this.company = member.getCompany();
-        this.email = member.getEmail();
-        this.password = member.getPassword();
-        this.name = member.getName();
-        this.phoneNumber = member.getPhoneNumber();
-        this.memberType = member.getMemberType();
-        this.loginType = member.getLoginType();
-    }
-
-    public Member toEntity(){
-        return Member.builder()
-                .id(id)
-                .company(company)
-                .email(email)
-                .password(password)
-                .name(name)
-                .phoneNumber(phoneNumber)
-                .memberType(memberType)
-                .loginType(loginType)
-                .build();
+    public void updateLoginMember(Long memberId){
+        this.id = memberId;
     }
 }

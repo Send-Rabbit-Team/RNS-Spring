@@ -16,7 +16,7 @@ import javax.persistence.*;
 @Entity
 public class MessageResult extends BaseEntity {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -32,5 +32,5 @@ public class MessageResult extends BaseEntity {
     private Broker broker;
 
     @Enumerated(EnumType.STRING)
-    private MessageStatus messageStatus;
+    private MessageStatus messageStatus = MessageStatus.PENDING;
 }

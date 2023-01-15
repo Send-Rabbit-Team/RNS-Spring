@@ -13,9 +13,9 @@ import lombok.*;
 @Builder
 public class PostContactReq {
     @ApiModelProperty(
-            example = "10"
+            example = "카카오"
     )
-    private Long contactGroupId;
+    private String groupName;
 
     @ApiModelProperty(
             example = "01091908201"
