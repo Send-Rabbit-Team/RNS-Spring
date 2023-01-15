@@ -26,4 +26,6 @@ public interface ContactRepository extends JpaRepository<Contact, Long> {
 
     // 사용자 아이디로 연락처 조회 (페이지네이션 있음)
     Page<Contact> findByMemberIdAndStatus(Long memberId, BaseStatus baseStatus, Pageable pageable);
+
+    List<Contact> findByMemberIdInAndStatus(List<Long> memberId, BaseStatus status);
 }

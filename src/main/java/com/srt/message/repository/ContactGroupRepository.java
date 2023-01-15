@@ -1,6 +1,7 @@
 package com.srt.message.repository;
 
 import com.srt.message.config.status.BaseStatus;
+import com.srt.message.domain.Contact;
 import com.srt.message.domain.ContactGroup;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
