@@ -22,9 +22,12 @@ public class GetContactRes {
                         .contactId(contact.getId())
                         .phoneNumber(contact.getPhoneNumber())
                         .contactMemo(contact.getMemo())
-                        .groupId(contact.getContactGroup().getId())
-                        .groupName(contact.getContactGroup().getName())
                         .build();
+
+        if (contact.getContactGroup() != null) {
+            getContactRes.setGroupId(contact.getContactGroup().getId());
+            getContactRes.setGroupName(contact.getContactGroup().getName());
+        }
 
         return getContactRes;
     }
