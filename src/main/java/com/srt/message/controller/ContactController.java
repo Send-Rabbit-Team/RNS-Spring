@@ -126,9 +126,4 @@ public class ContactController {
         PageResult<GetContactRes, Contact> memberContactList = contactService.getMemberContact(JwtInfo.getMemberId(request), page);
         return new BaseResponse<>(memberContactList);
     }
-
-    @GetMapping("/test/{id}")
-    public List<Contact> test(@PathVariable Long id){
-        return contactService.test(id);
-    }
 }

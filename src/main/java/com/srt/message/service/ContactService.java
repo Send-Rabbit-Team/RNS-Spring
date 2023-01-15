@@ -50,7 +50,7 @@ public class ContactService {
     // 연락처 추가
     @Transactional(readOnly = false)
     public PostContactRes saveContact(PostContactReq req, long memberId){
-        long groupId = req.getContactGroupId();
+        Long groupId = req.getContactGroupId();
 
         // 핸드폰 기존 등록 여부
         if(contactRepository.findByPhoneNumberAndStatus(req.getPhoneNumber(), BaseStatus.ACTIVE).isPresent())
@@ -130,24 +130,10 @@ public class ContactService {
     }
 
     // 전체 연락처 조회(페이징)
-//    public PageResult<ContactDTO, Contact> getMemberContact(long memberId, int page) {
-//        PageRequest pageRequest = PageRequest.of(page-1, 5, Sort.by("id").descending());
-//        Page<Contact> contactPage = contactRepository.findByMemberIdAndStatus(memberId, BaseStatus.ACTIVE, pageRequest);
-//        Function<Contact, ContactDTO> fn = (contact -> ContactDTO.toDto(contact));
-//        return new PageResult<>(contactPage, fn);
-//    }
-
     public PageResult<GetContactRes, Contact> getMemberContact(long memberId, int page) {
         PageRequest pageRequest = PageRequest.of(page-1, 5, Sort.by("id").descending());
         Page<Contact> contactPage = contactRepository.findByMemberIdAndStatus(memberId, BaseStatus.ACTIVE, pageRequest);
         Function<Contact, GetContactRes> fn = (contact -> GetContactRes.toDto(contact));
         return new PageResult<>(contactPage, fn);
     }
-
-    public List<Contact> test(Long id){
-        List<Long> test = new ArrayList<Long>();
-        test.add(id);
-        System.out.println("test = " + test);
-        return contactRepository.findByMemberIdInAndStatus(test, BaseStatus.ACTIVE);
-    };
 }

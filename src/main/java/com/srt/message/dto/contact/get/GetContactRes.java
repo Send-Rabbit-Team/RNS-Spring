@@ -13,7 +13,7 @@ public class GetContactRes {
     private long contactId;
     private String phoneNumber;
     private String contactMemo;
-    private long groupId;
+    private Long groupId;
     private String groupName;
 
     public static GetContactRes toDto(Contact contact){
