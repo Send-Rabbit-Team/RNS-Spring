@@ -127,4 +127,12 @@ public class ContactService {
                 .orElseThrow(()-> new BaseException(NOT_EXIST_CONTACT_NUMBER));
         return contact;
     }
+
+    // 전체 연락처 조회(페이징)
+    public PageResult<ContactDTO, Contact> getMemberSenderNumber(long memberId, int page) {
+        PageRequest pageRequest = PageRequest.of(page-1, 5, Sort.by("id").descending());
+        Page<Contact> contactPage = contactRepository.findByMemberIdAndStatus(memberId, BaseStatus.ACTIVE, pageRequest);
+        Function<Contact, ContactDTO> fn = (contact -> ContactDTO.toDto(contact));
+        return new PageResult<>(contactPage, fn);
+    }
 }

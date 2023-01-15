@@ -78,7 +78,7 @@ public class ContactController {
 
         return new BaseResponse<>("연락처가 정상적으로 삭제 되었습니다.");
     }
-    
+
     // 연락처 검색
     @ApiOperation(
             value = "연락처 검색 (페이징)",
@@ -108,5 +108,21 @@ public class ContactController {
     @GetMapping("/{contactId}")
     public BaseResponse<ContactDTO> find(@PathVariable int contactId){
         return new BaseResponse<>(contactService.findContactById(contactId));
+    }
+
+    @ApiOperation(
+            value = "연락처 전체 조회",
+            notes = "사용자 아이디를 통해 사용자가 보유한 모든 연락처를 조회하는 API"
+    )
+    @ApiResponses({
+            @ApiResponse(code = 1000, message = "요청에 성공하였습니다.")
+    })
+    @GetMapping("/list/{page}")
+    public BaseResponse<PageResult<ContactDTO, Contact>> getMemberContactList(
+            HttpServletRequest request,
+            @PathVariable("page") int page) {
+        Long memberId = JwtInfo.getMemberId(request);
+        PageResult<ContactDTO, Contact> memberContactList = contactService.getMemberSenderNumber(memberId, page);
+        return new BaseResponse<>(memberContactList);
     }
 }
