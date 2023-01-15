@@ -4,6 +4,7 @@ import com.srt.message.config.page.PageResult;
 import com.srt.message.config.response.BaseResponse;
 import com.srt.message.domain.Contact;
 import com.srt.message.dto.contact.ContactDTO;
+import com.srt.message.dto.contact.get.GetContactRes;
 import com.srt.message.dto.contact.patch.PatchContactReq;
 import com.srt.message.dto.contact.patch.PatchContactRes;
 import com.srt.message.dto.contact.post.PostContactReq;
@@ -119,10 +120,10 @@ public class ContactController {
             @ApiResponse(code = 1000, message = "요청에 성공하였습니다.")
     })
     @GetMapping("/list/{page}")
-    public BaseResponse<PageResult<ContactDTO, Contact>> getMemberContactList(
+    public BaseResponse<PageResult<GetContactRes, Contact>> getMemberContactList(
             HttpServletRequest request,
             @PathVariable("page") int page) {
-        PageResult<ContactDTO, Contact> memberContactList = contactService.getMemberContact(JwtInfo.getMemberId(request), page);
+        PageResult<GetContactRes, Contact> memberContactList = contactService.getMemberContact(JwtInfo.getMemberId(request), page);
         return new BaseResponse<>(memberContactList);
     }
 

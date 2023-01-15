@@ -7,6 +7,7 @@ import com.srt.message.domain.Contact;
 import com.srt.message.domain.ContactGroup;
 import com.srt.message.domain.Member;
 import com.srt.message.dto.contact.ContactDTO;
+import com.srt.message.dto.contact.get.GetContactRes;
 import com.srt.message.dto.contact.patch.PatchContactReq;
 import com.srt.message.dto.contact.patch.PatchContactRes;
 import com.srt.message.dto.contact.post.PostContactReq;
@@ -136,10 +137,10 @@ public class ContactService {
 //        return new PageResult<>(contactPage, fn);
 //    }
 
-    public PageResult<ContactDTO, Contact> getMemberContact(long memberId, int page) {
+    public PageResult<GetContactRes, Contact> getMemberContact(long memberId, int page) {
         PageRequest pageRequest = PageRequest.of(page-1, 5, Sort.by("id").descending());
         Page<Contact> contactPage = contactRepository.findByMemberIdAndStatus(memberId, BaseStatus.ACTIVE, pageRequest);
-        Function<Contact, ContactDTO> fn = (contact -> ContactDTO.toDto(contact));
+        Function<Contact, GetContactRes> fn = (contact -> GetContactRes.toDto(contact));
         return new PageResult<>(contactPage, fn);
     }
 
