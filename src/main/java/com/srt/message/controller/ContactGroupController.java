@@ -13,7 +13,6 @@ import com.srt.message.dto.contact_group.patch.PatchContactGroupRes;
 import com.srt.message.dto.contact_group.post.PostContactGroupReq;
 import com.srt.message.dto.contact_group.post.PostContactGroupRes;
 import com.srt.message.dto.jwt.JwtInfo;
-import com.srt.message.jwt.NoIntercept;
 import com.srt.message.service.ContactGroupService;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
