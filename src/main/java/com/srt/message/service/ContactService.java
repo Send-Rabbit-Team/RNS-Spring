@@ -11,7 +11,6 @@ import com.srt.message.dto.contact.patch.PatchContactReq;
 import com.srt.message.dto.contact.patch.PatchContactRes;
 import com.srt.message.dto.contact.post.PostContactReq;
 import com.srt.message.dto.contact.post.PostContactRes;
-import com.srt.message.dto.jwt.JwtInfo;
 import com.srt.message.repository.ContactRepository;
 import com.srt.message.repository.ContactGroupRepository;
 import com.srt.message.repository.MemberRepository;
@@ -22,7 +21,8 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.servlet.http.HttpServletRequest;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.function.Function;
 
 import static com.srt.message.config.response.BaseResponseStatus.*;
@@ -129,10 +129,24 @@ public class ContactService {
     }
 
     // 전체 연락처 조회(페이징)
-    public PageResult<ContactDTO, Contact> getMemberSenderNumber(long memberId, int page) {
+//    public PageResult<ContactDTO, Contact> getMemberContact(long memberId, int page) {
+//        PageRequest pageRequest = PageRequest.of(page-1, 5, Sort.by("id").descending());
+//        Page<Contact> contactPage = contactRepository.findByMemberIdAndStatus(memberId, BaseStatus.ACTIVE, pageRequest);
+//        Function<Contact, ContactDTO> fn = (contact -> ContactDTO.toDto(contact));
+//        return new PageResult<>(contactPage, fn);
+//    }
+
+    public PageResult<ContactDTO, Contact> getMemberContact(long memberId, int page) {
         PageRequest pageRequest = PageRequest.of(page-1, 5, Sort.by("id").descending());
         Page<Contact> contactPage = contactRepository.findByMemberIdAndStatus(memberId, BaseStatus.ACTIVE, pageRequest);
         Function<Contact, ContactDTO> fn = (contact -> ContactDTO.toDto(contact));
         return new PageResult<>(contactPage, fn);
     }
+
+    public List<Contact> test(Long id){
+        List<Long> test = new ArrayList<Long>();
+        test.add(id);
+        System.out.println("test = " + test);
+        return contactRepository.findByMemberIdInAndStatus(test, BaseStatus.ACTIVE);
+    };
 }

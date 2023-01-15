@@ -9,17 +9,16 @@ import com.srt.message.dto.contact.patch.PatchContactRes;
 import com.srt.message.dto.contact.post.PostContactReq;
 import com.srt.message.dto.contact.post.PostContactRes;
 import com.srt.message.dto.jwt.JwtInfo;
-import com.srt.message.jwt.NoIntercept;
 import com.srt.message.service.ContactService;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
-import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
-import javax.servlet.http.HttpServlet;
+
 import javax.servlet.http.HttpServletRequest;
+import java.util.List;
 
 @Log4j2
 @RestController
@@ -105,11 +104,13 @@ public class ContactController {
         return new BaseResponse<>(contactService.filterContactByGroup(groupId,currentPage,JwtInfo.getMemberId(request)));
     }
 
+    // 아이디로 연락처 찾기
     @GetMapping("/{contactId}")
     public BaseResponse<ContactDTO> find(@PathVariable int contactId){
         return new BaseResponse<>(contactService.findContactById(contactId));
     }
 
+    // 연락처 전체 조회
     @ApiOperation(
             value = "연락처 전체 조회",
             notes = "사용자 아이디를 통해 사용자가 보유한 모든 연락처를 조회하는 API"
@@ -121,8 +122,12 @@ public class ContactController {
     public BaseResponse<PageResult<ContactDTO, Contact>> getMemberContactList(
             HttpServletRequest request,
             @PathVariable("page") int page) {
-        Long memberId = JwtInfo.getMemberId(request);
-        PageResult<ContactDTO, Contact> memberContactList = contactService.getMemberSenderNumber(memberId, page);
+        PageResult<ContactDTO, Contact> memberContactList = contactService.getMemberContact(JwtInfo.getMemberId(request), page);
         return new BaseResponse<>(memberContactList);
+    }
+
+    @GetMapping("/test/{id}")
+    public List<Contact> test(@PathVariable Long id){
+        return contactService.test(id);
     }
 }
