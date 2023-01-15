@@ -1,6 +1,12 @@
 package com.srt.message.controller;
 
+import com.srt.message.config.page.PageResult;
 import com.srt.message.config.response.BaseResponse;
+import com.srt.message.domain.ContactGroup;
+import com.srt.message.dto.contact.patch.PatchContactRes;
+import com.srt.message.dto.contact_group.get.GetContactGroupRes;
+import com.srt.message.dto.contact.ContactDTO;
+import com.srt.message.dto.contact.patch.PatchContactRes;
 import com.srt.message.dto.contact_group.ContactGroupDTO;
 import com.srt.message.dto.contact_group.patch.PatchContactGroupReq;
 import com.srt.message.dto.contact_group.patch.PatchContactGroupRes;
@@ -34,7 +40,7 @@ public class ContactGroupController {
     }
 
     // 그룹 수정
-    @PostMapping("/edit")
+    @PatchMapping("/edit")
     public BaseResponse<PatchContactGroupRes> editGroup(@RequestBody PatchContactGroupReq patchContactGroupReq, HttpServletRequest request) {
         PatchContactGroupRes patchContactGroupRes = contactGroupService.editContactGroup(patchContactGroupReq, JwtInfo.getMemberId(request)); // 수정
 
@@ -42,11 +48,28 @@ public class ContactGroupController {
     }
 
     // 그룹 삭제
-    @PostMapping("/delete/{groupId}")
-    public BaseResponse<String> deleteGroup(@PathVariable long contactGroupId, HttpServletRequest request) {
+    @PatchMapping("/delete/{groupId}")
+    public BaseResponse<String> deleteGroup(@PathVariable("groupId") long contactGroupId, HttpServletRequest request) {
         contactGroupService.deleteContactGroup(contactGroupId, JwtInfo.getMemberId(request));
 
         return new BaseResponse<>("그룹이 정상적으로 삭제 되었습니다.");
+    }
+
+
+
+    @ApiOperation(
+            value = "수신자 그룹 조회",
+            notes = "발신자 아이디를 통해 보유한 수신자 그룹을 조회하는 API"
+    )
+    @ApiResponses({
+            @ApiResponse(code = 1000, message = "요청에 성공하였습니다."),
+    })
+    @GetMapping("/list/{page}")
+    public BaseResponse<PageResult<GetContactGroupRes, ContactGroup>> getMemberGroup(
+            HttpServletRequest request,
+            @PathVariable("page") int page) {
+        Long memberId = JwtInfo.getMemberId(request);
+        return new BaseResponse<>(contactGroupService.getMemberContactGroup(memberId, page));
     }
 
     // 그룹 찾기
@@ -74,4 +97,5 @@ public class ContactGroupController {
     public BaseResponse<List<ContactGroupDTO>> getAll(HttpServletRequest request){
         return new BaseResponse<>(contactGroupService.getAllContactGroup(JwtInfo.getMemberId((request))));
     }
+
 }

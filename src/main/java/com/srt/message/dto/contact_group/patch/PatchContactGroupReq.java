@@ -18,11 +18,6 @@ public class PatchContactGroupReq {
     private long contactGroupId;
 
     @ApiModelProperty(
-            example = "1"
-    )
-    private long memberId;
-
-    @ApiModelProperty(
             example = "오영주"
     )
     private String name;
