@@ -118,7 +118,7 @@ public class ContactService {
         }
 
         // 연락처에 연결된 그룹 해제
-        contact.quitContactGroup(groupId);
+        contact.quitContactGroup();
         contactRepository.save(contact);
     }
 

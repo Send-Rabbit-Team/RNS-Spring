@@ -41,21 +41,19 @@ public class Contact extends BaseEntity {
 
     private String memo;
 
-    private void changeContactGroup(ContactGroup contactGroup){this.contactGroup = contactGroup;}
+    public void changeContactGroup(ContactGroup contactGroup){this.contactGroup = contactGroup;}
     private void changePhoneNumber(String phoneNumber){this.phoneNumber = phoneNumber;}
     private void changeMemo(String memo){this.memo = memo;}
-
-    public void quitContactGroup(long groupId) {
-        if (this.contactGroup.getId() == groupId)
-            this.contactGroup = null;
-        else {
-            throw new BaseException(BaseResponseStatus.NOT_MATCH_GROUP);
-        }
+    public void quitContactGroup() {
+        this.contactGroup = null;
     }
 
     public void editContact(PatchContactReq contactDto, ContactGroup contactGroup){ // dto 수정
-        if(contactDto.getContactGroupId()!=null)
+        if(contactDto.getContactGroupId()!=null) {
             this.changeContactGroup(contactGroup);
+        } else {
+            this.contactGroup = null;
+        }
 
         if(contactDto.getPhoneNumber()!=null)
             this.changePhoneNumber(contactDto.getPhoneNumber());

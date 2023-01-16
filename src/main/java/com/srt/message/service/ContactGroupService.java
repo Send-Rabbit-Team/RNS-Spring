@@ -108,7 +108,7 @@ public class ContactGroupService {
         // 연락처 그룹에 연결된 연락처 해제
         List<Contact> contactList = contactRepository.findByContactGroupIdAndStatus(contactGroupId, BaseStatus.ACTIVE).orElseThrow(() -> new BaseException(NOT_EXIST_CONTACT_NUMBER));
         for (Contact contact : contactList) {
-            contact.quitContactGroup(contactGroupId);
+            contact.quitContactGroup();
             contactRepository.save(contact);
         }
 
