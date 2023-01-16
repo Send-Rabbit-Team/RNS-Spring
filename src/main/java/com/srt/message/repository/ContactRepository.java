@@ -22,7 +22,7 @@ public interface ContactRepository extends JpaRepository<Contact, Long> {
 
     // 그룹으로 연락처 조회 (페이지네이션 없음)
     Optional<List<Contact>> findByContactGroupIdAndStatus(Long groupId, BaseStatus status);
-    Page<Contact> findByContactGroupIdAndMemberIdAndStatus(Long groupId,Long memberId, Pageable pageable, BaseStatus status);
+    Optional<List<Contact>> findByContactGroupIdAndMemberIdAndStatus(Long groupId,Long memberId, BaseStatus status);
 
     // 사용자 아이디로 연락처 조회 (페이지네이션 있음)
     Page<Contact> findByMemberIdAndStatus(Long memberId, BaseStatus baseStatus, Pageable pageable);

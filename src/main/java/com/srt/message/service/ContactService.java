@@ -9,6 +9,7 @@ import com.srt.message.domain.ContactGroup;
 import com.srt.message.domain.Member;
 import com.srt.message.dto.contact.ContactDTO;
 import com.srt.message.dto.contact.get.GetContactRes;
+import com.srt.message.dto.contact.get.GetGroupContactRes;
 import com.srt.message.dto.contact.patch.PatchContactReq;
 import com.srt.message.dto.contact.patch.PatchContactRes;
 import com.srt.message.dto.contact.post.PostContactReq;
@@ -27,6 +28,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import static com.srt.message.config.response.BaseResponseStatus.*;
 
@@ -131,11 +133,10 @@ public class ContactService {
     }
 
     // 연락처 그룹으로 필터링
-    public PageResult<ContactDTO, Contact> filterContactByGroup(long groupId, int currentPage, long memberId){
-        PageRequest pageRequest = PageRequest.of(currentPage-1, 5, Sort.by("id").descending());
-        Page<Contact> contactPage = contactRepository.findByContactGroupIdAndMemberIdAndStatus(groupId,memberId, pageRequest,BaseStatus.ACTIVE);
-        Function<Contact, ContactDTO> fn = (contact -> ContactDTO.toDto(contact));
-        return new PageResult<>(contactPage, fn);
+    public List<GetGroupContactRes> filterContactByGroup(long groupId, long memberId){
+        List<Contact> contactList = contactRepository.findByContactGroupIdAndMemberIdAndStatus(groupId, memberId, BaseStatus.ACTIVE)
+                .orElseThrow(() -> new BaseException(NOT_EXIST_CONTACT_NUMBER));
+        return contactList.stream().map(contact -> GetGroupContactRes.toDto(contact)).collect(Collectors.toList());
     };
 
     // 편의 메서드
