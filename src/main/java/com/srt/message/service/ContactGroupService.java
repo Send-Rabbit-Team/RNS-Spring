@@ -130,24 +130,11 @@ public class ContactGroupService {
     public PageResult<GetContactGroupRes, ContactGroup> getMemberContactGroup(long memberId, int page) {
         PageRequest pageRequest = PageRequest.of(page - 1, 5, Sort.by("id").descending());
 
-        // 그룹 조회
-        Page<ContactGroup> contactGroupPage = contactGroupRepository.findByMemberIdAndStatus(memberId, BaseStatus.ACTIVE, pageRequest);
+        Page<ContactGroup> contactPage = contactGroupRepository.findByMemberIdAndStatus(memberId, BaseStatus.ACTIVE, pageRequest);
 
-        // Domain -> DTO 변환 함수 생성
-        Function<ContactGroup, GetContactGroupRes> fn = contactGroup -> {
-            // 그룹 ID를 통해 그룹에 속한 연락처 조회
-            long groupId = contactGroup.getId();
-            List<Contact> contactList = contactRepository.findByContactGroupIdAndStatus(groupId, BaseStatus.ACTIVE).orElse(null);
+        Function<ContactGroup, GetContactGroupRes> fn = (contactGroup -> GetContactGroupRes.toDto(contactGroup));
 
-            // Contact -> ContactDTO로 변환
-            List<ContactDTO> contactDTOList = new ArrayList<>();
-            for (Contact contact : contactList) {
-                contactDTOList.add(ContactDTO.toDto(contact));
-            }
-
-            return GetContactGroupRes.toDto(contactGroup, contactDTOList);
-        };
-        return new PageResult<>(contactGroupPage, fn);
+        return new PageResult<>(contactPage, fn);
     }
 
     public Member getExistMember(long memberId){
