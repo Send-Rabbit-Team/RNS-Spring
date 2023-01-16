@@ -2,6 +2,7 @@ package com.srt.message.service;
 
 import com.srt.message.config.exception.BaseException;
 import com.srt.message.config.page.PageResult;
+import com.srt.message.config.response.BaseResponseStatus;
 import com.srt.message.config.status.BaseStatus;
 import com.srt.message.domain.Contact;
 import com.srt.message.domain.ContactGroup;
@@ -24,6 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Function;
 
 import static com.srt.message.config.response.BaseResponseStatus.*;
@@ -98,6 +100,25 @@ public class ContactService {
 
         // 연락처 삭제
         contact.changeStatusInActive();
+        contactRepository.save(contact);
+    }
+
+    @Transactional(readOnly = false)
+    public void quitContactGroup(long contactId, long memberId){
+        // 존재하는 연락처인지 확인
+        Contact contact = getExistContact(contactId);
+
+        // 연락처를 변경할 권한이 있는지 확인
+        checkMatchMember(contact, memberId);
+
+        // 존재하는 그룹인지 확인
+        long groupId = contact.getContactGroup().getId();
+        if (contactGroupRepository.findByIdAndStatus(groupId, BaseStatus.ACTIVE).isEmpty()) {
+            throw new BaseException(BaseResponseStatus.NOT_EXIST_GROUP);
+        }
+
+        // 연락처에 연결된 그룹 해제
+        contact.quitContactGroup();
         contactRepository.save(contact);
     }
 

@@ -2,6 +2,7 @@ package com.srt.message.service;
 
 import com.srt.message.config.exception.BaseException;
 import com.srt.message.config.page.PageResult;
+import com.srt.message.config.response.BaseResponseStatus;
 import com.srt.message.config.status.BaseStatus;
 import com.srt.message.domain.Contact;
 import com.srt.message.config.status.BaseStatus;
@@ -100,9 +101,17 @@ public class ContactGroupService {
         ContactGroup contactGroup = getExistContactGroup(contactGroupId);
         checkMatchMember(contactGroup, memberId);
 
-        // 연락처 삭제
+        // 연락처 그룹 삭제
         contactGroup.changeStatusInActive();
         contactGroupRepository.save(contactGroup);
+
+        // 연락처 그룹에 연결된 연락처 해제
+        List<Contact> contactList = contactRepository.findByContactGroupIdAndStatus(contactGroupId, BaseStatus.ACTIVE).orElseThrow(() -> new BaseException(NOT_EXIST_CONTACT_NUMBER));
+        for (Contact contact : contactList) {
+            contact.quitContactGroup();
+            contactRepository.save(contact);
+        }
+
     }
 
     // 편의 메서드
