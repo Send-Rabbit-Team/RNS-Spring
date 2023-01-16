@@ -27,12 +27,10 @@ public class Contact extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="member_id")
-    @JsonIgnore // findby
     private Member member;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="group_id")
-    @JsonIgnore
     private ContactGroup contactGroup;
 
     private String phoneNumber;

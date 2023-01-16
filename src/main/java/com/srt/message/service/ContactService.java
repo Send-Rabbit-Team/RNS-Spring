@@ -60,9 +60,12 @@ public class ContactService {
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new BaseException(NOT_EXIST_MEMBER));
 
+        ContactGroup contactGroup = null;
         // 그룹 존재 여부
-        ContactGroup contactGroup = contactGroupRepository.findById(groupId)
-                .orElseThrow(() -> new BaseException(NOT_EXIST_GROUP));
+        if(groupId!=null) {
+            contactGroup = contactGroupRepository.findById(groupId)
+                    .orElseThrow(() -> new BaseException(NOT_EXIST_GROUP));
+        }
 
         Contact contact = PostContactReq.toEntity(req, contactGroup,member);
         contactRepository.save(contact);
