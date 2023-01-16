@@ -48,14 +48,14 @@ public class ContactGroupService {
     public List<ContactGroupDTO>  getAllContactGroup(long memberId){
         Member member = getExistMember(memberId);
 
-        return contactGroupRepository.findByMemberId(memberId).orElseThrow(()->new BaseException(NOT_EXIST_MEMBER))
+        return contactGroupRepository.findByMemberIdAndStatus(memberId, BaseStatus.ACTIVE).orElseThrow(()->new BaseException(NOT_EXIST_MEMBER))
                 .stream().map(m-> ContactGroupDTO.toDTO(m,member)) .collect(Collectors.toList());
     }
 
     //그룹 찾기
     @Transactional(readOnly = false)
     public ContactGroupDTO findContactGroupById(long contactGroupId){
-        ContactGroup contactGroup = contactGroupRepository.findById(contactGroupId)
+        ContactGroup contactGroup = contactGroupRepository.findByIdAndStatus(contactGroupId, BaseStatus.ACTIVE)
                 .orElseThrow(()-> new BaseException(NOT_EXIST_GROUP));
         Member member = contactGroup.getMember();
         return ContactGroupDTO.toDTO(contactGroup,member);
@@ -121,7 +121,7 @@ public class ContactGroupService {
     }
 
     public ContactGroup getExistContactGroup(long contactGroupId){
-        ContactGroup contactGroup = contactGroupRepository.findById(contactGroupId)
+        ContactGroup contactGroup = contactGroupRepository.findByIdAndStatus(contactGroupId, BaseStatus.ACTIVE)
                 .orElseThrow(()-> new BaseException(NOT_EXIST_GROUP));
         return contactGroup;
     }
@@ -151,7 +151,7 @@ public class ContactGroupService {
     }
 
     public Member getExistMember(long memberId){
-        Member member = memberRepository.findById(memberId)
+        Member member = memberRepository.findByIdAndStatus(memberId, BaseStatus.ACTIVE)
                 .orElseThrow(()-> new BaseException(NOT_EXIST_MEMBER));
         return member;
 
