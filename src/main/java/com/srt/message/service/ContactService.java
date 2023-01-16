@@ -52,7 +52,7 @@ public class ContactService {
     // 연락처 추가
     @Transactional(readOnly = false)
     public PostContactRes saveContact(PostContactReq req, long memberId){
-        long groupId = req.getContactGroupId();
+        Long groupId = req.getContactGroupId();
 
         // 핸드폰 기존 등록 여부
         if(contactRepository.findByPhoneNumberAndStatus(req.getPhoneNumber(), BaseStatus.ACTIVE).isPresent())
@@ -62,9 +62,12 @@ public class ContactService {
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new BaseException(NOT_EXIST_MEMBER));
 
+        ContactGroup contactGroup = null;
         // 그룹 존재 여부
-        ContactGroup contactGroup = contactGroupRepository.findById(groupId)
-                .orElseThrow(() -> new BaseException(NOT_EXIST_GROUP));
+        if(groupId!=null) {
+            contactGroup = contactGroupRepository.findById(groupId)
+                    .orElseThrow(() -> new BaseException(NOT_EXIST_GROUP));
+        }
 
         Contact contact = PostContactReq.toEntity(req, contactGroup,member);
         contactRepository.save(contact);
@@ -151,24 +154,10 @@ public class ContactService {
     }
 
     // 전체 연락처 조회(페이징)
-//    public PageResult<ContactDTO, Contact> getMemberContact(long memberId, int page) {
-//        PageRequest pageRequest = PageRequest.of(page-1, 5, Sort.by("id").descending());
-//        Page<Contact> contactPage = contactRepository.findByMemberIdAndStatus(memberId, BaseStatus.ACTIVE, pageRequest);
-//        Function<Contact, ContactDTO> fn = (contact -> ContactDTO.toDto(contact));
-//        return new PageResult<>(contactPage, fn);
-//    }
-
     public PageResult<GetContactRes, Contact> getMemberContact(long memberId, int page) {
         PageRequest pageRequest = PageRequest.of(page-1, 5, Sort.by("id").descending());
         Page<Contact> contactPage = contactRepository.findByMemberIdAndStatus(memberId, BaseStatus.ACTIVE, pageRequest);
         Function<Contact, GetContactRes> fn = (contact -> GetContactRes.toDto(contact));
         return new PageResult<>(contactPage, fn);
     }
-
-    public List<Contact> test(Long id){
-        List<Long> test = new ArrayList<Long>();
-        test.add(id);
-        System.out.println("test = " + test);
-        return contactRepository.findByMemberIdInAndStatus(test, BaseStatus.ACTIVE);
-    };
 }
