@@ -2,6 +2,8 @@ package com.srt.message.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.srt.message.config.domain.BaseEntity;
+import com.srt.message.config.exception.BaseException;
+import com.srt.message.config.response.BaseResponseStatus;
 import com.srt.message.config.status.BaseStatus;
 import com.srt.message.dto.contact.ContactDTO;
 import com.srt.message.dto.contact.patch.PatchContactReq;
@@ -37,13 +39,19 @@ public class Contact extends BaseEntity {
 
     private String memo;
 
-    private void changeContactGroup(ContactGroup contactGroup){this.contactGroup = contactGroup;}
+    public void changeContactGroup(ContactGroup contactGroup){this.contactGroup = contactGroup;}
     private void changePhoneNumber(String phoneNumber){this.phoneNumber = phoneNumber;}
     private void changeMemo(String memo){this.memo = memo;}
+    public void quitContactGroup() {
+        this.contactGroup = null;
+    }
 
     public void editContact(PatchContactReq contactDto, ContactGroup contactGroup){ // dto 수정
-        if(contactDto.getContactGroupId()!=null)
+        if(contactDto.getContactGroupId()!=null) {
             this.changeContactGroup(contactGroup);
+        } else {
+            this.contactGroup = null;
+        }
 
         if(contactDto.getPhoneNumber()!=null)
             this.changePhoneNumber(contactDto.getPhoneNumber());

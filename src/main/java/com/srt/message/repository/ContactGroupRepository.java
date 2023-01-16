@@ -14,7 +14,10 @@ import java.util.Optional;
 public interface ContactGroupRepository extends JpaRepository<ContactGroup,Long> {
     Optional<ContactGroup> findByNameAndStatus(String name, BaseStatus status);
 
+    Optional<List<ContactGroup>>findByMemberIdAndStatus(long memberId, BaseStatus baseStatus);
     Optional<ContactGroup> findByName(String name);
     Page<ContactGroup> findByMemberIdAndStatus(long memberId, BaseStatus status, Pageable pageable);
     Optional<List<ContactGroup>> findByMemberId(long memberId);
+
+    Optional<ContactGroup> findByIdAndStatus(long id, BaseStatus status);
 }
