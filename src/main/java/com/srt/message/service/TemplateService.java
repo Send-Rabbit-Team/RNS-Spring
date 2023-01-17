@@ -28,29 +28,62 @@ public class TemplateService {
     private final TemplateRepository templateRepository;
     private final MemberRepository memberRepository;
 
+    // member 조회
+    private Member getExistMember(long memberId) {
+        return memberRepository.findByIdAndStatus(memberId, BaseStatus.ACTIVE)
+                .orElseThrow(() -> new BaseException(NOT_EXIST_MEMBER));
+    }
+
+    // member의 template 인지 조회
+    private void checkMatchMember(Template template, long memberId) {
+        if (template.getMember().getId() != memberId)
+            throw new BaseException(NOT_ACCESS_MEMBER);
+    }
+
     // 탬플릿 생성
     @Transactional(readOnly = false)
     public GetTemplateRes registerTemplate(Long memberId, PostTemplateReq postTemplateReq) {
-        Member member = memberRepository.findByIdAndStatus(memberId, BaseStatus.ACTIVE)
-                .orElseThrow(() -> new BaseException(NOT_EXIST_MEMBER));
+        // member 조회
+        Member member = getExistMember(memberId);
+
+        // template 생성
         Template template = templateRepository.save(PostTemplateReq.toEntity(postTemplateReq, member));
+
         return GetTemplateRes.toDto(template);
     }
 
     // 탬플릿 단일 조회
     public GetTemplateRes getOneTemplate(Long memberId, Long templateId) {
-        Template template = templateRepository.findByIdAndMemberIdAndStatus(templateId, memberId, BaseStatus.ACTIVE)
+        // member 조회
+        Member member = getExistMember(memberId);
+
+        // template 조회
+        Template template = templateRepository.findByIdAndStatus(templateId, BaseStatus.ACTIVE)
                 .orElseThrow(() -> new BaseException(NOT_EXIST_TEMPLATE));
+
+        // member의 template 인지 조회
+        checkMatchMember(template, memberId);
+
+
         return GetTemplateRes.toDto(template);
     }
 
     // 탬플릿 전체 조회
     public PageResult<GetTemplateRes, Template> getAllTemplate(Long memberId, int page) {
+        // member 조회
+        getExistMember(memberId);
+
+        // pageRequest 생성
         PageRequest pageRequest = PageRequest.of(page-1, 3, Sort.by("id").descending());
+
+        // template 조회
         Page<Template> templatePage = templateRepository.findByMemberIdAndStatus(memberId, BaseStatus.ACTIVE, pageRequest);
         if (templatePage.isEmpty())
             throw new BaseException(NOT_EXIST_TEMPLATE);
+
+        // template -> template dto 함수 정의
         Function<Template, GetTemplateRes> fn = (template -> GetTemplateRes.toDto(template));
+
         return new PageResult<>(templatePage, fn);
     }
 
@@ -58,16 +91,14 @@ public class TemplateService {
     @Transactional(readOnly = false)
     public GetTemplateRes editTemplate(Long memberId, PatchTemplateReq patchTemplateReq) {
         // member 조회
-        if (memberRepository.findByIdAndStatus(memberId, BaseStatus.ACTIVE).isEmpty())
-            throw new BaseException(NOT_EXIST_MEMBER);
+        getExistMember(memberId);
 
         // template 조회
         Template template = templateRepository.findByIdAndStatus(patchTemplateReq.getTemplateId(), BaseStatus.ACTIVE)
                 .orElseThrow(() -> new BaseException(NOT_EXIST_TEMPLATE));
 
         // member의 template 인지 조회
-        if (template.getMember().getId() != memberId)
-            throw new BaseException(NOT_ACCESS_MEMBER);
+        checkMatchMember(template, memberId);
 
         // template 수정
         if (patchTemplateReq.getTitle() != null)
@@ -85,16 +116,14 @@ public class TemplateService {
     @Transactional(readOnly = false)
     public GetTemplateRes deleteTemplate(Long memberId, Long templateId) {
         // member 조회
-        memberRepository.findByIdAndStatus(memberId, BaseStatus.ACTIVE)
-                .orElseThrow(() -> new BaseException(NOT_EXIST_MEMBER));
+        getExistMember(memberId);
 
         // template 조회
         Template template = templateRepository.findByIdAndStatus(templateId, BaseStatus.ACTIVE)
                 .orElseThrow(() -> new BaseException(NOT_EXIST_TEMPLATE));
 
         // member의 template 인지 조회
-        if (template.getMember().getId() != memberId)
-            throw new BaseException(NOT_ACCESS_MEMBER);
+        checkMatchMember(template, memberId);
 
         // template 삭제
         template.changeStatusInActive();
