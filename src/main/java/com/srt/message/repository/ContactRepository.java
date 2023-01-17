@@ -22,9 +22,9 @@ public interface ContactRepository extends JpaRepository<Contact, Long> {
     Page<Contact> findByPhoneNumberContainingAndMemberIdAndStatus(String phoneNumber, Pageable pageable, long memberId, BaseStatus status);
 
     // 그룹으로 연락처 조회 (페이지네이션 없음)
-    Optional<List<Contact>> findByContactGroupIdAndStatus(Long groupId, BaseStatus status);
+    List<Contact> findByContactGroupIdAndStatus(Long groupId, BaseStatus status);
 
-    Optional<List<Contact>> findByContactGroupIdAndMemberIdAndStatus(Long groupId,Long memberId, BaseStatus status);
+    List<Contact> findByContactGroupIdAndMemberIdAndStatus(Long groupId,Long memberId, BaseStatus status);
 
     // 사용자 아이디로 연락처 조회 (페이지네이션 있음)
     @Query(value = "select c from Contact c where c.member.id = :memberId and c.status = :status",

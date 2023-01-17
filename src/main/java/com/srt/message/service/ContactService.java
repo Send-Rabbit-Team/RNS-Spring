@@ -137,8 +137,11 @@ public class ContactService {
 
     // 연락처 그룹으로 필터링
     public List<GetGroupContactRes> filterContactByGroup(long groupId, long memberId){
-        List<Contact> contactList = contactRepository.findByContactGroupIdAndMemberIdAndStatus(groupId, memberId, BaseStatus.ACTIVE)
-                .orElseThrow(() -> new BaseException(NOT_EXIST_CONTACT_NUMBER));
+        List<Contact> contactList = contactRepository.findByContactGroupIdAndMemberIdAndStatus(groupId, memberId, BaseStatus.ACTIVE);
+
+        if (contactList.isEmpty())
+            throw new BaseException(NOT_EXIST_CONTACT_NUMBER);
+
         return contactList.stream().map(contact -> GetGroupContactRes.toDto(contact)).collect(Collectors.toList());
     };
 
