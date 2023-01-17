@@ -17,19 +17,19 @@ public interface ContactRepository extends JpaRepository<Contact, Long> {
     Optional<Contact> findByPhoneNumberAndStatus(String phoneNumber, BaseStatus status);
 
     // 전화번호로 검색
-    @Query(value = "select c from Contact c where c.member.id = :memberId and c.status = :status and c.phoneNumber like '%:phoneNumber%'",
-    countQuery = "select count(c) from Contact c where c.member.id = :memberId and c.status = :status and c.phoneNumber like '%:phoneNumber%' ")
-    Page<Contact> findByPhoneNumberContainingAndMemberIdAndStatus(String phoneNumber, Pageable pageable, long memberId, BaseStatus status);
+    @Query(value = "select c from Contact c where c.member.id = :memberId and c.status = :status and c.phoneNumber like %:phoneNumber%",
+    countQuery = "select count(c) from Contact c where c.member.id = :memberId and c.status = :status and c.phoneNumber like %:phoneNumber%")
+    Page<Contact> findbyPhoneNumber(String phoneNumber, Pageable pageable, long memberId, BaseStatus status);
 
     // 그룹으로 연락처 조회 (페이지네이션 없음)
-    Optional<List<Contact>> findByContactGroupIdAndStatus(Long groupId, BaseStatus status);
+    List<Contact> findByContactGroupIdAndStatus(Long groupId, BaseStatus status);
 
-    Optional<List<Contact>> findByContactGroupIdAndMemberIdAndStatus(Long groupId,Long memberId, BaseStatus status);
+    List<Contact> findByContactGroupIdAndMemberIdAndStatus(Long groupId,Long memberId, BaseStatus status);
 
     // 사용자 아이디로 연락처 조회 (페이지네이션 있음)
     @Query(value = "select c from Contact c where c.member.id = :memberId and c.status = :status",
     countQuery = "select count(c) from Contact c where c.member.id = :memberId and c.status = :status")
-    Page<Contact> findByMemberIdAndStatus(Long memberId, BaseStatus status, Pageable pageable);
+    Page<Contact> findAll(Long memberId, BaseStatus status, Pageable pageable);
 
     List<Contact> findByMemberIdInAndStatus(List<Long> memberId, BaseStatus status);
 }

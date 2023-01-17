@@ -15,11 +15,11 @@ import java.util.Optional;
 public interface ContactGroupRepository extends JpaRepository<ContactGroup,Long> {
     Optional<ContactGroup> findByNameAndStatus(String name, BaseStatus status);
 
-    Optional<List<ContactGroup>>findByMemberIdAndStatus(long memberId, BaseStatus baseStatus);
+    List<ContactGroup>findByMemberIdAndStatus(long memberId, BaseStatus baseStatus);
 
     @Query(value = "select cg from ContactGroup cg where cg.member.id = :memberId and cg.status = :status",
     countQuery = "select count(cg) from ContactGroup cg where cg.member.id = :memberId and cg.status = :status")
-    Page<ContactGroup> findByMemberIdAndStatus(long memberId, BaseStatus status, Pageable pageable);
+    Page<ContactGroup> findAll(long memberId, BaseStatus status, Pageable pageable);
 
     Optional<ContactGroup> findByIdAndStatus(long id, BaseStatus status);
 }
