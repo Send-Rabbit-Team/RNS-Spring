@@ -16,7 +16,7 @@ public interface SenderNumberRepository extends JpaRepository<SenderNumber, Long
 
     @Query(value = "select sn from SenderNumber sn where sn.member.id = :memberId and sn.status = :status",
     countQuery = "select count(sn) from SenderNumber sn where sn.member.id = :memberId and sn.status = :status")
-    Page<SenderNumber> findByMemberIdAndStatus(Long memberId, BaseStatus status, Pageable pageable);
+    Page<SenderNumber> findAll(Long memberId, BaseStatus status, Pageable pageable);
 
     Optional<SenderNumber> findByIdAndStatus(Long senderNumberId, BaseStatus status);
 

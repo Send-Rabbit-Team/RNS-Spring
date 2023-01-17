@@ -48,8 +48,12 @@ public class ContactGroupService {
     public List<ContactGroupDTO>  getAllContactGroup(long memberId){
         Member member = getExistMember(memberId);
 
-        return contactGroupRepository.findByMemberIdAndStatus(memberId, BaseStatus.ACTIVE).orElseThrow(()->new BaseException(NOT_EXIST_MEMBER))
-                .stream().map(m-> ContactGroupDTO.toDTO(m,member)) .collect(Collectors.toList());
+        List<ContactGroup> contactGroupList = contactGroupRepository.findByMemberIdAndStatus(memberId, BaseStatus.ACTIVE);
+
+        if (contactGroupList.isEmpty())
+            throw new BaseException(NOT_EXIST_MEMBER);
+
+        return contactGroupList.stream().map(contactGroup -> ContactGroupDTO.toDTO(contactGroup,member)) .collect(Collectors.toList());
     }
 
     //그룹 찾기
@@ -105,8 +109,12 @@ public class ContactGroupService {
         contactGroup.changeStatusInActive();
         contactGroupRepository.save(contactGroup);
 
+        // 연락처 조회
+        List<Contact> contactList = contactRepository.findByContactGroupIdAndStatus(contactGroupId, BaseStatus.ACTIVE);
+        if (contactList.isEmpty())
+            throw new BaseException(NOT_EXIST_CONTACT_NUMBER);
+
         // 연락처 그룹에 연결된 연락처 해제
-        List<Contact> contactList = contactRepository.findByContactGroupIdAndStatus(contactGroupId, BaseStatus.ACTIVE).orElseThrow(() -> new BaseException(NOT_EXIST_CONTACT_NUMBER));
         for (Contact contact : contactList) {
             contact.quitContactGroup();
             contactRepository.save(contact);
@@ -130,7 +138,7 @@ public class ContactGroupService {
     public PageResult<GetContactGroupRes, ContactGroup> getMemberContactGroup(long memberId, int page) {
         PageRequest pageRequest = PageRequest.of(page - 1, 5, Sort.by("id").descending());
 
-        Page<ContactGroup> contactPage = contactGroupRepository.findByMemberIdAndStatus(memberId, BaseStatus.ACTIVE, pageRequest);
+        Page<ContactGroup> contactPage = contactGroupRepository.findAll(memberId, BaseStatus.ACTIVE, pageRequest);
 
         Function<ContactGroup, GetContactGroupRes> fn = (contactGroup -> GetContactGroupRes.toDto(contactGroup));
 

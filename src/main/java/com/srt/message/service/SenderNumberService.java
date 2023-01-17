@@ -60,7 +60,7 @@ public class SenderNumberService {
     // 발신자 조회
     public PageResult<GetSenderNumberRes, SenderNumber> getMemberSenderNumber(long memberId, int page) {
         PageRequest pageRequest = PageRequest.of(page-1, 5, Sort.by("id").descending());
-        Page<SenderNumber> senderNumberPage = senderNumberRepository.findByMemberIdAndStatus(memberId, BaseStatus.ACTIVE, pageRequest);
+        Page<SenderNumber> senderNumberPage = senderNumberRepository.findAll(memberId, BaseStatus.ACTIVE, pageRequest);
         Function<SenderNumber, GetSenderNumberRes> fn = (senderNumber -> GetSenderNumberRes.toDto(senderNumber));
         return new PageResult<>(senderNumberPage, fn);
     }
@@ -72,7 +72,7 @@ public class SenderNumberService {
                 .orElseThrow(() -> new BaseException(NOT_EXIST_PHONE_NUMBER));
 
         if (senderNumber.getMember().getId() != memberId)
-            throw new BaseException(NOT_AUTH_MEMBER);
+            throw new BaseException(NOT_ACCESS_MEMBER);
 
         senderNumber.changeStatusInActive();
         senderNumberRepository.save(senderNumber);
