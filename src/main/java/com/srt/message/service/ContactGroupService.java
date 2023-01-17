@@ -138,7 +138,7 @@ public class ContactGroupService {
     public PageResult<GetContactGroupRes, ContactGroup> getMemberContactGroup(long memberId, int page) {
         PageRequest pageRequest = PageRequest.of(page - 1, 5, Sort.by("id").descending());
 
-        Page<ContactGroup> contactPage = contactGroupRepository.findByMemberIdAndStatus(memberId, BaseStatus.ACTIVE, pageRequest);
+        Page<ContactGroup> contactPage = contactGroupRepository.findAll(memberId, BaseStatus.ACTIVE, pageRequest);
 
         Function<ContactGroup, GetContactGroupRes> fn = (contactGroup -> GetContactGroupRes.toDto(contactGroup));
 

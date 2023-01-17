@@ -77,7 +77,7 @@ public class TemplateService {
         PageRequest pageRequest = PageRequest.of(page-1, 3, Sort.by("id").descending());
 
         // template 조회
-        Page<Template> templatePage = templateRepository.findByMemberIdAndStatus(memberId, BaseStatus.ACTIVE, pageRequest);
+        Page<Template> templatePage = templateRepository.findAll(memberId, BaseStatus.ACTIVE, pageRequest);
         if (templatePage.isEmpty())
             throw new BaseException(NOT_EXIST_TEMPLATE);
 

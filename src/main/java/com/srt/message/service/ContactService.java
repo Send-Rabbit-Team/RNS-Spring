@@ -130,7 +130,7 @@ public class ContactService {
     // 연락처 검색
     public PageResult<ContactDTO, Contact> searchContact(String phoneNumber, int currentPage, long memberId) {
         PageRequest pageRequest = PageRequest.of(currentPage-1, 5, Sort.by("id").descending());
-        Page<Contact> contactPage = contactRepository.findByPhoneNumberContainingAndMemberIdAndStatus(phoneNumber, pageRequest, memberId,BaseStatus.ACTIVE);
+        Page<Contact> contactPage = contactRepository.findbyPhoneNumber(phoneNumber, pageRequest, memberId,BaseStatus.ACTIVE);
         Function<Contact, ContactDTO> fn = (contact -> ContactDTO.toDto(contact));
         return new PageResult<>(contactPage, fn);
     }
@@ -160,7 +160,7 @@ public class ContactService {
     // 전체 연락처 조회(페이징)
     public PageResult<GetContactRes, Contact> getMemberContact(long memberId, int page) {
         PageRequest pageRequest = PageRequest.of(page-1, 5, Sort.by("id").descending());
-        Page<Contact> contactPage = contactRepository.findByMemberIdAndStatus(memberId, BaseStatus.ACTIVE, pageRequest);
+        Page<Contact> contactPage = contactRepository.findAll(memberId, BaseStatus.ACTIVE, pageRequest);
         Function<Contact, GetContactRes> fn = (contact -> GetContactRes.toDto(contact));
         return new PageResult<>(contactPage, fn);
     }
