@@ -17,8 +17,8 @@ public interface ContactRepository extends JpaRepository<Contact, Long> {
     Optional<Contact> findByPhoneNumberAndStatus(String phoneNumber, BaseStatus status);
 
     // 전화번호로 검색
-    @Query(value = "select c from Contact c where c.member.id = :memberId and c.status = :status and c.phoneNumber like '%:phoneNumber%'",
-    countQuery = "select count(c) from Contact c where c.member.id = :memberId and c.status = :status and c.phoneNumber like '%:phoneNumber%' ")
+    @Query(value = "select c from Contact c where c.member.id = :memberId and c.status = :status and c.phoneNumber like %:phoneNumber%",
+    countQuery = "select count(c) from Contact c where c.member.id = :memberId and c.status = :status and c.phoneNumber like %:phoneNumber%")
     Page<Contact> findbyPhoneNumber(String phoneNumber, Pageable pageable, long memberId, BaseStatus status);
 
     // 그룹으로 연락처 조회 (페이지네이션 없음)
