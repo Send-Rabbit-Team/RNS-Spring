@@ -17,17 +17,15 @@ import java.util.List;
 @NoArgsConstructor
 @Getter
 public class GetContactGroupRes {
-    private long id;
-    private String name;
-    private List<ContactDTO> contactDTOList;
+    private long groupId;
+    private String groupName;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
-    public static GetContactGroupRes toDto(ContactGroup contactGroup, List<ContactDTO> contactDTOList) {
+    public static GetContactGroupRes toDto(ContactGroup contactGroup) {
         return GetContactGroupRes.builder()
-                .id(contactGroup.getId())
-                .name(contactGroup.getName())
-                .contactDTOList(contactDTOList)
+                .groupId(contactGroup.getId())
+                .groupName(contactGroup.getName())
                 .createdAt(contactGroup.getCreatedAt())
                 .updatedAt(contactGroup.getUpdatedAt())
                 .build();

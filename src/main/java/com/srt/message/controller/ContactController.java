@@ -5,6 +5,7 @@ import com.srt.message.config.response.BaseResponse;
 import com.srt.message.domain.Contact;
 import com.srt.message.dto.contact.ContactDTO;
 import com.srt.message.dto.contact.get.GetContactRes;
+import com.srt.message.dto.contact.get.GetGroupContactRes;
 import com.srt.message.dto.contact.patch.PatchContactReq;
 import com.srt.message.dto.contact.patch.PatchContactRes;
 import com.srt.message.dto.contact.post.PostContactReq;
@@ -110,17 +111,17 @@ public class ContactController {
         return new BaseResponse<>(contactService.searchContact(phoneNumber,currentPage,JwtInfo.getMemberId(request)));
     };
 
-    // 연락처 그룹 필터링
+    // 그룹으로 연락처 찾기
     @ApiOperation(
-            value = "연락처 그룹 필터링 (페이징)",
-            notes = "연락처 그룹 필터링 API - 페이징 처리"
+            value = "그룹으로 연락처 찾기",
+            notes = "그룹으로 연락처 찾기 API"
     )
     @ApiResponses({
             @ApiResponse(code = 1000, message = "요청에 성공하였습니다.")
     })
-    @GetMapping("/byGroup/{currentPage}")
-    public BaseResponse<PageResult<ContactDTO, Contact>> filterByGroup(@PathVariable int currentPage,@RequestParam long groupId, HttpServletRequest request){
-        return new BaseResponse<>(contactService.filterContactByGroup(groupId,currentPage,JwtInfo.getMemberId(request)));
+    @GetMapping("/byGroup")
+    public BaseResponse<List<GetGroupContactRes>> filterByGroup(@RequestParam long groupId, HttpServletRequest request){
+        return new BaseResponse<>(contactService.filterContactByGroup(groupId, JwtInfo.getMemberId(request)));
     }
 
     // 아이디로 연락처 찾기
