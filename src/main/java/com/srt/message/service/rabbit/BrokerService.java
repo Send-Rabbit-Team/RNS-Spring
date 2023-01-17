@@ -10,22 +10,30 @@ import com.srt.message.repository.MessageResultRepository;
 import com.srt.message.repository.MessageRuleRepository;
 import com.srt.message.repository.redis.MessageResultRedisRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.java.Log;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.SetOperations;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 
 import static com.srt.message.utils.rabbitmq.RabbitSMSUtil.*;
 import static com.srt.message.utils.rabbitmq.RabbitSMSUtil.LG_ROUTING_KEY;
 
+@Log4j2
 @Service
 @RequiredArgsConstructor
 public class BrokerService {
     private final int BROKER_SIZE = 3;
 
-    private final RedisTemplate<String, String> redisTemplate;
+    private final RedisTemplate<String, Object> redisTemplate;
 
     private final RabbitTemplate rabbitTemplate;
 
@@ -40,6 +48,7 @@ public class BrokerService {
     public void sendSmsMessage(BrokerMessageDto brokerMessageDto) {
         SMSMessageDto smsMessageDto = brokerMessageDto.getSmsMessageDto();
         Member member = brokerMessageDto.getMember();
+
 
         // KT, LG, SKT 순으로 정렬해서 가져옴
         List<MessageRule> messageRules = messageRuleRepository.findAllByMember(member);
@@ -76,39 +85,48 @@ public class BrokerService {
         String brokerName = routingKey.split("\\.")[1].toUpperCase();
         Broker broker = brokerRepository.findByName(brokerName);
 
-        RMessageResult rMessageResult = RMessageResult.builder()
-                .message(message)
-                .broker(broker)
-                .contact(null) // contact로 변경 해야함 (테스트 용)
-                .messageStatus(MessageStatus.PENDING)
-                .build();
+        Set<RMessageResult> rMessageResultSet = new LinkedHashSet<>();
 
-        MessageResult messageResult = MessageResult.builder()
-                .message(message)
-                .contact(null) // contact로 변경 해야함 (테스트 용)
-                .broker(broker)
-                .messageStatus(MessageStatus.PENDING)
-                .build();
 
         for (int i = 0; i < broker_count; i++) {
             smsMessageDto.setTo(contacts.get(0).getPhoneNumber()); // TODO 테스트를 위해 0으로 설정, 추후에 i로 변경해야 함
             Contact contact = contacts.get(0); // TODO 테스트를 위해 0으로 설정, 추후에 i로 변경해야 함
 
+            RMessageResult rMessageResult = RMessageResult.builder()
+                    .messageId(message.getId())
+                    .brokerId(broker.getId())
+                    .contactId(null) // contact로 변경 해야함 (테스트 용)
+                    .messageStatus(MessageStatus.PENDING)
+                    .build();
 
-//
+            MessageResult messageResult = MessageResult.builder()
+                    .message(message)
+                    .contact(null) // contact로 변경 해야함 (테스트 용)
+                    .broker(broker)
+                    .messageStatus(MessageStatus.PENDING)
+                    .build();
 
-//
-//            // TODO RDBMS 저장하는걸 MQ 사용해서 비동기로 처리해야 하나 고민해보기
+            // TODO RDBMS 저장하는걸 MQ 사용해서 비동기로 처리해야 하나 고민해보기
 //            messageResultRepository.save(messageResult);
 
             // RedisTemplate 사용 (속도 더 빠름)
-//            ValueOperations<String, String> stringStringValueOperations = redisTemplate.opsForValue();
-//            stringStringValueOperations.set("test", "1");
+//            ValueOperations<String, Object> stringStringValueOperations = redisTemplate.opsForValue();
+//            stringStringValueOperations.set("test", rMessageResult);
 
-            messageResultRedisRepository.save(rMessageResult);
+            rMessageResultSet.add(rMessageResult);
+
+//            messageResultRedisRepository.save(rMessageResult);
 
             rabbitTemplate.convertAndSend(SMS_EXCHANGE_NAME, routingKey, smsMessageDto);
-            System.out.println((i + 1) + " 번째 메시지가 전송되었습니다 - " + routingKey);
+            log.info((i + 1) + " 번째 메시지가 전송되었습니다 - " + routingKey);
         }
+
+        // redis 저장
+//        messageResultRedisRepository.saveAll(rMessageResultList);
+
+        // RedisTemplate Set 저장 (속도 더 빠름)
+        SetOperations<String, Object> setOperation = redisTemplate.opsForSet();
+        setOperation.add("test123", rMessageResultSet);
+        System.out.println("종료");
     }
 }

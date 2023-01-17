@@ -28,6 +28,7 @@ public class MessageService {
 
     private final BrokerService brokerService;
 
+
     public void sendMessageToBroker(PostSendMessageReq messageReq, long memberId){
         Member member = memberRepository.findById(memberId)
                         .orElseThrow(() -> new BaseException(NOT_EXIST_MEMBER));

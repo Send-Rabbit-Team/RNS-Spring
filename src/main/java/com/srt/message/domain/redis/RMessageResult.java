@@ -15,6 +15,7 @@ import org.springframework.data.redis.core.TimeToLive;
 
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
+import java.io.Serializable;
 
 
 @AllArgsConstructor
@@ -22,15 +23,15 @@ import javax.persistence.Enumerated;
 @Getter
 @Builder
 @RedisHash("messageResult")
-public class RMessageResult {
+public class RMessageResult implements Serializable {
     @Id
     private String id;
 
-    private Message message;
+    private Long messageId;
 
-    private Contact contact;
+    private Long contactId;
 
-    private Broker broker;
+    private Long brokerId;
 
     @TimeToLive // 유효시간 5분으로 설정
     private Long expiration = 60 * 5L;
