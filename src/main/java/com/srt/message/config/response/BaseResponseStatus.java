@@ -39,6 +39,7 @@ public enum BaseResponseStatus {
     NOT_VALID_BROKER_RATE(false, 2019, "중계사 비율 설정이 올바르지 않습니다."),
     NOT_EXIST_BROKER(false, 2020, "존재하지 않는 중계사입니다."),
     NOT_MATCH_SENDER_NUMBER(false, 2021, "해당 사용자의 발신자 번호가 아닙니다."),
+    NOT_MATCH_GROUP(false, 2022, "연락처에 연결된 그룹이 아닙니다."),
 
 
 

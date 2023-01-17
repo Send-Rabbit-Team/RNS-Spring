@@ -24,10 +24,14 @@ public class ContactDTO {
                 ContactDTO.builder()
                         .id(contact.getId())
                         .memberId(contact.getMember().getId())
-                        .groupId(contact.getContactGroup().getId())
                         .phoneNumber(contact.getPhoneNumber())
                         .memo(contact.getMemo())
                         .build();
+
+
+        if (contact.getContactGroup() != null) {
+            contactDTO.setGroupId(contact.getContactGroup().getId());
+        }
 
         return contactDTO;
     }

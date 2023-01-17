@@ -1,23 +1,26 @@
 package com.srt.message.controller;
 
+import com.srt.message.config.page.PageResult;
 import com.srt.message.config.response.BaseResponse;
+import com.srt.message.domain.Contact;
 import com.srt.message.dto.contact.ContactDTO;
+import com.srt.message.dto.contact.get.GetContactRes;
+import com.srt.message.dto.contact.get.GetGroupContactRes;
 import com.srt.message.dto.contact.patch.PatchContactReq;
 import com.srt.message.dto.contact.patch.PatchContactRes;
 import com.srt.message.dto.contact.post.PostContactReq;
 import com.srt.message.dto.contact.post.PostContactRes;
 import com.srt.message.dto.jwt.JwtInfo;
-import com.srt.message.jwt.NoIntercept;
 import com.srt.message.service.ContactService;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
-import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.List;
 
 @Log4j2
 @RestController
@@ -53,7 +56,6 @@ public class ContactController {
             @ApiResponse(code = 2016, message = "해당 사용자의 데이터가 아닙니다.")
     })
     @PatchMapping("/edit")
-    @NoIntercept
     public BaseResponse<PatchContactRes> editContact(@RequestBody PatchContactReq patchContactReq, HttpServletRequest request){
         PatchContactRes patchContactRes = contactService.editContact(patchContactReq, JwtInfo.getMemberId(request)); // 수정
 
@@ -72,13 +74,29 @@ public class ContactController {
             @ApiResponse(code = 2012, message = "이미 등록된 연락처입니다."),
     })
     @PatchMapping("/delete/{contactId}")
-    @NoIntercept
     public BaseResponse<String> deleteContact(@PathVariable long contactId, HttpServletRequest request){
         contactService.deleteContact(contactId, JwtInfo.getMemberId(request));
 
         return new BaseResponse<>("연락처가 정상적으로 삭제 되었습니다.");
     }
 
+    //연락처에서 그룹 해제
+    @ApiOperation(
+            value = "연락처에서 그룹 해제",
+            notes = "연락처에 연결된 그룹을 해제하는 API"
+    )
+    @ApiResponses({
+            @ApiResponse(code = 1000, message = "요청에 성공하였습니다."),
+            @ApiResponse(code = 2011, message = "존재하지 않는 그룹입니다."),
+            @ApiResponse(code = 2014, message = "존재하지 않는 연락처입니다."),
+            @ApiResponse(code = 2021, message = "연락처에 연결된 그룹이 아닙니다.")
+    })
+    @PatchMapping("/quit/{contactId}")
+    public BaseResponse<String> quitContactGroup(@PathVariable("contactId") long contactId, HttpServletRequest request){
+        contactService.quitContactGroup(contactId, JwtInfo.getMemberId(request));
+
+        return new BaseResponse<>("연락처가 그룹에서 해제 되었습니다.");
+    }
 
     // 연락처 검색
     @ApiOperation(
@@ -89,20 +107,42 @@ public class ContactController {
             @ApiResponse(code = 1000, message = "요청에 성공하였습니다.")
     })
     @GetMapping("/search/{currentPage}")
-    public Page<ContactDTO> search(@PathVariable int currentPage, @RequestParam String phoneNumber){
-        return contactService.searchContact(phoneNumber,currentPage);
+    public BaseResponse<PageResult<ContactDTO, Contact>> search(@PathVariable int currentPage, @RequestParam String phoneNumber, HttpServletRequest request){
+        return new BaseResponse<>(contactService.searchContact(phoneNumber,currentPage,JwtInfo.getMemberId(request)));
     };
 
-    // 연락처 그룹 필터링
+    // 그룹으로 연락처 찾기
     @ApiOperation(
-            value = "연락처 필터링 (페이징)",
-            notes = "연락처 필터 API - 페이징 처리"
+            value = "그룹으로 연락처 찾기",
+            notes = "그룹으로 연락처 찾기 API"
     )
     @ApiResponses({
             @ApiResponse(code = 1000, message = "요청에 성공하였습니다.")
     })
-    @GetMapping("/byGroup/{currentPage}")
-    public Page<ContactDTO> filterByGroup(@PathVariable int currentPage,@RequestParam long groupId){
-        return contactService.filterContactByGroup(groupId,currentPage);
+    @GetMapping("/byGroup")
+    public BaseResponse<List<GetGroupContactRes>> filterByGroup(@RequestParam long groupId, HttpServletRequest request){
+        return new BaseResponse<>(contactService.filterContactByGroup(groupId, JwtInfo.getMemberId(request)));
+    }
+
+    // 아이디로 연락처 찾기
+    @GetMapping("/{contactId}")
+    public BaseResponse<ContactDTO> find(@PathVariable int contactId){
+        return new BaseResponse<>(contactService.findContactById(contactId));
+    }
+
+    // 연락처 전체 조회
+    @ApiOperation(
+            value = "연락처 전체 조회",
+            notes = "사용자 아이디를 통해 사용자가 보유한 모든 연락처를 조회하는 API"
+    )
+    @ApiResponses({
+            @ApiResponse(code = 1000, message = "요청에 성공하였습니다.")
+    })
+    @GetMapping("/list/{page}")
+    public BaseResponse<PageResult<GetContactRes, Contact>> getMemberContactList(
+            HttpServletRequest request,
+            @PathVariable("page") int page) {
+        PageResult<GetContactRes, Contact> memberContactList = contactService.getMemberContact(JwtInfo.getMemberId(request), page);
+        return new BaseResponse<>(memberContactList);
     }
 }
