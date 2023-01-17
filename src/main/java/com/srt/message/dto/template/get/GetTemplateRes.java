@@ -12,14 +12,14 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class GetTemplateRes {
-    private long id;
+    private long templateId;
     private String title;
     private String content;
     private TemplateType templateType;
 
     public static GetTemplateRes toDto(Template template){
         return GetTemplateRes.builder()
-                .id(template.getId())
+                .templateId(template.getId())
                 .title(template.getTitle())
                 .content(template.getContent())
                 .templateType(template.getTemplateType())
