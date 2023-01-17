@@ -35,10 +35,11 @@ public enum BaseResponseStatus {
     NOT_ACCESS_GOOGLE(false, 2015, "구글 회원 인증에 실패했습니다."),
     NOT_MATCH_MEMBER(false, 2016, "해당 사용자의 데이터가 아닙니다."),
     NOT_EXIST_PHONE_NUMBER(false, 2017, "존재하지 않는 전화번호입니다."),
-    NOT_AUTH_MEMBER(false, 2018, "권한이 없는 사용자입니다."),
+    NOT_ACCESS_MEMBER(false, 2018, "권한이 없는 사용자입니다."),
     NOT_VALID_BROKER_RATE(false, 2019, "중계사 비율 설정이 올바르지 않습니다."),
     NOT_EXIST_BROKER(false, 2020, "존재하지 않는 중계사입니다."),
     NOT_MATCH_GROUP(false, 2021, "연락처에 연결된 그룹이 아닙니다."),
+    NOT_EXIST_TEMPLATE(true, 2022, "존재하지 않는 탬플릿입니다."),
 
 
 
