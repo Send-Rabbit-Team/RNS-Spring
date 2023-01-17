@@ -72,7 +72,7 @@ public class SenderNumberService {
                 .orElseThrow(() -> new BaseException(NOT_EXIST_PHONE_NUMBER));
 
         if (senderNumber.getMember().getId() != memberId)
-            throw new BaseException(NOT_AUTH_MEMBER);
+            throw new BaseException(NOT_ACCESS_MEMBER);
 
         senderNumber.changeStatusInActive();
         senderNumberRepository.save(senderNumber);
