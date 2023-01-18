@@ -42,6 +42,7 @@ public enum BaseResponseStatus {
     NOT_MATCH_GROUP(false, 2022, "연락처에 연결된 그룹이 아닙니다."),
     NOT_EXIST_MESSAGE(false, 2023, "존재하는 메시지가 아닙니다."),
     NOT_EXIST_CONTACT(false, 2024, "존재하지 않는 연락처입니다."),
+    NOT_EXIST_TEMPLATE(true, 2025, "존재하지 않는 탬플릿입니다."),
 
 
 

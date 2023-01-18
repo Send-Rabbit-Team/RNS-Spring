@@ -28,6 +28,7 @@ public class BaseTimeEntity {
     private LocalDateTime updatedAt;
 
     @Enumerated(EnumType.STRING)
+    @Column(columnDefinition = "ENUM('ACTIVE', 'INACTIVE', 'EXPIRED')")
     private BaseStatus status = BaseStatus.ACTIVE;
 
     protected void setStatus(BaseStatus status) {
