@@ -23,11 +23,15 @@ spring:
         show_sql: true
 
   redis:
+    pool:
+      min-idle: 0
+      max-idle: 8
+      max-active: 8
     cluster:
       nodes:
         210.109.63.84:30001,
-        210.109.63.84:30002,
-        210.109.63.84:30003
+        210.109.63.84:30003,
+        210.109.63.84:30006
       enabled: true
 
   ## Rabbit MQ

@@ -1,5 +1,6 @@
 package com.srt.message.domain.redis;
 
+import com.srt.message.config.domain.BaseTimeEntity;
 import com.srt.message.config.status.AuthPhoneNumberStatus;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

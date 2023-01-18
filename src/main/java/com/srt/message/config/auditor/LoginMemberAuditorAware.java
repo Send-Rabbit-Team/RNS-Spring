@@ -9,11 +9,12 @@ import java.util.Optional;
 
 @Component
 @RequiredArgsConstructor
-public class LoginMemberAuditorAware implements AuditorAware<Member> {
+public class LoginMemberAuditorAware implements AuditorAware<Long> {
     private final LoginMember loginMember;
 
     @Override
-    public Optional<Member> getCurrentAuditor() {
-        return Optional.of(loginMember.toEntity());
+    public Optional<Long> getCurrentAuditor() {
+        Long memberId = loginMember.getId() != null? loginMember.getId() : 0;
+        return Optional.of(memberId);
     }
 }

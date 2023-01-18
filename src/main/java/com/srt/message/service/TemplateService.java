@@ -5,9 +5,9 @@ import com.srt.message.config.page.PageResult;
 import com.srt.message.config.status.BaseStatus;
 import com.srt.message.domain.Member;
 import com.srt.message.domain.Template;
-import com.srt.message.dto.template.get.GetTemplateRes;
-import com.srt.message.dto.template.patch.PatchTemplateReq;
-import com.srt.message.dto.template.post.PostTemplateReq;
+import com.srt.message.service.dto.template.get.GetTemplateRes;
+import com.srt.message.service.dto.template.patch.PatchTemplateReq;
+import com.srt.message.service.dto.template.post.PostTemplateReq;
 import com.srt.message.repository.MemberRepository;
 import com.srt.message.repository.TemplateRepository;
 import lombok.RequiredArgsConstructor;
@@ -37,7 +37,7 @@ public class TemplateService {
     // member의 template 인지 조회
     private void checkMatchMember(Template template, long memberId) {
         if (template.getMember().getId() != memberId)
-            throw new BaseException(NOT_ACCESS_MEMBER);
+            throw new BaseException(NOT_AUTH_MEMBER);
     }
 
     // 탬플릿 생성

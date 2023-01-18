@@ -1,7 +1,7 @@
 package com.srt.message.jwt;
 
 import com.srt.message.config.exception.BaseException;
-import com.srt.message.dto.jwt.JwtInfo;
+import com.srt.message.service.dto.jwt.JwtInfo;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
