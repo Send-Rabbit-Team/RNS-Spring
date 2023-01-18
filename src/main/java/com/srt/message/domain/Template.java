@@ -1,7 +1,6 @@
 package com.srt.message.domain;
 
 import com.srt.message.config.domain.BaseEntity;
-import com.srt.message.config.type.MemberType;
 import com.srt.message.config.type.TemplateType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -46,5 +45,9 @@ public class Template extends BaseEntity {
 
     public void changeContent(String content) {
         this.content = content;
+    }
+
+    public void changeTemplateType(TemplateType templateType) {
+        this.templateType = templateType;
     }
 }
