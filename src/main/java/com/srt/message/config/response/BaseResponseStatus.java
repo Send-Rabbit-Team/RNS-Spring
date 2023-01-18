@@ -40,6 +40,8 @@ public enum BaseResponseStatus {
     NOT_EXIST_BROKER(false, 2020, "존재하지 않는 중계사입니다."),
     NOT_MATCH_SENDER_NUMBER(false, 2021, "해당 사용자의 발신자 번호가 아닙니다."),
     NOT_MATCH_GROUP(false, 2022, "연락처에 연결된 그룹이 아닙니다."),
+    NOT_EXIST_MESSAGE(false, 2023, "존재하는 메시지가 아닙니다."),
+    NOT_EXIST_CONTACT(false, 2024, "존재하지 않는 연락처입니다."),
 
 
 

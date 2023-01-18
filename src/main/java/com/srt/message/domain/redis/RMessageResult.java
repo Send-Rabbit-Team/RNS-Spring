@@ -22,9 +22,7 @@ import java.io.Serializable;
 @NoArgsConstructor
 @Getter
 @Builder
-@RedisHash("messageResult")
-public class RMessageResult implements Serializable {
-    @Id
+public class RMessageResult {
     private String id;
 
     private Long messageId;
@@ -33,9 +31,5 @@ public class RMessageResult implements Serializable {
 
     private Long brokerId;
 
-    @TimeToLive // 유효시간 5분으로 설정
-    private Long expiration = 60 * 5L;
-
-    @Enumerated(EnumType.STRING)
     private MessageStatus messageStatus = MessageStatus.PENDING;
 }

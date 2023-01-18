@@ -1,31 +1,29 @@
 package com.srt.message.service.rabbit;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.srt.message.config.status.MessageStatus;
 import com.srt.message.domain.*;
 import com.srt.message.domain.redis.RMessageResult;
 import com.srt.message.dto.message.BrokerMessageDto;
+import com.srt.message.dto.message.BrokerSendMessageDto;
 import com.srt.message.dto.message.SMSMessageDto;
+import com.srt.message.dto.message_result.MessageResultDto;
 import com.srt.message.repository.BrokerRepository;
 import com.srt.message.repository.MessageResultRepository;
 import com.srt.message.repository.MessageRuleRepository;
-import com.srt.message.repository.redis.MessageResultRedisRepository;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.java.Log;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.core.SetOperations;
-import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.LinkedHashSet;
+import java.util.HashMap;
 import java.util.List;
-import java.util.Set;
 
 import static com.srt.message.utils.rabbitmq.RabbitSMSUtil.*;
-import static com.srt.message.utils.rabbitmq.RabbitSMSUtil.LG_ROUTING_KEY;
+import static com.srt.message.utils.rabbitmq.RabbitSMSUtil.LG_WORK_ROUTING_KEY;
 
 @Log4j2
 @Service
@@ -38,7 +36,6 @@ public class BrokerService {
     private final RabbitTemplate rabbitTemplate;
 
     private final MessageResultRepository messageResultRepository;
-    private final MessageResultRedisRepository messageResultRedisRepository;
 
     private final MessageRuleRepository messageRuleRepository;
 
@@ -46,9 +43,7 @@ public class BrokerService {
 
     // Broker 서버에게 메시지 전송
     public void sendSmsMessage(BrokerMessageDto brokerMessageDto) {
-        SMSMessageDto smsMessageDto = brokerMessageDto.getSmsMessageDto();
         Member member = brokerMessageDto.getMember();
-
 
         // KT, LG, SKT 순으로 정렬해서 가져옴
         List<MessageRule> messageRules = messageRuleRepository.findAllByMember(member);
@@ -68,13 +63,13 @@ public class BrokerService {
             broker_count[(int)(Math.random() * 3)] += count - sum;
 
         // kt
-        sendMsgToBroker(brokerMessageDto, KT_ROUTING_KEY, broker_count[0]);
+        sendMsgToBroker(brokerMessageDto, KT_WORK_ROUTING_KEY, broker_count[0]);
 
         // lg
-        sendMsgToBroker(brokerMessageDto, LG_ROUTING_KEY, broker_count[1]);
+        sendMsgToBroker(brokerMessageDto, LG_WORK_ROUTING_KEY, broker_count[1]);
 
         // skt
-        sendMsgToBroker(brokerMessageDto, SKT_ROUTING_KEY, broker_count[2]);
+        sendMsgToBroker(brokerMessageDto, SKT_WORK_ROUTING_KEY, broker_count[2]);
     }
 
     private void sendMsgToBroker(BrokerMessageDto brokerMessageDto, String routingKey, int broker_count){
@@ -82,51 +77,55 @@ public class BrokerService {
         Message message = brokerMessageDto.getMessage();
         List<Contact> contacts = brokerMessageDto.getContacts();
 
-        String brokerName = routingKey.split("\\.")[1].toUpperCase();
+        String brokerName = routingKey.split("\\.")[2].toUpperCase();
         Broker broker = brokerRepository.findByName(brokerName);
 
-        Set<RMessageResult> rMessageResultSet = new LinkedHashSet<>();
+        long messageId = brokerMessageDto.getMessage().getId();
 
+        HashMap<String, String> rMessageResultMap = new HashMap<>();
 
         for (int i = 0; i < broker_count; i++) {
             smsMessageDto.setTo(contacts.get(0).getPhoneNumber()); // TODO 테스트를 위해 0으로 설정, 추후에 i로 변경해야 함
             Contact contact = contacts.get(0); // TODO 테스트를 위해 0으로 설정, 추후에 i로 변경해야 함
 
+            MessageResultDto messageResultDto = MessageResultDto.builder()
+                    .messageId(messageId)
+                    .contactId(contact.getId())
+                    .brokerId(broker.getId())
+                    .messageStatus(MessageStatus.PENDING)
+                    .build();
+
             RMessageResult rMessageResult = RMessageResult.builder()
                     .messageId(message.getId())
                     .brokerId(broker.getId())
-                    .contactId(null) // contact로 변경 해야함 (테스트 용)
+                    .contactId(contact.getId())
                     .messageStatus(MessageStatus.PENDING)
                     .build();
 
-            MessageResult messageResult = MessageResult.builder()
-                    .message(message)
-                    .contact(null) // contact로 변경 해야함 (테스트 용)
-                    .broker(broker)
-                    .messageStatus(MessageStatus.PENDING)
-                    .build();
+            rMessageResultMap.put(String.valueOf(i), convertObjectToJsonString(rMessageResult));
 
-            // TODO RDBMS 저장하는걸 MQ 사용해서 비동기로 처리해야 하나 고민해보기
-//            messageResultRepository.save(messageResult);
+            BrokerSendMessageDto sendMessageDto = new BrokerSendMessageDto(smsMessageDto, messageResultDto);
+            rabbitTemplate.convertAndSend(SMS_EXCHANGE_NAME, routingKey, sendMessageDto);
 
-            // RedisTemplate 사용 (속도 더 빠름)
-//            ValueOperations<String, Object> stringStringValueOperations = redisTemplate.opsForValue();
-//            stringStringValueOperations.set("test", rMessageResult);
-
-            rMessageResultSet.add(rMessageResult);
-
-//            messageResultRedisRepository.save(rMessageResult);
-
-            rabbitTemplate.convertAndSend(SMS_EXCHANGE_NAME, routingKey, smsMessageDto);
             log.info((i + 1) + " 번째 메시지가 전송되었습니다 - " + routingKey);
         }
 
-        // redis 저장
-//        messageResultRedisRepository.saveAll(rMessageResultList);
+        // RedisTemplate Map 자료구조 사용 (속도 더 빠름)
+        HashOperations<String, String, Object> hashOperations = redisTemplate.opsForHash();
+        hashOperations.putAll(messageId + "." + brokerName, rMessageResultMap);
 
-        // RedisTemplate Set 저장 (속도 더 빠름)
-        SetOperations<String, Object> setOperation = redisTemplate.opsForSet();
-        setOperation.add("test123", rMessageResultSet);
         System.out.println("종료");
+    }
+
+    // RMessageResult를 Json 형태로 변환
+    public String convertObjectToJsonString(RMessageResult rMessageResult) {
+        ObjectMapper mapper = new ObjectMapper();
+        String jsonStr = null;
+        try {
+            jsonStr = mapper.writeValueAsString(rMessageResult);
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
+        return jsonStr;
     }
 }

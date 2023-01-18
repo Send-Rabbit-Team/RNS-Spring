@@ -1,6 +1,7 @@
 package com.srt.message.domain;
 
 import com.srt.message.config.domain.BaseEntity;
+import com.srt.message.config.domain.BaseTimeEntity;
 import com.srt.message.config.status.MessageStatus;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -14,7 +15,7 @@ import javax.persistence.*;
 @NoArgsConstructor
 @Getter
 @Entity
-public class MessageResult extends BaseEntity {
+public class MessageResult extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
@@ -32,5 +33,5 @@ public class MessageResult extends BaseEntity {
     private Broker broker;
 
     @Enumerated(EnumType.STRING)
-    private MessageStatus messageStatus = MessageStatus.PENDING;
+    private MessageStatus messageStatus;
 }

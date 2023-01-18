@@ -54,6 +54,8 @@ public class MessageService {
 
         messageRepository.save(message);
 
+        messageReq.getMessage().setMessageId(message.getId()); // 메시지 id 설정
+
         BrokerMessageDto brokerMessageDto = BrokerMessageDto.builder()
                 .smsMessageDto(messageReq.getMessage())
                 .message(message)

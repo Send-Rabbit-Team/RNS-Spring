@@ -5,6 +5,7 @@ import com.srt.message.domain.Contact;
 import io.lettuce.core.dynamic.annotation.Param;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
@@ -37,4 +38,8 @@ public interface ContactRepository extends JpaRepository<Contact, Long> {
     Page<Contact> findByMemberIdAndStatus(Long memberId, BaseStatus status, Pageable pageable);
 
     List<Contact> findByMemberIdInAndStatus(List<Long> memberId, BaseStatus status);
+
+    // 캐시용
+    @EntityGraph(value = "Contact.with.Member.ContactGroup")
+    Optional<Contact> findContactById(long contactId);
 }

@@ -9,6 +9,15 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 
+@NamedEntityGraph(name = "Message.with.Member.SenderNumber.RepeatRule", attributeNodes = {
+        @NamedAttributeNode(value = "member", subgraph = "member_company"),
+        @NamedAttributeNode("senderNumber"),
+        @NamedAttributeNode("repeatRule")
+},
+        subgraphs = @NamedSubgraph(name = "member_company", attributeNodes = {
+                @NamedAttributeNode("company")
+        })
+)
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor

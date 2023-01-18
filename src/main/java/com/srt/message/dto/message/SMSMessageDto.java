@@ -1,6 +1,7 @@
 package com.srt.message.dto.message;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.srt.message.config.status.MessageStatus;
 import com.srt.message.config.type.MessageType;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.*;
@@ -11,6 +12,10 @@ import lombok.*;
 @Getter
 @Setter
 public class SMSMessageDto {
+    @JsonIgnore
+    @ApiModelProperty(hidden = true)
+    private long messageId;
+
     @ApiModelProperty(
             example = "01025291674"
     )
@@ -34,6 +39,9 @@ public class SMSMessageDto {
             example = "BSAKJNDNKASDJkfetjoi312oiadsioo21basdop"
     )
     private String image;
+
+    @ApiModelProperty(hidden = true)
+    private MessageStatus messageStatus;
 
     @ApiModelProperty(
             example = "SMS"

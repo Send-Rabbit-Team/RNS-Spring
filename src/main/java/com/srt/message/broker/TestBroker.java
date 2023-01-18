@@ -29,9 +29,9 @@ public class TestBroker {
     @GetMapping("/producer/test")
     public void sendSMSMessageToKTBroker(){
         // init
-        declareBinding(KT_QUEUE_NAME, KT_ROUTING_KEY);
-        declareBinding(SKT_QUEUE_NAME, SKT_ROUTING_KEY);
-        declareBinding(LG_QUEUE_NAME, LG_ROUTING_KEY);
+        declareBinding(KT_WORK_QUEUE_NAME, KT_WORK_ROUTING_KEY);
+        declareBinding(SKT_WORK_QUEUE_NAME, SKT_WORK_ROUTING_KEY);
+        declareBinding(LG_WORK_QUEUE_NAME, LG_WORK_ROUTING_KEY);
 
         sendToAllBroker(getTestMessageDto(), 1000);
     }
@@ -49,18 +49,18 @@ public class TestBroker {
 
         // kt
         for(int i = 0; i < kt_count; i++){
-            rabbitTemplate.convertAndSend(EXCHANGE_NAME, KT_ROUTING_KEY, SMSMessageDto);
-            System.out.println((i+1) + " 번째 메시지가 전송되었습니다 - " + KT_ROUTING_KEY);
+            rabbitTemplate.convertAndSend(EXCHANGE_NAME, KT_WORK_ROUTING_KEY, SMSMessageDto);
+            System.out.println((i+1) + " 번째 메시지가 전송되었습니다 - " + KT_WORK_ROUTING_KEY);
         }
         // skt
         for(int i = 0; i < skt_count; i++){
-            rabbitTemplate.convertAndSend(EXCHANGE_NAME, SKT_ROUTING_KEY, SMSMessageDto);
-            System.out.println((i+1) + " 번째 메시지가 전송되었습니다 - " + SKT_ROUTING_KEY);
+            rabbitTemplate.convertAndSend(EXCHANGE_NAME, SKT_WORK_ROUTING_KEY, SMSMessageDto);
+            System.out.println((i+1) + " 번째 메시지가 전송되었습니다 - " + SKT_WORK_ROUTING_KEY);
         }
         // lg
         for(int i = 0; i < lg_count; i++){
-            rabbitTemplate.convertAndSend(EXCHANGE_NAME, LG_ROUTING_KEY, SMSMessageDto);
-            System.out.println((i+1) + " 번째 메시지가 전송되었습니다 - " + LG_ROUTING_KEY);
+            rabbitTemplate.convertAndSend(EXCHANGE_NAME, LG_WORK_ROUTING_KEY, SMSMessageDto);
+            System.out.println((i+1) + " 번째 메시지가 전송되었습니다 - " + LG_WORK_ROUTING_KEY);
         }
     }
 

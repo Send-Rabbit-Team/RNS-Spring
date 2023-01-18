@@ -15,6 +15,14 @@ import lombok.extern.log4j.Log4j2;
 
 import javax.persistence.*;
 
+@NamedEntityGraph(name = "Contact.with.Member.ContactGroup", attributeNodes = {
+        @NamedAttributeNode(value = "member", subgraph = "member"),
+        @NamedAttributeNode("contactGroup")
+        },
+        subgraphs = @NamedSubgraph(name = "member", attributeNodes = {
+                @NamedAttributeNode("company")
+        })
+)
 @Log4j2
 @AllArgsConstructor
 @NoArgsConstructor
