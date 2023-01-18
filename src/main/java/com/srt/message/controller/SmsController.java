@@ -2,8 +2,8 @@ package com.srt.message.controller;
 
 import com.srt.message.config.exception.BaseException;
 import com.srt.message.config.response.BaseResponse;
-import com.srt.message.dto.sms.MessageDTO;
-import com.srt.message.dto.sms.PhoneNumberValidDTO;
+import com.srt.message.service.dto.sms.MessageDTO;
+import com.srt.message.service.dto.sms.PhoneNumberValidDTO;
 import com.srt.message.jwt.NoIntercept;
 import com.srt.message.service.SmsService;
 import io.swagger.annotations.ApiOperation;

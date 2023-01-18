@@ -20,7 +20,7 @@ public class Member extends BaseTimeEntity {
     @Column(name = "member_id")
     private long id;
 
-    @OneToOne
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "company_id")
     private Company company;
 
@@ -39,14 +39,10 @@ public class Member extends BaseTimeEntity {
     private LoginType loginType;
 
     @Column(name = "profile_image_URL")
-    private String profileImageURL = getDefaultProfileImg();
+    private String profileImageURL;
 
     // 편의 메서드
     public void changeLoginTypeToGoogle(){
         this.loginType = LoginType.GOOGLE;
-    }
-
-    public String getDefaultProfileImg(){
-        return "https://objectstorage.kr-central-1.kakaoi.io/v1/586d691a32c5421b859e89fd7a7f8dcd/message/img%2Fprofile%2FprofileImg.png";
     }
 }

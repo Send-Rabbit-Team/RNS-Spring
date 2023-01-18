@@ -1,13 +1,12 @@
 package com.srt.message.broker;
 
-import com.srt.message.config.type.SMSType;
-import com.srt.message.dto.broker.sms.SmsMessageDto;
+import com.srt.message.config.type.MessageType;
+import com.srt.message.service.dto.message.SMSMessageDto;
 import com.srt.message.jwt.NoIntercept;
 import lombok.RequiredArgsConstructor;
 import org.springframework.amqp.core.*;
 import org.springframework.amqp.rabbit.core.RabbitAdmin;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -30,14 +29,14 @@ public class TestBroker {
     @GetMapping("/producer/test")
     public void sendSMSMessageToKTBroker(){
         // init
-        declareBinding(KT_QUEUE_NAME, KT_ROUTING_KEY);
-        declareBinding(SKT_QUEUE_NAME, SKT_ROUTING_KEY);
-        declareBinding(LG_QUEUE_NAME, LG_ROUTING_KEY);
+        declareBinding(KT_WORK_QUEUE_NAME, KT_WORK_ROUTING_KEY);
+        declareBinding(SKT_WORK_QUEUE_NAME, SKT_WORK_ROUTING_KEY);
+        declareBinding(LG_WORK_QUEUE_NAME, LG_WORK_ROUTING_KEY);
 
         sendToAllBroker(getTestMessageDto(), 1000);
     }
 
-    public void sendToAllBroker(SmsMessageDto messageDto, int count){
+    public void sendToAllBroker(SMSMessageDto SMSMessageDto, int count){
         int value = (count / 100);
         int kt_count = value * KT_RATE;
         int skt_count = value * SKT_RATE;
@@ -50,24 +49,24 @@ public class TestBroker {
 
         // kt
         for(int i = 0; i < kt_count; i++){
-            rabbitTemplate.convertAndSend(EXCHANGE_NAME, KT_ROUTING_KEY, messageDto);
-            System.out.println((i+1) + " 번째 메시지가 전송되었습니다 - " + KT_ROUTING_KEY);
+            rabbitTemplate.convertAndSend(EXCHANGE_NAME, KT_WORK_ROUTING_KEY, SMSMessageDto);
+            System.out.println((i+1) + " 번째 메시지가 전송되었습니다 - " + KT_WORK_ROUTING_KEY);
         }
         // skt
         for(int i = 0; i < skt_count; i++){
-            rabbitTemplate.convertAndSend(EXCHANGE_NAME, SKT_ROUTING_KEY, messageDto);
-            System.out.println((i+1) + " 번째 메시지가 전송되었습니다 - " + SKT_ROUTING_KEY);
+            rabbitTemplate.convertAndSend(EXCHANGE_NAME, SKT_WORK_ROUTING_KEY, SMSMessageDto);
+            System.out.println((i+1) + " 번째 메시지가 전송되었습니다 - " + SKT_WORK_ROUTING_KEY);
         }
         // lg
         for(int i = 0; i < lg_count; i++){
-            rabbitTemplate.convertAndSend(EXCHANGE_NAME, LG_ROUTING_KEY, messageDto);
-            System.out.println((i+1) + " 번째 메시지가 전송되었습니다 - " + LG_ROUTING_KEY);
+            rabbitTemplate.convertAndSend(EXCHANGE_NAME, LG_WORK_ROUTING_KEY, SMSMessageDto);
+            System.out.println((i+1) + " 번째 메시지가 전송되었습니다 - " + LG_WORK_ROUTING_KEY);
         }
     }
 
-    public SmsMessageDto getTestMessageDto(){
-        return SmsMessageDto.builder()
-                .smsType(SMSType.SMS)
+    public SMSMessageDto getTestMessageDto(){
+        return SMSMessageDto.builder()
+                .messageType(MessageType.SMS)
                 .to("010123441234")
                 .from("01025291674")
                 .subject("메시지 분배 테스트")
