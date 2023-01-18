@@ -2,19 +2,16 @@ package com.srt.message.service;
 
 import com.srt.message.config.exception.BaseException;
 import com.srt.message.config.page.PageResult;
-import com.srt.message.config.response.BaseResponseStatus;
 import com.srt.message.config.status.BaseStatus;
 import com.srt.message.domain.Contact;
-import com.srt.message.config.status.BaseStatus;
 import com.srt.message.domain.ContactGroup;
 import com.srt.message.domain.Member;
-import com.srt.message.dto.contact.ContactDTO;
-import com.srt.message.dto.contact_group.ContactGroupDTO;
-import com.srt.message.dto.contact_group.get.GetContactGroupRes;
-import com.srt.message.dto.contact_group.patch.PatchContactGroupReq;
-import com.srt.message.dto.contact_group.patch.PatchContactGroupRes;
-import com.srt.message.dto.contact_group.post.PostContactGroupReq;
-import com.srt.message.dto.contact_group.post.PostContactGroupRes;
+import com.srt.message.service.dto.contact_group.ContactGroupDTO;
+import com.srt.message.service.dto.contact_group.get.GetContactGroupRes;
+import com.srt.message.service.dto.contact_group.patch.PatchContactGroupReq;
+import com.srt.message.service.dto.contact_group.patch.PatchContactGroupRes;
+import com.srt.message.service.dto.contact_group.post.PostContactGroupReq;
+import com.srt.message.service.dto.contact_group.post.PostContactGroupRes;
 import com.srt.message.repository.ContactGroupRepository;
 import com.srt.message.repository.ContactRepository;
 import com.srt.message.repository.MemberRepository;
@@ -25,10 +22,8 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
-import java.util.List;
 import java.util.stream.Collectors;
 
 import static com.srt.message.config.response.BaseResponseStatus.*;

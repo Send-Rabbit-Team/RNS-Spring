@@ -1,9 +1,9 @@
 package com.srt.message.controller;
 
 import com.srt.message.config.response.BaseResponse;
-import com.srt.message.dto.jwt.JwtInfo;
-import com.srt.message.dto.message_rule.post.PostSMSRuleReq;
-import com.srt.message.dto.message_rule.post.PostSMSRuleRes;
+import com.srt.message.service.dto.jwt.JwtInfo;
+import com.srt.message.service.dto.message_rule.post.PostSMSRuleReq;
+import com.srt.message.service.dto.message_rule.post.PostSMSRuleRes;
 import com.srt.message.service.MessageRuleService;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;

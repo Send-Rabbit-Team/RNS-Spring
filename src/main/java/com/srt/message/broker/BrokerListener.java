@@ -4,7 +4,7 @@ import com.srt.message.domain.Broker;
 import com.srt.message.domain.Contact;
 import com.srt.message.domain.Message;
 import com.srt.message.domain.MessageResult;
-import com.srt.message.dto.message_result.MessageResultDto;
+import com.srt.message.service.dto.message_result.MessageResultDto;
 import com.srt.message.repository.MessageResultRepository;
 import com.srt.message.repository.cache.BrokerCacheRepository;
 import com.srt.message.repository.cache.ContactCacheRepository;

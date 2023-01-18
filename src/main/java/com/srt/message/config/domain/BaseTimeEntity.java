@@ -15,6 +15,7 @@ import java.time.LocalDateTime;
 
 @Getter
 @MappedSuperclass
+@EntityListeners(AuditingEntityListener.class)
 public class BaseTimeEntity {
     @CreatedDate
     @JsonSerialize(using = LocalDateTimeSerializer.class)

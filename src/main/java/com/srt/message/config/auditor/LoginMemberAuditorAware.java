@@ -14,6 +14,7 @@ public class LoginMemberAuditorAware implements AuditorAware<Long> {
 
     @Override
     public Optional<Long> getCurrentAuditor() {
-        return Optional.of(loginMember.getId());
+        Long memberId = loginMember.getId() != null? loginMember.getId() : 0;
+        return Optional.of(memberId);
     }
 }

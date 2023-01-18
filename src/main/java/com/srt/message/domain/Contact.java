@@ -1,12 +1,7 @@
 package com.srt.message.domain;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.srt.message.config.domain.BaseEntity;
-import com.srt.message.config.exception.BaseException;
-import com.srt.message.config.response.BaseResponseStatus;
-import com.srt.message.config.status.BaseStatus;
-import com.srt.message.dto.contact.ContactDTO;
-import com.srt.message.dto.contact.patch.PatchContactReq;
+import com.srt.message.service.dto.contact.patch.PatchContactReq;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;

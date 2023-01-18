@@ -12,7 +12,7 @@ import org.springframework.stereotype.Component;
 import javax.persistence.*;
 
 @Component
-@Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
+@Scope(value = "prototype", proxyMode = ScopedProxyMode.TARGET_CLASS)
 @Getter
 public class LoginMember {
     private Long id;

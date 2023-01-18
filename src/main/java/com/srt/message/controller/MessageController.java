@@ -1,9 +1,8 @@
 package com.srt.message.controller;
 
 import com.srt.message.config.response.BaseResponse;
-import com.srt.message.config.response.BaseResponseStatus;
-import com.srt.message.dto.jwt.JwtInfo;
-import com.srt.message.dto.message.post.PostSendMessageReq;
+import com.srt.message.service.dto.jwt.JwtInfo;
+import com.srt.message.service.dto.message.post.PostSendMessageReq;
 import com.srt.message.jwt.NoIntercept;
 import com.srt.message.service.MessageService;
 import com.srt.message.service.ObjectStorageService;

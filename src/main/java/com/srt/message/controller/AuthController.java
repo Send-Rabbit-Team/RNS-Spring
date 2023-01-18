@@ -2,18 +2,17 @@ package com.srt.message.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.srt.message.config.response.BaseResponse;
-import com.srt.message.dto.auth.login.post.PostLoginReq;
-import com.srt.message.dto.auth.login.post.PostLoginRes;
-import com.srt.message.dto.auth.register.google.CredentialResponse;
-import com.srt.message.dto.auth.register.google.GoogleRegisterReq;
-import com.srt.message.dto.auth.register.google.GoogleRegisterRes;
-import com.srt.message.dto.auth.register.google.GoogleUserInfoDTO;
-import com.srt.message.dto.auth.register.post.PostRegisterReq;
-import com.srt.message.dto.auth.register.post.PostRegisterRes;
-import com.srt.message.dto.jwt.JwtInfo;
-import com.srt.message.dto.member.get.GetInfoMemberRes;
+import com.srt.message.service.dto.auth.login.post.PostLoginReq;
+import com.srt.message.service.dto.auth.login.post.PostLoginRes;
+import com.srt.message.service.dto.auth.register.google.CredentialResponse;
+import com.srt.message.service.dto.auth.register.google.GoogleRegisterReq;
+import com.srt.message.service.dto.auth.register.google.GoogleRegisterRes;
+import com.srt.message.service.dto.auth.register.google.GoogleUserInfoDTO;
+import com.srt.message.service.dto.auth.register.post.PostRegisterReq;
+import com.srt.message.service.dto.auth.register.post.PostRegisterRes;
+import com.srt.message.service.dto.jwt.JwtInfo;
+import com.srt.message.service.dto.member.get.GetInfoMemberRes;
 import com.srt.message.jwt.NoIntercept;
-import com.srt.message.repository.CompanyRepository;
 import com.srt.message.service.*;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
@@ -22,11 +21,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import springfox.documentation.annotations.ApiIgnore;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
 
 @Log4j2
 @RestController
