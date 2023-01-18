@@ -4,16 +4,18 @@ import com.srt.message.config.exception.BaseException;
 import com.srt.message.domain.Broker;
 import com.srt.message.domain.Member;
 import com.srt.message.domain.MessageRule;
-import com.srt.message.dto.message_rule.MessageRuleVO;
-import com.srt.message.dto.message_rule.get.GetSMSRuleRes;
-import com.srt.message.dto.message_rule.post.PostSMSRuleReq;
-import com.srt.message.dto.message_rule.post.PostSMSRuleRes;
+import com.srt.message.service.dto.message_rule.get.GetSMSRuleRes;
 import com.srt.message.service.dto.message_rule.MessageRuleVO;
+import com.srt.message.service.dto.message_rule.patch.PatchSMSRuleReq;
+import com.srt.message.service.dto.message_rule.patch.PatchSMSRuleRes;
 import com.srt.message.service.dto.message_rule.post.PostSMSRuleReq;
 import com.srt.message.service.dto.message_rule.post.PostSMSRuleRes;
 import com.srt.message.repository.BrokerRepository;
 import com.srt.message.repository.MemberRepository;
 import com.srt.message.repository.MessageRuleRepository;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -58,12 +60,31 @@ public class MessageRuleService {
     }
 
     // 중계사 규칙 반환
-    public List<GetSMSRuleRes> getAll(long memberId){
-        List<MessageRule> messageRuleList = messageRuleRepository.findByMemberId(memberId)
+    public GetSMSRuleRes getAll(long memberId){
+        Member member = memberRepository.findById(memberId)
                 .orElseThrow(()-> new BaseException(NOT_EXIST_MEMBER));
 
-        return messageRuleList.stream().map(messageRule-> GetSMSRuleRes.toDto(messageRule)).collect(Collectors.toList());
+        List<MessageRule> messageRuleList = messageRuleRepository.findAllByMember(member);
+
+        return GetSMSRuleRes.toDto(messageRuleList);
+    }
 
 
+    // 중계사 규칙 수정
+    @Transactional(readOnly = false)
+    public PatchSMSRuleRes edit(PatchSMSRuleReq patchSMSRuleReq, long memberId){
+        Member member = memberRepository.findById(memberId).orElseThrow(()->new BaseException(NOT_EXIST_MEMBER));
+
+        List<MessageRule> modMessageRuleList = patchSMSRuleReq.getMessageRules().stream().map(
+                request -> PatchSMSRuleReq.toEntity(brokerRepository.findById(request.getBrokerId()).get(),request.getBrokerRate(),member)).collect(Collectors.toList());
+
+        modMessageRuleList.forEach(
+                modMessageRule -> {
+                    MessageRule prevMessageRule = messageRuleRepository.findByBroker(modMessageRule.getBroker()).orElseThrow(()->new BaseException(NOT_EXIST_MESSAGE_RULE));
+                    prevMessageRule.editMessageRule(modMessageRule);
+                }
+        );
+
+        return PatchSMSRuleRes.toDto(modMessageRuleList);
     }
 }
