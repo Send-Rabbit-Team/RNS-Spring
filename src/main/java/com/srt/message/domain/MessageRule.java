@@ -28,4 +28,6 @@ public class MessageRule extends BaseEntity {
     private Broker broker;
 
     private int brokerRate;
+
+
 }

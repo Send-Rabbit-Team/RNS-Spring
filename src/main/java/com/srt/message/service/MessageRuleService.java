@@ -5,6 +5,7 @@ import com.srt.message.domain.Broker;
 import com.srt.message.domain.Member;
 import com.srt.message.domain.MessageRule;
 import com.srt.message.dto.message_rule.MessageRuleVO;
+import com.srt.message.dto.message_rule.get.GetSMSRuleRes;
 import com.srt.message.dto.message_rule.post.PostSMSRuleReq;
 import com.srt.message.dto.message_rule.post.PostSMSRuleRes;
 import com.srt.message.repository.BrokerRepository;
@@ -15,6 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static com.srt.message.config.response.BaseResponseStatus.*;
@@ -51,5 +53,15 @@ public class MessageRuleService {
         messageRuleRepository.saveAll(messageRules);
 
         return PostSMSRuleRes.toDto(messageRules);
+    }
+
+    // 중계사 규칙 반환
+    public List<GetSMSRuleRes> getAll(long memberId){
+        List<MessageRule> messageRuleList = messageRuleRepository.findByMemberId(memberId)
+                .orElseThrow(()-> new BaseException(NOT_EXIST_MEMBER));
+
+        return messageRuleList.stream().map(messageRule-> GetSMSRuleRes.toDto(messageRule)).collect(Collectors.toList());
+
+
     }
 }
