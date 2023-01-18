@@ -47,4 +47,8 @@ public class Template extends BaseEntity {
     public void changeContent(String content) {
         this.content = content;
     }
+
+    public void changeTemplateType(TemplateType templateType) {
+        this.templateType = templateType;
+    }
 }

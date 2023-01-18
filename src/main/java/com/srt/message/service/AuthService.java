@@ -8,20 +8,19 @@ import com.srt.message.config.type.MemberType;
 import com.srt.message.domain.Company;
 import com.srt.message.domain.Member;
 import com.srt.message.domain.redis.AuthPhoneNumber;
-import com.srt.message.dto.auth.login.post.PostLoginReq;
-import com.srt.message.dto.auth.login.post.PostLoginRes;
-import com.srt.message.dto.auth.register.google.GoogleRegisterReq;
-import com.srt.message.dto.auth.register.google.GoogleRegisterRes;
-import com.srt.message.dto.auth.register.post.PostRegisterReq;
-import com.srt.message.dto.auth.register.post.PostRegisterRes;
-import com.srt.message.dto.jwt.JwtInfo;
-import com.srt.message.dto.member.get.GetInfoMemberRes;
+import com.srt.message.service.dto.auth.login.post.PostLoginReq;
+import com.srt.message.service.dto.auth.login.post.PostLoginRes;
+import com.srt.message.service.dto.auth.register.google.GoogleRegisterReq;
+import com.srt.message.service.dto.auth.register.google.GoogleRegisterRes;
+import com.srt.message.service.dto.auth.register.post.PostRegisterReq;
+import com.srt.message.service.dto.auth.register.post.PostRegisterRes;
+import com.srt.message.service.dto.jwt.JwtInfo;
+import com.srt.message.service.dto.member.get.GetInfoMemberRes;
 import com.srt.message.jwt.JwtService;
 import com.srt.message.repository.CompanyRepository;
 import com.srt.message.repository.MemberRepository;
 import com.srt.message.repository.redis.AuthPhoneNumberRedisRepository;
 import com.srt.message.utils.encrypt.SHA256;
-import io.jsonwebtoken.Jwt;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -156,10 +155,7 @@ public class AuthService {
     }
 
     // Audit
-    public void updateLoginMemberById(Long id){
-        Member member = memberRepository.findById(id)
-                .orElseThrow(() -> new BaseException(NOT_EXIST_MEMBER));
-
-        loginMember.updateLoginMember(member);
+    public void updateLoginMember(Long memberId){
+        loginMember.updateLoginMember(memberId);
     }
 }

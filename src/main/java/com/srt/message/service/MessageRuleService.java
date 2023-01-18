@@ -8,6 +8,9 @@ import com.srt.message.dto.message_rule.MessageRuleVO;
 import com.srt.message.dto.message_rule.get.GetSMSRuleRes;
 import com.srt.message.dto.message_rule.post.PostSMSRuleReq;
 import com.srt.message.dto.message_rule.post.PostSMSRuleRes;
+import com.srt.message.service.dto.message_rule.MessageRuleVO;
+import com.srt.message.service.dto.message_rule.post.PostSMSRuleReq;
+import com.srt.message.service.dto.message_rule.post.PostSMSRuleRes;
 import com.srt.message.repository.BrokerRepository;
 import com.srt.message.repository.MemberRepository;
 import com.srt.message.repository.MessageRuleRepository;
@@ -16,7 +19,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static com.srt.message.config.response.BaseResponseStatus.*;

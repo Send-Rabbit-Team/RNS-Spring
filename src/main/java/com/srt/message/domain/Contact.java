@@ -1,12 +1,7 @@
 package com.srt.message.domain;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.srt.message.config.domain.BaseEntity;
-import com.srt.message.config.exception.BaseException;
-import com.srt.message.config.response.BaseResponseStatus;
-import com.srt.message.config.status.BaseStatus;
-import com.srt.message.dto.contact.ContactDTO;
-import com.srt.message.dto.contact.patch.PatchContactReq;
+import com.srt.message.service.dto.contact.patch.PatchContactReq;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -15,6 +10,14 @@ import lombok.extern.log4j.Log4j2;
 
 import javax.persistence.*;
 
+@NamedEntityGraph(name = "Contact.with.Member.ContactGroup", attributeNodes = {
+        @NamedAttributeNode(value = "member", subgraph = "member"),
+        @NamedAttributeNode("contactGroup")
+        },
+        subgraphs = @NamedSubgraph(name = "member", attributeNodes = {
+                @NamedAttributeNode("company")
+        })
+)
 @Log4j2
 @AllArgsConstructor
 @NoArgsConstructor

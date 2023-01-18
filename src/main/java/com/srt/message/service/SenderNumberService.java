@@ -7,9 +7,9 @@ import com.srt.message.config.status.BaseStatus;
 import com.srt.message.domain.Member;
 import com.srt.message.domain.SenderNumber;
 import com.srt.message.domain.redis.AuthPhoneNumber;
-import com.srt.message.dto.sender_number.get.GetSenderNumberRes;
-import com.srt.message.dto.sender_number.post.RegisterSenderNumberReq;
-import com.srt.message.dto.sender_number.post.RegisterSenderNumberRes;
+import com.srt.message.service.dto.sender_number.get.GetSenderNumberRes;
+import com.srt.message.service.dto.sender_number.post.RegisterSenderNumberReq;
+import com.srt.message.service.dto.sender_number.post.RegisterSenderNumberRes;
 import com.srt.message.repository.MemberRepository;
 import com.srt.message.repository.SenderNumberRepository;
 import com.srt.message.repository.redis.AuthPhoneNumberRedisRepository;
@@ -69,10 +69,10 @@ public class SenderNumberService {
     @Transactional(readOnly = false)
     public void deleteSenderNumber(long senderNumberId, long memberId) {
         SenderNumber senderNumber = senderNumberRepository.findByIdAndStatus(senderNumberId, BaseStatus.ACTIVE)
-                .orElseThrow(() -> new BaseException(NOT_EXIST_PHONE_NUMBER));
+                .orElseThrow(() -> new BaseException(NOT_EXIST_SENDER_NUMBER));
 
         if (senderNumber.getMember().getId() != memberId)
-            throw new BaseException(NOT_ACCESS_MEMBER);
+            throw new BaseException(NOT_AUTH_MEMBER);
 
         senderNumber.changeStatusInActive();
         senderNumberRepository.save(senderNumber);
