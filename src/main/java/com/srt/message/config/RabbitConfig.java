@@ -30,7 +30,7 @@ public class RabbitConfig {
     }
 
     @Bean
-    RabbitTemplate rabbitTemplate(ConnectionFactory connectionFactory){
+    public RabbitTemplate rabbitTemplate(ConnectionFactory connectionFactory){
         RabbitTemplate rabbitTemplate = new RabbitTemplate(connectionFactory);
         rabbitTemplate.setMessageConverter(new Jackson2JsonMessageConverter());
         rabbitTemplate.setMessageConverter(jsonMessageConverter());
@@ -40,27 +40,27 @@ public class RabbitConfig {
     // BROKER MSG SEND SETTING
     // SMS QUEUE
     @Bean
-    Queue smsKTQueue(){
+    public Queue smsKTQueue(){
         Map<String, Object> args = new HashMap<>();
-        args.put("x-dead-letter-exchange", "dlx-sms");
-        args.put("x-dead-letter-routing-key", SKT_WORK_ROUTING_KEY);
-        return new Queue(KT_WORK_QUEUE_NAME, true);
+        args.put("x-dead-letter-exchange", DLX_EXCHANGE_NAME);
+        args.put("x-dead-letter-routing-key", KT_WAIT_ROUTING_KEY);
+        return new Queue(KT_WORK_QUEUE_NAME, true, false, false, args);
     }
 
     @Bean
-    Queue smsSKTQueue(){
+    public Queue smsSKTQueue(){
         Map<String, Object> args = new HashMap<>();
-        args.put("x-dead-letter-exchange", "dlx-sms");
-        args.put("x-dead-letter-routing-key", LG_WORK_ROUTING_KEY);
-        return new Queue(SKT_WORK_QUEUE_NAME, true);
+        args.put("x-dead-letter-exchange", DLX_EXCHANGE_NAME);
+        args.put("x-dead-letter-routing-key", SKT_WAIT_ROUTING_KEY);
+        return new Queue(SKT_WORK_QUEUE_NAME, true, false, false, args);
     }
 
     @Bean
-    Queue smsLGQueue(){
+    public Queue smsLGQueue(){
         Map<String, Object> args = new HashMap<>();
-        args.put("x-dead-letter-exchange", "dlx-sms");
-        args.put("x-dead-letter-routing-key", KT_WORK_ROUTING_KEY);
-        return new Queue(LG_WORK_QUEUE_NAME, true);
+        args.put("x-dead-letter-exchange", DLX_EXCHANGE_NAME);
+        args.put("x-dead-letter-routing-key", LG_WAIT_ROUTING_KEY);
+        return new Queue(LG_WORK_QUEUE_NAME, true, false, false, args);
     }
 
     // SMS Exchange
@@ -68,13 +68,6 @@ public class RabbitConfig {
     public DirectExchange smsExchange(){
         return new DirectExchange("dx.sms.work");
     }
-
-    // DLX Exchange
-    @Bean
-    public DirectExchange dlxSMSExchange(){
-        return new DirectExchange("dlx.sms");
-    }
-
 
     // SMS Binding
     @Bean
@@ -92,31 +85,9 @@ public class RabbitConfig {
     }
 
     @Bean
-    public Binding bindingDLXSmsLG(DirectExchange smsExchange, Queue smsLGQueue){
+    public Binding bindingSmsLG(DirectExchange smsExchange, Queue smsLGQueue){
         return BindingBuilder.bind(smsLGQueue)
                 .to(smsExchange)
-                .with(LG_WORK_ROUTING_KEY);
-    }
-
-    // DLX SMS Binding
-    @Bean
-    public Binding bindingDLXSmsKT(DirectExchange dlxSMSExchange, Queue smsKTQueue){
-        return BindingBuilder.bind(smsKTQueue)
-                .to(dlxSMSExchange)
-                .with(KT_WORK_ROUTING_KEY);
-    }
-
-    @Bean
-    public Binding bindingDLXSmsSKT(DirectExchange dlxSMSExchange, Queue smsSKTQueue){
-        return BindingBuilder.bind(smsSKTQueue)
-                .to(dlxSMSExchange)
-                .with(SKT_WORK_ROUTING_KEY);
-    }
-
-    @Bean
-    public Binding bindingSmsLG(DirectExchange dlxSMSExchange, Queue smsLGQueue){
-        return BindingBuilder.bind(smsLGQueue)
-                .to(dlxSMSExchange)
                 .with(LG_WORK_ROUTING_KEY);
     }
 
@@ -166,5 +137,52 @@ public class RabbitConfig {
         return BindingBuilder.bind(smsReceiveLGQueue)
                 .to(smsReceiveExchange)
                 .with(LG_RECEIVE_ROUTING_KEY);
+    }
+
+    /**
+     * DLX 설정
+     */
+    // DLX Queue
+    @Bean
+    public Queue smsWaitKTQueue(){
+        return new Queue(KT_WAIT_QUEUE_NAME, true);
+    }
+
+    @Bean
+    public Queue smsWaitSKTQueue(){
+        return new Queue(SKT_WAIT_QUEUE_NAME, true);
+    }
+
+    @Bean
+    public Queue smsWaitLGQueue(){
+        return new Queue(LG_WAIT_QUEUE_NAME, true);
+    }
+
+    // DLX Exchange
+    @Bean
+    public DirectExchange dlxSMSExchange(){
+        return new DirectExchange(DLX_EXCHANGE_NAME);
+    }
+
+    // DLX Binding
+    @Bean
+    public Binding bindingDLXSmsKT(DirectExchange dlxSMSExchange, Queue smsWaitKTQueue){
+        return BindingBuilder.bind(smsWaitKTQueue)
+                .to(dlxSMSExchange)
+                .with(KT_WAIT_ROUTING_KEY);
+    }
+
+    @Bean
+    public Binding bindingDLXSmsSKT(DirectExchange dlxSMSExchange, Queue smsWaitSKTQueue){
+        return BindingBuilder.bind(smsWaitSKTQueue)
+                .to(dlxSMSExchange)
+                .with(SKT_WAIT_ROUTING_KEY);
+    }
+
+    @Bean
+    public Binding bindingDLXSmsLG(DirectExchange dlxSMSExchange, Queue smsWaitLGQueue){
+        return BindingBuilder.bind(smsWaitLGQueue)
+                .to(dlxSMSExchange)
+                .with(LG_WAIT_ROUTING_KEY);
     }
 }
