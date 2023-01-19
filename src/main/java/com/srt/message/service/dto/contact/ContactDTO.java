@@ -28,7 +28,6 @@ public class ContactDTO {
                         .memo(contact.getMemo())
                         .build();
 
-
         if (contact.getContactGroup() != null) {
             contactDTO.setGroupId(contact.getContactGroup().getId());
         }

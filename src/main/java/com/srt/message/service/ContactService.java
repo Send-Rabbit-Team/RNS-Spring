@@ -8,6 +8,7 @@ import com.srt.message.domain.Contact;
 import com.srt.message.domain.ContactGroup;
 import com.srt.message.domain.Member;
 import com.srt.message.service.dto.contact.ContactDTO;
+import com.srt.message.service.dto.contact.get.GetContactAllRes;
 import com.srt.message.service.dto.contact.get.GetContactRes;
 import com.srt.message.service.dto.contact.get.GetGroupContactRes;
 import com.srt.message.service.dto.contact.patch.PatchContactReq;
@@ -161,5 +162,11 @@ public class ContactService {
         Page<Contact> contactPage = contactRepository.findAll(memberId, BaseStatus.ACTIVE, pageRequest);
         Function<Contact, GetContactRes> fn = (contact -> GetContactRes.toDto(contact));
         return new PageResult<>(contactPage, fn);
+    }
+
+    public GetContactAllRes getMemberContactAll(long memberId){
+        List<Contact> contactList = contactRepository.findByMemberIdAndStatus(memberId, BaseStatus.ACTIVE);
+        GetContactAllRes getContactAllRes = GetContactAllRes.toDto(contactList);
+        return getContactAllRes;
     }
 }

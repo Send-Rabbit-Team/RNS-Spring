@@ -34,7 +34,7 @@ public interface ContactRepository extends JpaRepository<Contact, Long> {
     countQuery = "select count(c) from Contact c where c.member.id = :memberId and c.status = :status")
     Page<Contact> findAll(Long memberId, BaseStatus status, Pageable pageable);
 
-    List<Contact> findByMemberIdInAndStatus(List<Long> memberId, BaseStatus status);
+    List<Contact> findByMemberIdAndStatus(long memberId, BaseStatus status);
 
     // 캐시용
     @EntityGraph(value = "Contact.with.Member.ContactGroup")
