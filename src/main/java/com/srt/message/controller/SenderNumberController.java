@@ -89,4 +89,19 @@ public class SenderNumberController {
         senderNumberService.deleteSenderNumber(senderNumberId, JwtInfo.getMemberId(request));
         return new BaseResponse<>("성공");
     }
+
+    @ApiOperation(
+            value = "차단 번호 조회",
+            notes = "발신자 번호를 통해 수신 치단 번호를 조회할 수 있다."
+    )
+    @ApiResponses({
+            @ApiResponse(code = 1000, message = "요청에 성공하였습니다."),
+            @ApiResponse(code = 2012, message = "존재하지 않는 전화번호입니다."),
+            @ApiResponse(code = 2017, message = "존재하지 않는 발신자 번호입니다.")
+    })
+    @GetMapping("/block/{senderNumberId}")
+    public BaseResponse<String> getBlockNumber(@PathVariable long senderNumberId, HttpServletRequest request){
+
+        return new BaseResponse<>(senderNumberService.getBlockNumber(senderNumberId,JwtInfo.getMemberId(request)));
+    }
 }

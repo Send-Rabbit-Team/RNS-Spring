@@ -93,4 +93,11 @@ public class SenderNumberService {
         senderNumber.changeStatusInActive();
         senderNumberRepository.save(senderNumber);
     }
+
+    public String getBlockNumber(long senderNumberId, long memberId){
+        SenderNumber senderNumber =  senderNumberRepository.findByIdAndStatus(senderNumberId, BaseStatus.ACTIVE)
+                .orElseThrow(()-> new BaseException(NOT_EXIST_SENDER_NUMBER));
+
+        return senderNumber.getBlockNumber();
+    }
 }

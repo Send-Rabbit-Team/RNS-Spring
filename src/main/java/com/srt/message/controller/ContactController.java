@@ -4,6 +4,7 @@ import com.srt.message.config.page.PageResult;
 import com.srt.message.config.response.BaseResponse;
 import com.srt.message.domain.Contact;
 import com.srt.message.service.dto.contact.ContactDTO;
+import com.srt.message.service.dto.contact.get.GetContactAllRes;
 import com.srt.message.service.dto.contact.get.GetContactRes;
 import com.srt.message.service.dto.contact.get.GetGroupContactRes;
 import com.srt.message.service.dto.contact.patch.PatchContactReq;
@@ -132,17 +133,32 @@ public class ContactController {
 
     // 연락처 전체 조회
     @ApiOperation(
+            value = "연락처 전체 조회 (페이징)",
+            notes = "사용자 아이디를 통해 사용자가 보유한 모든 연락처를 조회하는 API - 페이징 처리"
+    )
+    @ApiResponses({
+            @ApiResponse(code = 1000, message = "요청에 성공하였습니다.")
+    })
+    @GetMapping("/list/{page}")
+    public BaseResponse<PageResult<GetContactRes, Contact>> getMemberContactListPaging(
+            HttpServletRequest request,
+            @PathVariable("page") int page) {
+        PageResult<GetContactRes, Contact> memberContactList = contactService.getMemberContact(JwtInfo.getMemberId(request), page);
+        return new BaseResponse<>(memberContactList);
+    }
+
+    @ApiOperation(
             value = "연락처 전체 조회",
             notes = "사용자 아이디를 통해 사용자가 보유한 모든 연락처를 조회하는 API"
     )
     @ApiResponses({
             @ApiResponse(code = 1000, message = "요청에 성공하였습니다.")
     })
-    @GetMapping("/list/{page}")
-    public BaseResponse<PageResult<GetContactRes, Contact>> getMemberContactList(
-            HttpServletRequest request,
-            @PathVariable("page") int page) {
-        PageResult<GetContactRes, Contact> memberContactList = contactService.getMemberContact(JwtInfo.getMemberId(request), page);
-        return new BaseResponse<>(memberContactList);
+    @GetMapping("/list")
+    public BaseResponse<GetContactAllRes> getMemberContactList(HttpServletRequest request){
+        GetContactAllRes getContactAllRes = contactService.getMemberContactAll(JwtInfo.getMemberId(request));
+        return new BaseResponse<>(getContactAllRes);
     }
+
+
 }

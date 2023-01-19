@@ -9,9 +9,9 @@ spring:
 
   ## MYSQL ##
   datasource:
-    url: jdbc:mysql://210.109.62.6:10001/rns_database
-    username: ENC(w+H4HxQwUz+O1280P7NXAQ==)
-    password: ENC(r1Pbjwsdr5wWorYu+jCCBbn9uDSeFTkE)
+    url: jdbc:mysql://localhost:3306/rns_database
+    username: admin
+    password: 1q2w3e4r!
     driver-class-name: com.mysql.cj.jdbc.Driver
 
   jpa:
@@ -36,10 +36,10 @@ spring:
 
   ## Rabbit MQ
   rabbitmq:
-    host: 210.109.62.6
-    port: 10015
-    username: admin
-    password: 1q2w3e4r!
+    host: localhost
+    port: 5672
+    username: guest
+    password: guest
 
 ## Jwt Secret ##
 secret:
