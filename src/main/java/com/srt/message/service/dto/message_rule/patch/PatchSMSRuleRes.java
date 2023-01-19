@@ -18,8 +18,12 @@ public class PatchSMSRuleRes {
 
     public static PatchSMSRuleRes toDto(List<MessageRule> messageRules){
         List<MessageRuleVO> messageRuleVOS = messageRules.stream()
-                .map(m -> new MessageRuleVO(m.getBroker().getId(), m.getBrokerRate()))
-                .collect(Collectors.toList());
+                .map(messageRule -> {
+                    return MessageRuleVO.builder()
+                            .brokerId(messageRule.getBroker().getId())
+                            .brokerRate(messageRule.getBrokerRate())
+                            .build();
+                }).collect(Collectors.toList());
 
         return new PatchSMSRuleRes(messageRuleVOS);
     }

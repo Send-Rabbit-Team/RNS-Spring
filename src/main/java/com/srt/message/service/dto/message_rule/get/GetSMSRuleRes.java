@@ -19,8 +19,12 @@ public class GetSMSRuleRes {
 
     public static GetSMSRuleRes toDto(List<MessageRule> messageRules){
         List<MessageRuleVO> getSMSRuleRes = messageRules.stream()
-                .map(messageRule -> new MessageRuleVO(messageRule.getBroker().getId(), messageRule.getBrokerRate()))
-                .collect(Collectors.toList());
+                .map(messageRule -> {
+                    return MessageRuleVO.builder()
+                            .brokerId(messageRule.getBroker().getId())
+                            .brokerRate(messageRule.getBrokerRate())
+                            .build();
+                }).collect(Collectors.toList());
 
         return new GetSMSRuleRes(getSMSRuleRes);
     };

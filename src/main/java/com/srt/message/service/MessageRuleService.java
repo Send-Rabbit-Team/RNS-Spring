@@ -1,6 +1,7 @@
 package com.srt.message.service;
 
 import com.srt.message.config.exception.BaseException;
+import com.srt.message.config.response.BaseResponse;
 import com.srt.message.domain.Broker;
 import com.srt.message.domain.Member;
 import com.srt.message.domain.MessageRule;
@@ -75,12 +76,20 @@ public class MessageRuleService {
     public PatchSMSRuleRes edit(PatchSMSRuleReq patchSMSRuleReq, long memberId){
         Member member = memberRepository.findById(memberId).orElseThrow(()->new BaseException(NOT_EXIST_MEMBER));
 
+
         List<MessageRule> modMessageRuleList = patchSMSRuleReq.getMessageRules().stream().map(
-                request -> PatchSMSRuleReq.toEntity(brokerRepository.findById(request.getBrokerId()).get(),request.getBrokerRate(),member)).collect(Collectors.toList());
+                modMessageRule -> {
+                    return PatchSMSRuleReq.toEntity(
+                            brokerRepository.findById(modMessageRule.getBrokerId())
+                                    .orElseThrow(()->new BaseException(NOT_EXIST_BROKER)),
+                            modMessageRule.getBrokerRate(), member);
+                }
+        ).collect(Collectors.toList());
 
         modMessageRuleList.forEach(
                 modMessageRule -> {
-                    MessageRule prevMessageRule = messageRuleRepository.findByBroker(modMessageRule.getBroker()).orElseThrow(()->new BaseException(NOT_EXIST_MESSAGE_RULE));
+                    MessageRule prevMessageRule = messageRuleRepository.findByBroker(modMessageRule.getBroker())
+                            .orElseThrow(()-> new BaseException(NOT_EXIST_MESSAGE_RULE));
                     prevMessageRule.editMessageRule(modMessageRule);
                 }
         );
