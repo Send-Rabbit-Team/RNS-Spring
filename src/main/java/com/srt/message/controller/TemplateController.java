@@ -21,6 +21,7 @@ import java.util.List;
 @Log4j2
 @RestController
 @RequiredArgsConstructor
+@RequestMapping("/template")
 public class TemplateController {
     private final TemplateService templateService;
 
@@ -32,7 +33,7 @@ public class TemplateController {
             @ApiResponse(code = 1000, message = "요청에 성공하였습니다."),
             @ApiResponse(code = 2009, message = "존재하지 않는 사용자입니다."),
     })
-    @PostMapping("/template/register")
+    @PostMapping("/register")
     public BaseResponse<GetTemplateRes> registerTemplate(@RequestBody PostTemplateReq postTemplateReq, HttpServletRequest request){
         return new BaseResponse<>(templateService.registerTemplate(JwtInfo.getMemberId(request), postTemplateReq));
     }
@@ -47,8 +48,8 @@ public class TemplateController {
             @ApiResponse(code = 2022, message = "존재하지 않는 탬플릿입니다."),
             @ApiResponse(code = 2018, message = "권한이 없는 사용자입니다."),
     })
-    @GetMapping("/template/{templateId}")
-    public BaseResponse<GetTemplateRes> getOneTemplate(@PathVariable("templateId") long templateId, HttpServletRequest request){
+    @GetMapping("/get")
+    public BaseResponse<GetTemplateRes> getOneTemplate(@RequestParam("templateId") long templateId, HttpServletRequest request){
         return new BaseResponse<>(templateService.getOneTemplate(JwtInfo.getMemberId(request), templateId));
     }
 
@@ -61,7 +62,7 @@ public class TemplateController {
             @ApiResponse(code = 2009, message = "존재하지 않는 사용자입니다."),
             @ApiResponse(code = 2022, message = "존재하지 않는 탬플릿입니다."),
     })
-    @GetMapping("/templates/all")
+    @GetMapping("/list")
     public BaseResponse<List<GetTemplateRes>> getAllTemplate(HttpServletRequest request){
         return new BaseResponse<>(templateService.getAllTemplate(JwtInfo.getMemberId(request)));
     }
@@ -75,7 +76,7 @@ public class TemplateController {
             @ApiResponse(code = 2009, message = "존재하지 않는 사용자입니다."),
             @ApiResponse(code = 2022, message = "존재하지 않는 탬플릿입니다."),
     })
-    @GetMapping("/template/{page}")
+    @GetMapping("/all/{page}")
     public BaseResponse<PageResult<GetTemplateRes, Template>> getPageTemplate(@PathVariable("page") int page, HttpServletRequest request){
         return new BaseResponse<>(templateService.getPageTemplate(JwtInfo.getMemberId(request), page));
     }
@@ -90,7 +91,7 @@ public class TemplateController {
             @ApiResponse(code = 2022, message = "존재하지 않는 탬플릿입니다."),
             @ApiResponse(code = 2018, message = "권한이 없는 사용자입니다."),
     })
-    @PatchMapping("/template/edit")
+    @PatchMapping("/edit")
     public BaseResponse<GetTemplateRes> editTemplate(@RequestBody PatchTemplateReq patchTemplateReq, HttpServletRequest request) {
         return new BaseResponse<>(templateService.editTemplate(JwtInfo.getMemberId(request), patchTemplateReq));
     }
@@ -105,7 +106,7 @@ public class TemplateController {
             @ApiResponse(code = 2022, message = "존재하지 않는 탬플릿입니다."),
             @ApiResponse(code = 2018, message = "권한이 없는 사용자입니다."),
     })
-    @PatchMapping("/template/delete/{templateId}")
+    @PatchMapping("/delete/{templateId}")
     public BaseResponse<GetTemplateRes> deleteTemplate(@PathVariable("templateId") Long templateId, HttpServletRequest request) {
         GetTemplateRes getTemplateRes = templateService.deleteTemplate(JwtInfo.getMemberId(request), templateId);
         return new BaseResponse<>(getTemplateRes);
