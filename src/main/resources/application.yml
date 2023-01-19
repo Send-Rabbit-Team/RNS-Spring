@@ -27,12 +27,6 @@ spring:
       min-idle: 0
       max-idle: 8
       max-active: 8
-    cluster:
-      nodes:
-        210.109.63.84:30001,
-        210.109.63.84:30003,
-        210.109.63.84:30006
-      enabled: true
 
   ## Rabbit MQ
   rabbitmq:
@@ -78,7 +72,7 @@ google:
   client-id: 835228927820-80mfcdq6p90s97pqbo582f9f1s0ng935.apps.googleusercontent.com
   client-secret: ENC(wXHk/fbb2D+cqVKxwJIcOpZrOSBcWO8GLrT+jdQ7CURSkBUJpv5KS+mJ1zLYbqcd)
   scope: email
-x`  redirect-uri: http://localhost:8080/google/redirect
+  redirect-uri: http://localhost:8080/google/redirect
 
 ## jasypt
 jasypt:

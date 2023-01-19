@@ -10,6 +10,7 @@ import com.srt.message.service.dto.message.post.PostSendMessageReq;
 import com.srt.message.repository.*;
 import com.srt.message.service.rabbit.BrokerService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -17,6 +18,7 @@ import java.util.List;
 import static com.srt.message.config.response.BaseResponseStatus.*;
 import static com.srt.message.config.status.BaseStatus.ACTIVE;
 
+@Log4j2
 @Service
 @RequiredArgsConstructor
 public class MessageService {
@@ -29,7 +31,7 @@ public class MessageService {
     private final BrokerService brokerService;
 
 
-    public void sendMessageToBroker(PostSendMessageReq messageReq, long memberId){
+    public String sendMessageToBroker(PostSendMessageReq messageReq, long memberId){
         Member member = memberRepository.findById(memberId)
                         .orElseThrow(() -> new BaseException(NOT_EXIST_MEMBER));
 
@@ -41,7 +43,11 @@ public class MessageService {
         // 발신자 번호 예외 처리
         SenderNumber senderNumber = senderNumberRepository.findByPhoneNumberAndStatus(messageReq.getSenderNumber(), ACTIVE)
                 .orElseThrow(() -> new BaseException(NOT_EXIST_SENDER_NUMBER));
-        if(!senderNumber.getMember().equals(member))
+
+        log.info("senderNumber - memberId {}", senderNumber.getMember().getId());
+        log.info("member - memberId {}", member.getId());
+
+        if(senderNumber.getMember().getId() != member.getId())
             throw new BaseException(NOT_MATCH_SENDER_NUMBER);
 
         Message message = Message.builder()
@@ -64,6 +70,6 @@ public class MessageService {
                 .count(messageReq.getCount())
                 .build();
 
-        brokerService.sendSmsMessage(brokerMessageDto);
+        return brokerService.sendSmsMessage(brokerMessageDto);
     }
 }
