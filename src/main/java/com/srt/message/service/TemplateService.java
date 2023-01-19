@@ -17,7 +17,9 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import static com.srt.message.config.response.BaseResponseStatus.*;
 
@@ -52,8 +54,8 @@ public class TemplateService {
         return GetTemplateRes.toDto(template);
     }
 
-    // 탬플릿 전체 조회
-    public PageResult<GetTemplateRes, Template> getAllTemplate(Long memberId, int page) {
+    // 탬플릿 전체 조회(페이징 O)
+    public PageResult<GetTemplateRes, Template> getPageTemplate(Long memberId, int page) {
         getExistMember(memberId);
 
         // pageRequest 생성
@@ -68,6 +70,18 @@ public class TemplateService {
         Function<Template, GetTemplateRes> fn = (template -> GetTemplateRes.toDto(template));
 
         return new PageResult<>(templatePage, fn);
+    }
+
+    // 탬플릿 전체 조회(페이징 X)
+    public List<GetTemplateRes> getAllTemplate(Long memberId) {
+        getExistMember(memberId);
+
+        // template 조회
+        List<Template> templateList = templateRepository.findByMemberIdAndStatus(memberId, BaseStatus.ACTIVE);
+        if (templateList.isEmpty())
+            throw new BaseException(NOT_EXIST_TEMPLATE);
+
+        return templateList.stream().map(template -> GetTemplateRes.toDto(template)).collect(Collectors.toList());
     }
 
     // 탬플릿 수정

@@ -16,6 +16,7 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.List;
 
 @Log4j2
 @RestController
@@ -53,7 +54,21 @@ public class TemplateController {
     }
 
     @ApiOperation(
-            value = "사용자 탬플릿 조회",
+            value = "사용자 탬플릿 조회 (페이징 X)",
+            notes = "사용자 아이디를 통해 사용자가 보유한 모든 탬플릿을 조회할 수 있다."
+    )
+    @ApiResponses({
+            @ApiResponse(code = 1000, message = "요청에 성공하였습니다."),
+            @ApiResponse(code = 2009, message = "존재하지 않는 사용자입니다."),
+            @ApiResponse(code = 2022, message = "존재하지 않는 탬플릿입니다."),
+    })
+    @GetMapping("/list")
+    public BaseResponse<List<GetTemplateRes>> getAllTemplate(HttpServletRequest request){
+        return new BaseResponse<>(templateService.getAllTemplate(JwtInfo.getMemberId(request)));
+    }
+
+    @ApiOperation(
+            value = "사용자 탬플릿 조회 (페이징 O)",
             notes = "사용자 아이디를 통해 사용자가 보유한 모든 탬플릿을 조회할 수 있다."
     )
     @ApiResponses({
@@ -62,8 +77,8 @@ public class TemplateController {
             @ApiResponse(code = 2022, message = "존재하지 않는 탬플릿입니다."),
     })
     @GetMapping("/all/{page}")
-    public BaseResponse<PageResult<GetTemplateRes, Template>> getAllTemplate(@PathVariable("page") int page, HttpServletRequest request){
-        return new BaseResponse<>(templateService.getAllTemplate(JwtInfo.getMemberId(request), page));
+    public BaseResponse<PageResult<GetTemplateRes, Template>> getPageTemplate(@PathVariable("page") int page, HttpServletRequest request){
+        return new BaseResponse<>(templateService.getPageTemplate(JwtInfo.getMemberId(request), page));
     }
 
     @ApiOperation(
