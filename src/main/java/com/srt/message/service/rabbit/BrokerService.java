@@ -14,6 +14,9 @@ import com.srt.message.repository.MessageResultRepository;
 import com.srt.message.repository.MessageRuleRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.apache.commons.lang3.time.StopWatch;
+import org.springframework.amqp.core.MessageBuilder;
+import org.springframework.amqp.core.MessageProperties;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -23,7 +26,6 @@ import java.util.HashMap;
 import java.util.List;
 
 import static com.srt.message.utils.rabbitmq.RabbitSMSUtil.*;
-import static com.srt.message.utils.rabbitmq.RabbitSMSUtil.LG_WORK_ROUTING_KEY;
 
 @Log4j2
 @Service
@@ -41,8 +43,14 @@ public class BrokerService {
 
     private final BrokerRepository brokerRepository;
 
+    private final ObjectMapper objectMapper;
+
     // Broker 서버에게 메시지 전송
-    public void sendSmsMessage(BrokerMessageDto brokerMessageDto) {
+    public String sendSmsMessage(BrokerMessageDto brokerMessageDto) {
+        // 시간 측정
+        StopWatch stopWatch = new StopWatch();
+        stopWatch.start();
+
         Member member = brokerMessageDto.getMember();
 
         // KT, LG, SKT 순으로 정렬해서 가져옴
@@ -70,6 +78,12 @@ public class BrokerService {
 
         // skt
         sendMsgToBroker(brokerMessageDto, SKT_WORK_ROUTING_KEY, broker_count[2]);
+
+        // 시간 측정 결과
+        stopWatch.stop();
+        String processTime = String.valueOf(stopWatch.getTime());
+        log.info("Process Time: {} ", processTime);
+        return processTime;
     }
 
     private void sendMsgToBroker(BrokerMessageDto brokerMessageDto, String routingKey, int broker_count){
@@ -102,10 +116,17 @@ public class BrokerService {
                     .messageStatus(MessageStatus.PENDING)
                     .build();
 
-            rMessageResultMap.put(String.valueOf(i), convertObjectToJsonString(rMessageResult));
+            rMessageResultMap.put(String.valueOf(i), convertToJson(rMessageResult));
 
-            BrokerSendMessageDto sendMessageDto = new BrokerSendMessageDto(smsMessageDto, messageResultDto);
-            rabbitTemplate.convertAndSend(SMS_EXCHANGE_NAME, routingKey, sendMessageDto);
+            BrokerSendMessageDto brokerSendMessageDto = new BrokerSendMessageDto(smsMessageDto, messageResultDto);
+
+            // AMQP Message Builder
+            org.springframework.amqp.core.Message amqpMessage = MessageBuilder
+                    .withBody(convertToJson(brokerSendMessageDto).getBytes())
+                            .setContentType(MessageProperties.CONTENT_TYPE_JSON)
+                                    .build();
+
+            rabbitTemplate.convertAndSend(SMS_EXCHANGE_NAME, routingKey, amqpMessage);
 
             log.info((i + 1) + " 번째 메시지가 전송되었습니다 - " + routingKey);
         }
@@ -117,15 +138,14 @@ public class BrokerService {
         System.out.println("종료");
     }
 
-    // RMessageResult를 Json 형태로 변환
-    public String convertObjectToJsonString(RMessageResult rMessageResult) {
-        ObjectMapper mapper = new ObjectMapper();
-        String jsonStr = null;
+    // Json 형태로 반환
+    public String convertToJson(Object object){
+        String sendMessageJson = null;
         try {
-            jsonStr = mapper.writeValueAsString(rMessageResult);
-        } catch (JsonProcessingException e) {
+             sendMessageJson = objectMapper.writeValueAsString(object);
+        }catch (JsonProcessingException e){
             e.printStackTrace();
         }
-        return jsonStr;
+        return sendMessageJson;
     }
 }

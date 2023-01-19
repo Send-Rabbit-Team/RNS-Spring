@@ -19,7 +19,7 @@ public class PostContactRes {
     @ApiModelProperty(
             example = "10"
     )
-    private ContactGroup contactGroup;
+    private long contactGroupId;
 
     @ApiModelProperty(
             example = "01091908201"
@@ -34,7 +34,7 @@ public class PostContactRes {
     public static PostContactRes toDto(Contact contact, ContactGroup contactGroup){
         PostContactRes postContactRes = PostContactRes.builder()
                 .contactId(contact.getId())
-                .contactGroup(contactGroup)
+                .contactGroupId(contactGroup.getId())
                 .phoneNumber(contact.getPhoneNumber())
                 .memo(contact.getMemo())
                 .build();

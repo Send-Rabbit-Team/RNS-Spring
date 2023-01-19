@@ -43,7 +43,6 @@ public class BrokerListener {
         saveMessageResult(messageResultDto);
     }
 
-    @Transactional
     public void saveMessageResult(final MessageResultDto messageResultDto){
         Message message = messageCacheRepository.findMessageById(messageResultDto.getMessageId());
         Contact contact = contactCacheRepository.findContactById(messageResultDto.getContactId());

@@ -51,8 +51,8 @@ public class MessageController {
     })
     @PostMapping("/send")
     public BaseResponse<String> sendMessage(@RequestBody PostSendMessageReq postSendMessageReq, HttpServletRequest request){
-        messageService.sendMessageToBroker(postSendMessageReq, JwtInfo.getMemberId(request));
+        String processTime = messageService.sendMessageToBroker(postSendMessageReq, JwtInfo.getMemberId(request));
 
-        return new BaseResponse<>("성공적으로 메시지가 발송되었습니다.");
+        return new BaseResponse<>("메시지 발송 걸린 시간: " + processTime);
     }
 }

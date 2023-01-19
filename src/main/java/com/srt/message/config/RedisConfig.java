@@ -26,13 +26,11 @@ import java.util.List;
 @Configuration
 @EnableRedisRepositories
 public class RedisConfig {
-    @Value("${spring.redis.cluster.nodes}")
-    private List<String> clusterNodes;
 
     @Bean
     public RedisConnectionFactory redisConnectionFactory() {
 
-        return new LettuceConnectionFactory("210.109.63.21", 6379);
+        return new LettuceConnectionFactory("localhost", 6379);
     }
 
     @Bean
