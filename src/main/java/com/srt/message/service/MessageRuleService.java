@@ -78,19 +78,21 @@ public class MessageRuleService {
 
 
         List<MessageRule> modMessageRuleList = patchSMSRuleReq.getMessageRules().stream().map(
-                modMessageRule -> {
+                m -> {
+                    Broker broker = brokerRepository.findById(m.getBrokerId())
+                            .orElseThrow(()-> new BaseException(NOT_EXIST_BROKER));
+
                     return PatchSMSRuleReq.toEntity(
-                            brokerRepository.findById(modMessageRule.getBrokerId())
-                                    .orElseThrow(()->new BaseException(NOT_EXIST_BROKER)),
-                            modMessageRule.getBrokerRate(), member);
+                            broker,
+                            m.getBrokerRate(), member);
                 }
         ).collect(Collectors.toList());
 
         modMessageRuleList.forEach(
-                modMessageRule -> {
-                    MessageRule prevMessageRule = messageRuleRepository.findByBroker(modMessageRule.getBroker())
+                m -> {
+                    MessageRule prevMessageRule = messageRuleRepository.findByBroker(m.getBroker())
                             .orElseThrow(()-> new BaseException(NOT_EXIST_MESSAGE_RULE));
-                    prevMessageRule.editMessageRule(modMessageRule);
+                    prevMessageRule.editMessageRule(m);
                 }
         );
 
