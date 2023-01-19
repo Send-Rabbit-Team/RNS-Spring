@@ -20,7 +20,9 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import static com.srt.message.config.response.BaseResponseStatus.*;
 
@@ -57,13 +59,27 @@ public class SenderNumberService {
         return RegisterSenderNumberRes.toDto(senderNumber);
     }
 
-    // 발신자 조회
-    public PageResult<GetSenderNumberRes, SenderNumber> getMemberSenderNumber(long memberId, int page) {
+    // 발신자 조회(페이징 O)
+    public PageResult<GetSenderNumberRes, SenderNumber> getPageSenderNumber(long memberId, int page) {
         PageRequest pageRequest = PageRequest.of(page-1, 5, Sort.by("id").descending());
+
         Page<SenderNumber> senderNumberPage = senderNumberRepository.findAll(memberId, BaseStatus.ACTIVE, pageRequest);
+        if (senderNumberPage.isEmpty())
+            throw new BaseException(NOT_EXIST_SENDER_NUMBER);
+
         Function<SenderNumber, GetSenderNumberRes> fn = (senderNumber -> GetSenderNumberRes.toDto(senderNumber));
+
         return new PageResult<>(senderNumberPage, fn);
     }
+
+    // 발신자 조회(페이징 X)
+    public List<GetSenderNumberRes> getAllSenderNumber(long memberId) {
+        List<SenderNumber> senderNumberList = senderNumberRepository.findByMemberIdAndStatus(memberId, BaseStatus.ACTIVE);
+        if (senderNumberList.isEmpty())
+            throw new BaseException(NOT_EXIST_SENDER_NUMBER);
+        return senderNumberList.stream().map(senderNumber -> GetSenderNumberRes.toDto(senderNumber)).collect(Collectors.toList());
+    }
+
 
     // 발신자 삭제
     @Transactional(readOnly = false)
@@ -76,5 +92,12 @@ public class SenderNumberService {
 
         senderNumber.changeStatusInActive();
         senderNumberRepository.save(senderNumber);
+    }
+
+    public String getBlockNumber(long senderNumberId, long memberId){
+        SenderNumber senderNumber =  senderNumberRepository.findByIdAndStatus(senderNumberId, BaseStatus.ACTIVE)
+                .orElseThrow(()-> new BaseException(NOT_EXIST_SENDER_NUMBER));
+
+        return senderNumber.getBlockNumber();
     }
 }

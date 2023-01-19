@@ -7,11 +7,14 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface TemplateRepository extends JpaRepository<Template, Long> {
 
     Optional<Template> findByIdAndStatus(Long templateId, BaseStatus status);
+
+    List<Template> findByMemberIdAndStatus(Long memberId, BaseStatus status);
 
     @Query(value = "select t from Template t where t.member.id = :memberId and t.status = :status",
     countQuery = "select count(t) from Template t where t.member.id = :memberId and t.status = :status")
