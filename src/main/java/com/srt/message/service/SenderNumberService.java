@@ -63,7 +63,7 @@ public class SenderNumberService {
     public PageResult<GetSenderNumberRes, SenderNumber> getPageSenderNumber(long memberId, int page) {
         PageRequest pageRequest = PageRequest.of(page-1, 5, Sort.by("id").descending());
 
-        Page<SenderNumber> senderNumberPage = senderNumberRepository.findAll(memberId, BaseStatus.ACTIVE, pageRequest);
+        Page<SenderNumber> senderNumberPage = senderNumberRepository.findAllSenderNumber(memberId, BaseStatus.ACTIVE, pageRequest);
         if (senderNumberPage.isEmpty())
             throw new BaseException(NOT_EXIST_SENDER_NUMBER);
 

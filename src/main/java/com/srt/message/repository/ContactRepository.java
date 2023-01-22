@@ -32,7 +32,7 @@ public interface ContactRepository extends JpaRepository<Contact, Long> {
     // 사용자 아이디로 연락처 조회 (페이지네이션 있음)
     @Query(value = "select c from Contact c where c.member.id = :memberId and c.status = :status",
     countQuery = "select count(c) from Contact c where c.member.id = :memberId and c.status = :status")
-    Page<Contact> findAll(Long memberId, BaseStatus status, Pageable pageable);
+    Page<Contact> findAllContact(Long memberId, BaseStatus status, Pageable pageable);
 
     List<Contact> findByMemberIdAndStatus(long memberId, BaseStatus status);
 
