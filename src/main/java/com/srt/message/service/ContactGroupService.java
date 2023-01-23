@@ -106,14 +106,15 @@ public class ContactGroupService {
 
         // 연락처 조회
         List<Contact> contactList = contactRepository.findByContactGroupIdAndStatus(contactGroupId, BaseStatus.ACTIVE);
-        if (contactList.isEmpty())
-            throw new BaseException(NOT_EXIST_CONTACT_NUMBER);
-
-        // 연락처 그룹에 연결된 연락처 해제
-        for (Contact contact : contactList) {
-            contact.quitContactGroup();
-            contactRepository.save(contact);
+        if (!contactList.isEmpty()) {
+            // 연락처 그룹에 연결된 연락처 해제
+            for (Contact contact : contactList) {
+                contact.quitContactGroup();
+                contactRepository.save(contact);
+            }
         }
+
+
 
     }
 
@@ -133,7 +134,7 @@ public class ContactGroupService {
     public PageResult<GetContactGroupRes, ContactGroup> getMemberContactGroup(long memberId, int page) {
         PageRequest pageRequest = PageRequest.of(page - 1, 5, Sort.by("id").descending());
 
-        Page<ContactGroup> contactPage = contactGroupRepository.findAll(memberId, BaseStatus.ACTIVE, pageRequest);
+        Page<ContactGroup> contactPage = contactGroupRepository.findAllContactGroup(memberId, BaseStatus.ACTIVE, pageRequest);
 
         Function<ContactGroup, GetContactGroupRes> fn = (contactGroup -> GetContactGroupRes.toDto(contactGroup));
 

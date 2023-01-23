@@ -19,7 +19,7 @@ public interface ContactGroupRepository extends JpaRepository<ContactGroup,Long>
 
     @Query(value = "select cg from ContactGroup cg where cg.member.id = :memberId and cg.status = :status",
     countQuery = "select count(cg) from ContactGroup cg where cg.member.id = :memberId and cg.status = :status")
-    Page<ContactGroup> findAll(long memberId, BaseStatus status, Pageable pageable);
+    Page<ContactGroup> findAllContactGroup(long memberId, BaseStatus status, Pageable pageable);
 
     Optional<ContactGroup> findByIdAndStatus(long id, BaseStatus status);
 }
