@@ -12,9 +12,6 @@ import lombok.*;
 @Getter
 @Setter
 public class SMSMessageDto {
-    @JsonIgnore
-    @ApiModelProperty(hidden = true)
-    private long messageId;
 
     @ApiModelProperty(
             example = "01025291674"
