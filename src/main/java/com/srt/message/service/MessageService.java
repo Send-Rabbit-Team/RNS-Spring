@@ -41,7 +41,7 @@ public class MessageService {
             throw new BaseException(NOT_EXIST_CONTACT_NUMBER);
 
         // 발신자 번호 예외 처리
-        SenderNumber senderNumber = senderNumberRepository.findByPhoneNumberAndStatus(messageReq.getSenderNumber(), ACTIVE)
+        SenderNumber senderNumber = senderNumberRepository.findByPhoneNumberAndStatus(messageReq.getMessage().getFrom(), ACTIVE)
                 .orElseThrow(() -> new BaseException(NOT_EXIST_SENDER_NUMBER));
 
         log.info("senderNumber - memberId {}", senderNumber.getMember().getId());

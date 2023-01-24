@@ -24,6 +24,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import static com.srt.message.utils.rabbitmq.RabbitSMSUtil.*;
 
@@ -45,11 +46,23 @@ public class BrokerService {
 
     private final ObjectMapper objectMapper;
 
+    private BrokerMessageDto brokerMessageDto;
+    private SMSMessageDto smsMessageDto;
+    private Message message;
+    private List<Contact> contacts;
+
+    private int contactIdx = 0;
+
     // Broker 서버에게 메시지 전송
     public String sendSmsMessage(BrokerMessageDto brokerMessageDto) {
         // 시간 측정
         StopWatch stopWatch = new StopWatch();
         stopWatch.start();
+
+        this.brokerMessageDto = brokerMessageDto;
+        smsMessageDto = brokerMessageDto.getSmsMessageDto();
+        message = brokerMessageDto.getMessage();
+        contacts = brokerMessageDto.getContacts();
 
         Member member = brokerMessageDto.getMember();
 
@@ -58,7 +71,7 @@ public class BrokerService {
 
         int count = brokerMessageDto.getCount();
 
-        double value = (count / 100);
+        double value = (count / 100D);
         int[] broker_count = new int[BROKER_SIZE]; // ([0] KT, [1] LG, [2] SKT)
         int sum = 0;
 
@@ -71,13 +84,13 @@ public class BrokerService {
             broker_count[(int)(Math.random() * 3)] += count - sum;
 
         // kt
-        sendMsgToBroker(brokerMessageDto, KT_WORK_ROUTING_KEY, broker_count[0]);
+        sendMsgToBroker(KT_WORK_ROUTING_KEY, broker_count[0]);
 
         // lg
-        sendMsgToBroker(brokerMessageDto, LG_WORK_ROUTING_KEY, broker_count[1]);
+        sendMsgToBroker(LG_WORK_ROUTING_KEY, broker_count[1]);
 
         // skt
-        sendMsgToBroker(brokerMessageDto, SKT_WORK_ROUTING_KEY, broker_count[2]);
+        sendMsgToBroker(SKT_WORK_ROUTING_KEY, broker_count[2]);
 
         // 시간 측정 결과
         stopWatch.stop();
@@ -86,21 +99,17 @@ public class BrokerService {
         return processTime;
     }
 
-    private void sendMsgToBroker(BrokerMessageDto brokerMessageDto, String routingKey, int broker_count){
-        SMSMessageDto smsMessageDto = brokerMessageDto.getSmsMessageDto();
-        Message message = brokerMessageDto.getMessage();
-        List<Contact> contacts = brokerMessageDto.getContacts();
-
+    private void sendMsgToBroker(String routingKey, int broker_count){
         String brokerName = routingKey.split("\\.")[2].toUpperCase();
         Broker broker = brokerRepository.findByName(brokerName);
 
-        long messageId = brokerMessageDto.getMessage().getId();
+        long messageId = message.getId();
 
         HashMap<String, String> rMessageResultMap = new HashMap<>();
 
-        for (int i = 0; i < broker_count; i++) {
-            smsMessageDto.setTo(contacts.get(0).getPhoneNumber()); // TODO 테스트를 위해 0으로 설정, 추후에 i로 변경해야 함
-            Contact contact = contacts.get(0); // TODO 테스트를 위해 0으로 설정, 추후에 i로 변경해야 함
+        for (int i = contactIdx; i < broker_count; i++) {
+            smsMessageDto.setTo(contacts.get(0).getPhoneNumber());
+            Contact contact = contacts.get(0);
 
             MessageResultDto messageResultDto = MessageResultDto.builder()
                     .messageId(messageId)
@@ -132,9 +141,12 @@ public class BrokerService {
         }
 
         // RedisTemplate Map 자료구조 사용 (속도 더 빠름)
+        String key = messageId + "." + brokerName;
         HashOperations<String, String, Object> hashOperations = redisTemplate.opsForHash();
-        hashOperations.putAll(messageId + "." + brokerName, rMessageResultMap);
+        redisTemplate.expire(key, 10, TimeUnit.MINUTES);
+        hashOperations.putAll(key, rMessageResultMap);
 
+        contactIdx += broker_count;
         System.out.println("종료");
     }
 
