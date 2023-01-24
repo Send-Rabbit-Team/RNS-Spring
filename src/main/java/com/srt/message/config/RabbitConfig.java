@@ -10,7 +10,6 @@ import org.springframework.amqp.rabbit.core.RabbitAdmin;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
 import org.springframework.amqp.support.converter.MessageConverter;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -199,7 +198,7 @@ public class RabbitConfig {
     public DirectExchange kakaoReceiveExchange(){ return new DirectExchange(KAKAO_RECEIVE_EXCHANGE_NAME); }
 
     @Bean
-    public DirectExchange KakaoDlxExchange(){ return new DirectExchange(KAKAO_DLX_EXCHANGE_NAME); }
+    public DirectExchange kakaoDlxExchange(){ return new DirectExchange(KAKAO_DLX_EXCHANGE_NAME); }
 
     // KE Queue(work, wait, receive)
     @Bean
@@ -243,9 +242,9 @@ public class RabbitConfig {
 
 
     @Bean
-    public Binding bindingKakaoDlxKE(DirectExchange KakaoDlxExchange, Queue kakaoWaitKEQueue){
+    public Binding bindingKakaoDlxKE(DirectExchange kakaoDlxExchange, Queue kakaoWaitKEQueue){
         return BindingBuilder.bind(kakaoWaitKEQueue)
-                .to(KakaoDlxExchange)
+                .to(kakaoDlxExchange)
                 .with(KE_WAIT_ROUTING_KEY);
     }
 }
