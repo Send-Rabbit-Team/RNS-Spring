@@ -5,14 +5,14 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.srt.message.config.status.MessageStatus;
 import com.srt.message.domain.*;
 import com.srt.message.domain.redis.RMessageResult;
+import com.srt.message.repository.*;
 import com.srt.message.service.dto.message.kakao.BrokerKakaoMessageDto;
+import com.srt.message.service.dto.message.kakao.BrokerSendKakaoMessageDto;
+import com.srt.message.service.dto.message.kakao.KakaoMessageDto;
 import com.srt.message.service.dto.message.sms.BrokerMessageDto;
 import com.srt.message.service.dto.message.sms.BrokerSendMessageDto;
 import com.srt.message.service.dto.message.sms.SMSMessageDto;
 import com.srt.message.service.dto.message_result.MessageResultDto;
-import com.srt.message.repository.BrokerRepository;
-import com.srt.message.repository.MessageResultRepository;
-import com.srt.message.repository.MessageRuleRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.lang3.time.StopWatch;
@@ -34,15 +34,19 @@ import static com.srt.message.utils.rabbitmq.RabbitSMSUtil.*;
 public class BrokerService {
     private final int BROKER_SIZE = 3;
 
+    private final int KAKAO_BROKER_SIZE = 2;
+
     private final RedisTemplate<String, Object> redisTemplate;
 
     private final RabbitTemplate rabbitTemplate;
 
-    private final MessageResultRepository messageResultRepository;
+    private final KakaoMessageRuleRepository kakaoMessageRuleRepository;
 
     private final MessageRuleRepository messageRuleRepository;
 
     private final BrokerRepository brokerRepository;
+
+    private final KakaoBrokerRepository kakaoBrokerRepository;
 
     private final ObjectMapper objectMapper;
 
@@ -150,31 +154,28 @@ public class BrokerService {
 
         Member member = brokerKakaoMessageDto.getMember();
 
-        // KT, LG, SKT 순으로 정렬해서 가져옴
-        List<MessageRule> messageRules = messageRuleRepository.findAllByMember(member);
+        List<KakaoMessageRule> messageRules = kakaoMessageRuleRepository.findAllByMember(member);
 
         int count = brokerKakaoMessageDto.getCount();
 
         double value = (count / 100);
-        int[] broker_count = new int[BROKER_SIZE]; // ([0] KT, [1] LG, [2] SKT)
+        int[] broker_count = new int[KAKAO_BROKER_SIZE]; // ([0] CNS, [1] KE)
         int sum = 0;
 
-        for(int i = 0; i < BROKER_SIZE; i++){
-            broker_count[i] = !messageRules.isEmpty() ? (int)(messageRules.get(i).getBrokerRate() * value) : (int)(33 * value); // 중계사 비율 설정 안했을 경우 33%씩 분배
+        for(int i = 0; i < KAKAO_BROKER_SIZE; i++){
+            broker_count[i] = !messageRules.isEmpty() ? (int)(messageRules.get(i).getBrokerRate() * value) : (int)(50 * value); // 중계사 비율 설정 안했을 경우 33%씩 분배
             sum += broker_count[i];
         }
 
         if (sum < count) // 비율이 안떨어질 경우, 랜덤 중계사에게 배분
-            broker_count[(int)(Math.random() * 3)] += count - sum;
+            broker_count[(int)(Math.random() * 2)] += count - sum;
 
-        // kt
-        sendMsgToBroker(brokerMessageDto, KT_WORK_ROUTING_KEY, broker_count[0]);
+        // cns
+        sendKakaoMsgToBroker(brokerKakaoMessageDto, CNS_WORK_ROUTING_KEY, broker_count[0]);
 
-        // lg
-        sendMsgToBroker(brokerMessageDto, LG_WORK_ROUTING_KEY, broker_count[1]);
+        // ke
+        sendKakaoMsgToBroker(brokerKakaoMessageDto, KE_WORK_ROUTING_KEY, broker_count[1]);
 
-        // skt
-        sendMsgToBroker(brokerMessageDto, SKT_WORK_ROUTING_KEY, broker_count[2]);
 
         // 시간 측정 결과
         stopWatch.stop();
@@ -183,47 +184,47 @@ public class BrokerService {
         return processTime;
     }
 
-    private void sendKakaoMsgToBroker(BrokerMessageDto brokerMessageDto, String routingKey, int broker_count){
-        SMSMessageDto smsMessageDto = brokerMessageDto.getSmsMessageDto();
-        Message message = brokerMessageDto.getMessage();
-        List<Contact> contacts = brokerMessageDto.getContacts();
+    private void sendKakaoMsgToBroker(BrokerKakaoMessageDto brokerKakaoMessageDto, String routingKey, int broker_count){
+        KakaoMessageDto kakaoMessageDto = brokerKakaoMessageDto.getKakaoMessageDto();
+        KakaoMessage message = brokerKakaoMessageDto.getMessage();
+        List<Contact> contacts = brokerKakaoMessageDto.getContacts();
 
         String brokerName = routingKey.split("\\.")[2].toUpperCase();
-        Broker broker = brokerRepository.findByName(brokerName);
+        KakaoBroker kakaoBroker = kakaoBrokerRepository.findByName(brokerName);
 
-        long messageId = brokerMessageDto.getMessage().getId();
+        long messageId = brokerKakaoMessageDto.getMessage().getId();
 
         HashMap<String, String> rMessageResultMap = new HashMap<>();
 
         for (int i = 0; i < broker_count; i++) {
-            smsMessageDto.setTo(contacts.get(0).getPhoneNumber()); // TODO 테스트를 위해 0으로 설정, 추후에 i로 변경해야 함
+            kakaoMessageDto.setTo(contacts.get(0).getPhoneNumber()); // TODO 테스트를 위해 0으로 설정, 추후에 i로 변경해야 함
             Contact contact = contacts.get(0); // TODO 테스트를 위해 0으로 설정, 추후에 i로 변경해야 함
 
             MessageResultDto messageResultDto = MessageResultDto.builder()
                     .messageId(messageId)
                     .contactId(contact.getId())
-                    .brokerId(broker.getId())
+                    .brokerId(kakaoBroker.getId())
                     .messageStatus(MessageStatus.PENDING)
                     .build();
 
             RMessageResult rMessageResult = RMessageResult.builder()
                     .messageId(message.getId())
-                    .brokerId(broker.getId())
+                    .brokerId(kakaoBroker.getId())
                     .contactId(contact.getId())
                     .messageStatus(MessageStatus.PENDING)
                     .build();
 
             rMessageResultMap.put(String.valueOf(i), convertToJson(rMessageResult));
 
-            BrokerSendMessageDto brokerSendMessageDto = new BrokerSendMessageDto(smsMessageDto, messageResultDto);
+            BrokerSendKakaoMessageDto brokerSendKakaoMessageDto = new BrokerSendKakaoMessageDto(kakaoMessageDto, messageResultDto);
 
             // AMQP Message Builder
             org.springframework.amqp.core.Message amqpMessage = MessageBuilder
-                    .withBody(convertToJson(brokerSendMessageDto).getBytes())
+                    .withBody(convertToJson(brokerSendKakaoMessageDto).getBytes())
                     .setContentType(MessageProperties.CONTENT_TYPE_JSON)
                     .build();
 
-            rabbitTemplate.convertAndSend(SMS_EXCHANGE_NAME, routingKey, amqpMessage);
+            rabbitTemplate.convertAndSend(KAKAO_WORK_EXCHANGE_NAME, routingKey, amqpMessage);
 
             log.info((i + 1) + " 번째 메시지가 전송되었습니다 - " + routingKey);
         }

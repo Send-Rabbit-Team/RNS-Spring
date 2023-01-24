@@ -1,5 +1,6 @@
 package com.srt.message.config;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.amqp.core.Binding;
 import org.springframework.amqp.core.BindingBuilder;
 import org.springframework.amqp.core.DirectExchange;
@@ -18,6 +19,7 @@ import java.util.Map;
 import static com.srt.message.utils.rabbitmq.RabbitSMSUtil.*;
 
 @Configuration
+@RequiredArgsConstructor
 public class RabbitConfig {
     @Bean
     public MessageConverter jsonMessageConverter(){
@@ -184,5 +186,64 @@ public class RabbitConfig {
         return BindingBuilder.bind(smsWaitLGQueue)
                 .to(dlxSMSExchange)
                 .with(LG_WAIT_ROUTING_KEY);
+    }
+
+    // KAKAO Exchange
+    @Bean
+    public DirectExchange kakaoWorkExchange() {
+        return new DirectExchange(KAKAO_WORK_EXCHANGE_NAME);
+    }
+
+    @Bean
+    public DirectExchange kakaoReceiveExchange(){ return new DirectExchange(KAKAO_RECEIVE_EXCHANGE_NAME); }
+
+    @Bean
+    public DirectExchange KakaoDlxExchange(){ return new DirectExchange(KAKAO_DLX_EXCHANGE_NAME); }
+
+    // KE Queue(work, wait, receive)
+    @Bean
+    public Queue kakaoWorkKEQueue() {
+        Map<String, Object> args = new HashMap<>();
+        args.put("x-dead-letter-exchange", KAKAO_DLX_EXCHANGE_NAME);
+        args.put("x-dead-letter-routing-key", KE_WAIT_ROUTING_KEY);
+        return new Queue(KE_WORK_QUEUE_NAME, true, false, false, args);
+    }
+
+    @Bean
+    public Queue kakaoReceiveKEQueue() {
+        return new Queue(KE_RECEIVE_QUEUE_NAME, true);
+    }
+
+    @Bean
+    public Queue kakaoWaitKEQueue() {
+        Map<String, Object> args = new HashMap<>();
+//        args.put("x-message-ttl", WAIT_TTL);
+        args.put("x-dead-letter-exchange", KAKAO_WORK_EXCHANGE_NAME);
+        args.put("x-dead-letter-routing-key", KE_WORK_ROUTING_KEY);
+
+        return new Queue(KE_WAIT_QUEUE_NAME, true, false,false, args);
+    }
+
+    // KE Binding
+    @Bean
+    public Binding bindingKakaoWorkKE(DirectExchange kakaoWorkExchange, Queue kakaoWorkKEQueue){
+        return BindingBuilder.bind(kakaoWorkKEQueue)
+                .to(kakaoWorkExchange)
+                .with(KE_WORK_ROUTING_KEY);
+    }
+
+
+    @Bean
+    public Binding bindingKakaoReceiveKE(DirectExchange kakaoReceiveExchange, Queue kakaoReceiveKEQueue){
+        return BindingBuilder.bind(kakaoReceiveKEQueue)
+                .to(kakaoReceiveExchange)
+                .with(KE_RECEIVE_ROUTING_KEY);
+    }
+
+    @Bean
+    public Binding bindingKakaoDlxKE(DirectExchange kakaoDlxExchange, Queue kakaoWaitKEQueue){
+        return BindingBuilder.bind(kakaoWaitKEQueue)
+                .to(kakaoDlxExchange)
+                .with(KE_WAIT_ROUTING_KEY);
     }
 }

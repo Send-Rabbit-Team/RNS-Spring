@@ -4,15 +4,13 @@ package com.srt.message.service.dto.message.kakao;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.srt.message.config.status.MessageStatus;
 import com.srt.message.config.type.ButtonType;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
+@Setter
 public class KakaoMessageDto {
     private long messageId;
 
