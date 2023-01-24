@@ -1,4 +1,4 @@
-package com.srt.message.service.dto.message;
+package com.srt.message.service.dto.message.sms;
 
 import com.srt.message.service.dto.message_result.MessageResultDto;
 import lombok.AllArgsConstructor;

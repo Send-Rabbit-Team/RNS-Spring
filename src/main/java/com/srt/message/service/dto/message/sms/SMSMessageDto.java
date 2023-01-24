@@ -1,4 +1,4 @@
-package com.srt.message.service.dto.message;
+package com.srt.message.service.dto.message.sms;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.srt.message.config.status.MessageStatus;

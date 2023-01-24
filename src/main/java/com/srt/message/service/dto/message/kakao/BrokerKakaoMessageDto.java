@@ -1,8 +1,10 @@
-package com.srt.message.service.dto.message;
+package com.srt.message.service.dto.message.kakao;
 
 import com.srt.message.domain.Contact;
+import com.srt.message.domain.KakaoMessage;
 import com.srt.message.domain.Member;
 import com.srt.message.domain.Message;
+import com.srt.message.service.dto.message.sms.SMSMessageDto;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -14,10 +16,10 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
-public class BrokerMessageDto {
-    private SMSMessageDto smsMessageDto;
+public class BrokerKakaoMessageDto {
+    private KakaoMessageDto kakaoMessageDto;
 
-    private Message message;
+    private KakaoMessage message;
 
     private List<Contact> contacts;
 

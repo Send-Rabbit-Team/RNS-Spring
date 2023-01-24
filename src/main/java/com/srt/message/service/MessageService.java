@@ -1,12 +1,12 @@
 package com.srt.message.service;
 
 import com.srt.message.config.exception.BaseException;
-import com.srt.message.domain.Contact;
-import com.srt.message.domain.Member;
-import com.srt.message.domain.Message;
-import com.srt.message.domain.SenderNumber;
-import com.srt.message.service.dto.message.BrokerMessageDto;
-import com.srt.message.service.dto.message.post.PostSendMessageReq;
+import com.srt.message.domain.*;
+import com.srt.message.service.dto.message.kakao.BrokerKakaoMessageDto;
+import com.srt.message.service.dto.message.kakao.KakaoMessageDto;
+import com.srt.message.service.dto.message.kakao.post.PostSendKakaoMessageReq;
+import com.srt.message.service.dto.message.sms.BrokerMessageDto;
+import com.srt.message.service.dto.message.sms.post.PostSendMessageReq;
 import com.srt.message.repository.*;
 import com.srt.message.service.rabbit.BrokerService;
 import lombok.RequiredArgsConstructor;
@@ -27,6 +27,8 @@ public class MessageService {
     private final ContactRepository contactRepository;
 
     private final MessageRepository messageRepository;
+
+    private final KakaoMessageRepository kakaoMessageRepository;
 
     private final BrokerService brokerService;
 
@@ -70,4 +72,50 @@ public class MessageService {
 
         return brokerService.sendSmsMessage(brokerMessageDto);
     }
+
+    public String sendKakaoMessageToBroker(PostSendKakaoMessageReq messageReq, long memberId){
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new BaseException(NOT_EXIST_MEMBER));
+
+        List<Contact> contacts = contactRepository.findByPhoneNumberIn(messageReq.getReceivers());
+        // 연락처 예외 처리
+        if(contacts.contains(null) || contacts.isEmpty())
+            throw new BaseException(NOT_EXIST_CONTACT_NUMBER);
+
+        // 발신자 번호 예외 처리
+        SenderNumber senderNumber = senderNumberRepository.findByPhoneNumberAndStatus(messageReq.getSenderNumber(), ACTIVE)
+                .orElseThrow(() -> new BaseException(NOT_EXIST_SENDER_NUMBER));
+
+        log.info("senderNumber - memberId {}", senderNumber.getMember().getId());
+        log.info("member - memberId {}", member.getId());
+
+        if(senderNumber.getMember().getId() != member.getId())
+            throw new BaseException(NOT_MATCH_SENDER_NUMBER);
+
+        KakaoMessage message = KakaoMessage.builder()
+                .member(member)
+                .senderNumber(senderNumber)
+                .subject(messageReq.getMessage().getSubject())
+                .subTitle(messageReq.getMessage().getSubtitle())
+                .content(messageReq.getMessage().getContent())
+                .image(messageReq.getMessage().getImage())
+                .description(messageReq.getMessage().getDescription())
+                .buttonUrl(messageReq.getMessage().getButtonUrl())
+                .buttonTitle(messageReq.getMessage().getButtonTitle())
+                .buttonType(messageReq.getMessage().getButtonType())
+                .build();
+
+        kakaoMessageRepository.save(message);
+
+        BrokerKakaoMessageDto brokerMessageDto = BrokerKakaoMessageDto.builder()
+                .kakaoMessageDto(messageReq.getMessage())
+                .message(message)
+                .contacts(contacts)
+                .member(member)
+                .count(messageReq.getCount())
+                .build();
+
+        return brokerService.sendKakaoMessage(brokerMessageDto);
+    }
+
 }
