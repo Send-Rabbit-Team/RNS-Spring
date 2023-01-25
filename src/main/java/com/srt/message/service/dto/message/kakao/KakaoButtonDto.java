@@ -8,7 +8,7 @@ import lombok.*;
 @NoArgsConstructor
 @Getter
 public class KakaoButtonDto {
-    private long kakaoButtonIds;
+    private long kakaoButtonId;
 
     private String buttonUrl;
 
