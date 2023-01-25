@@ -2,12 +2,13 @@ package com.srt.message.service.rabbit;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.srt.message.config.exception.BaseException;
 import com.srt.message.config.status.MessageStatus;
 import com.srt.message.domain.*;
 import com.srt.message.domain.redis.RKakaoMessageResult;
-import com.srt.message.domain.redis.RMessageResult;
 import com.srt.message.repository.KakaoBrokerRepository;
 import com.srt.message.repository.KakaoMessageRuleRepository;
+import com.srt.message.repository.redis.RKakaoMessageResultRepository;
 import com.srt.message.service.dto.message.kakao.BrokerKakaoMessageDto;
 import com.srt.message.service.dto.message.kakao.BrokerSendKakaoMessageDto;
 import com.srt.message.service.dto.message.kakao.KakaoMessageDto;
@@ -18,13 +19,13 @@ import org.apache.commons.lang3.time.StopWatch;
 import org.springframework.amqp.core.MessageBuilder;
 import org.springframework.amqp.core.MessageProperties;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
-import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
 import java.util.List;
 
+import static com.srt.message.config.response.BaseResponseStatus.NOT_EXIST_BROKER;
 import static com.srt.message.utils.rabbitmq.RabbitKakaoUtil.*;
 
 @Log4j2
@@ -42,20 +43,34 @@ public class KakaoBrokerService {
 
     private final KakaoBrokerRepository kakaoBrokerRepository;
 
+    private final RKakaoMessageResultRepository rKakaoMessageResultRepository;
+
     private final ObjectMapper objectMapper;
+
+    private KakaoMessageDto kakaoMessageDto;
+
+    private KakaoMessage kakaoMessage;
+
+    private List<Contact> contacts;
+
+    private int contactIdx = 0;
 
     public String sendKakaoMessage(BrokerKakaoMessageDto brokerKakaoMessageDto) {
         // 시간 측정
         StopWatch stopWatch = new StopWatch();
         stopWatch.start();
 
+        this.kakaoMessageDto = brokerKakaoMessageDto.getKakaoMessageDto();
+        this.kakaoMessage = brokerKakaoMessageDto.getKakaoMessage();
+        this.contacts = brokerKakaoMessageDto.getContacts();
+
         Member member = brokerKakaoMessageDto.getMember();
 
         List<KakaoMessageRule> messageRules = kakaoMessageRuleRepository.findAllByMember(member);
 
-        int count = brokerKakaoMessageDto.getCount();
+        int count = brokerKakaoMessageDto.getContacts().size();
 
-        double value = (count / 100);
+        double value = (count / 100D);
         int[] broker_count = new int[KAKAO_BROKER_SIZE]; // ([0] CNS, [1] KE)
         int sum = 0;
 
@@ -67,11 +82,16 @@ public class KakaoBrokerService {
         if (sum < count) // 비율이 안떨어질 경우, 랜덤 중계사에게 배분
             broker_count[(int)(Math.random() * 2)] += count - sum;
 
+        // Redis에 메시지 상태 저장
+        saveKakaoMessageResultByRedis(broker_count);
+
+        contactIdx = 0;
+
         // cns
-        sendKakaoMsgToBroker(brokerKakaoMessageDto, CNS_WORK_ROUTING_KEY, broker_count[0]);
+        sendKakaoMsgToBroker(CNS_WORK_ROUTING_KEY, broker_count[0]);
 
         // ke
-        sendKakaoMsgToBroker(brokerKakaoMessageDto, KE_WORK_ROUTING_KEY, broker_count[1]);
+        sendKakaoMsgToBroker(KE_WORK_ROUTING_KEY, broker_count[1]);
 
 
         // 시간 측정 결과
@@ -81,37 +101,45 @@ public class KakaoBrokerService {
         return processTime;
     }
 
-    private void sendKakaoMsgToBroker(BrokerKakaoMessageDto brokerKakaoMessageDto, String routingKey, int broker_count){
-        KakaoMessageDto kakaoMessageDto = brokerKakaoMessageDto.getKakaoMessageDto();
-        KakaoMessage message = brokerKakaoMessageDto.getKakaoMessage();
-        List<Contact> contacts = brokerKakaoMessageDto.getContacts();
+    private void saveKakaoMessageResultByRedis(int[] broker_count){
+        HashMap<String, String> rKakaoMessageResultMap = new HashMap<>();
 
+        for(int i = 0; i < KAKAO_BROKER_SIZE; i++){
+            KakaoBroker kakaoBroker = kakaoBrokerRepository.findById((long) i+1).orElseThrow(() -> new BaseException(NOT_EXIST_BROKER));
+            for(int j = contactIdx; j < contactIdx + broker_count[i]; j++){
+                Contact contact = contacts.get(j);
+                RKakaoMessageResult rKakaoMessageResult = RKakaoMessageResult.builder()
+                        .id(String.valueOf(j))
+                        .kakaoMessageId(kakaoMessage.getId())
+                        .kakaoBrokerId(kakaoBroker.getId())
+                        .contactId(contact.getId())
+                        .messageStatus(MessageStatus.PENDING)
+                        .build();
+
+                rKakaoMessageResultMap.put(String.valueOf(i) , convertToJson(rKakaoMessageResult));
+            }
+
+            String key = kakaoMessage.getId() + "." + kakaoBroker.getName();
+            rKakaoMessageResultRepository.saveAll(key, rKakaoMessageResultMap);
+
+            contactIdx += broker_count[i];
+        }
+    }
+
+    private void sendKakaoMsgToBroker(String routingKey, int broker_count){
         String brokerName = routingKey.split("\\.")[2].toUpperCase();
         KakaoBroker kakaoBroker = kakaoBrokerRepository.findByName(brokerName);
 
-        long messageId = brokerKakaoMessageDto.getKakaoMessage().getId();
-
-        HashMap<String, String> rMessageResultMap = new HashMap<>();
-
-        for (int i = 0; i < broker_count; i++) {
-            kakaoMessageDto.setTo(contacts.get(0).getPhoneNumber()); // TODO 테스트를 위해 0으로 설정, 추후에 i로 변경해야 함
-            Contact contact = contacts.get(0); // TODO 테스트를 위해 0으로 설정, 추후에 i로 변경해야 함
+        for (int i = contactIdx; i < contactIdx + broker_count; i++) {
+            kakaoMessageDto.setTo(contacts.get(i).getPhoneNumber()); // TODO 테스트를 위해 0으로 설정, 추후에 i로 변경해야 함
+            Contact contact = contacts.get(i); // TODO 테스트를 위해 0으로 설정, 추후에 i로 변경해야 함
 
             KakaoMessageResultDto kakaoMessageResultDto = KakaoMessageResultDto.builder()
-                    .messageId(messageId)
+                    .messageId(kakaoMessage.getId())
                     .contactId(contact.getId())
                     .brokerId(kakaoBroker.getId())
                     .messageStatus(MessageStatus.PENDING)
                     .build();
-
-            RKakaoMessageResult rKakaoMessageResult = RKakaoMessageResult.builder()
-                    .kakaoMessageId(message.getId())
-                    .kakaoBrokerId(kakaoBroker.getId())
-                    .contactId(contact.getId())
-                    .messageStatus(MessageStatus.PENDING)
-                    .build();
-
-            rMessageResultMap.put(String.valueOf(i), convertToJson(rKakaoMessageResult));
 
             BrokerSendKakaoMessageDto brokerSendKakaoMessageDto = new BrokerSendKakaoMessageDto(kakaoMessageDto, kakaoMessageResultDto);
 
@@ -126,21 +154,9 @@ public class KakaoBrokerService {
             log.info((i + 1) + " 번째 메시지가 전송되었습니다 - " + routingKey);
         }
 
-        // RedisTemplate Map 자료구조 사용 (속도 더 빠름)
-        HashOperations<String, String, Object> hashOperations = redisTemplate.opsForHash();
-        hashOperations.putAll(messageId + "." + brokerName, rMessageResultMap);
-
+        contactIdx += broker_count;
         System.out.println("종료");
     }
-
-
-
-
-
-
-
-
-
 
     // Json 형태로 반환
     public String convertToJson(Object object){
