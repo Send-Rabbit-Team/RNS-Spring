@@ -1,9 +1,10 @@
 package com.srt.message.interceptor;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.srt.message.dto.jwt.JwtInfo;
+import com.srt.message.service.dto.jwt.JwtInfo;
 import com.srt.message.jwt.JwtService;
 import com.srt.message.jwt.NoIntercept;
+import com.srt.message.service.AuthService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.web.method.HandlerMethod;
@@ -18,6 +19,8 @@ import java.util.LinkedHashMap;
 public class AuthenticationInterceptor implements HandlerInterceptor {
     private final JwtService jwtService;
     private final ObjectMapper objectMapper;
+
+    private final AuthService authService;
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
@@ -50,5 +53,8 @@ public class AuthenticationInterceptor implements HandlerInterceptor {
 
         JwtInfo convertJwtInfo = objectMapper.convertValue(jwtInfo, JwtInfo.class);
         request.setAttribute("jwtInfo", convertJwtInfo);
+
+        // auditor
+        authService.updateLoginMember(convertJwtInfo.getMemberId());
     }
 }
