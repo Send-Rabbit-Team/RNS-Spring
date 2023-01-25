@@ -9,5 +9,5 @@ import java.util.Optional;
 public interface KakaoMessageRepository extends JpaRepository<KakaoMessage, Long> {
     // 캐시용
     @EntityGraph(value = "KakaoMessage.with.Member.SenderNumber.RepeatRule")
-    Optional<KakaoMessage> findMessageById(long messageId);
+    Optional<KakaoMessage> findKakaoMessageById(long messageId);
 }
