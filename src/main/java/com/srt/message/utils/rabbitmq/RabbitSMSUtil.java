@@ -1,6 +1,8 @@
 package com.srt.message.utils.rabbitmq;
 
 public class RabbitSMSUtil {
+        public static final int WAIT_TTL = 5000;
+
         public static final String SMS_EXCHANGE_NAME = "dx.sms.work";
         public static final String DLX_EXCHANGE_NAME = "dx.sms.wait";
         public static final String RECEIVE_EXCHANGE_NAME = "dx.sms.receive";
