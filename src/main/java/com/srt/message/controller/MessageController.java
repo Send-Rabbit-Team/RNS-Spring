@@ -53,6 +53,6 @@ public class MessageController {
     public BaseResponse<String> sendMessage(@RequestBody PostSendMessageReq postSendMessageReq, HttpServletRequest request){
         String processTime = messageService.sendMessageToBroker(postSendMessageReq, JwtInfo.getMemberId(request));
 
-        return new BaseResponse<>("메시지 갯수: " + postSendMessageReq.getCount() +  ", 메시지 발송 걸린 시간: " + Double.parseDouble(processTime) / 1000 + "초");
+        return new BaseResponse<>("메시지 갯수: " + postSendMessageReq.getCount() + ", 메시지 발송 걸린 시간: " + Double.parseDouble(processTime) / 1000 + "초");
     }
 }

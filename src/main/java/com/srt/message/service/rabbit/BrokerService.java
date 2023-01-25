@@ -2,15 +2,16 @@ package com.srt.message.service.rabbit;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.srt.message.config.exception.BaseException;
 import com.srt.message.config.status.MessageStatus;
 import com.srt.message.domain.*;
 import com.srt.message.domain.redis.RMessageResult;
+import com.srt.message.repository.redis.RMessageResultRepository;
 import com.srt.message.service.dto.message.BrokerMessageDto;
 import com.srt.message.service.dto.message.BrokerSendMessageDto;
 import com.srt.message.service.dto.message.SMSMessageDto;
 import com.srt.message.service.dto.message_result.MessageResultDto;
 import com.srt.message.repository.BrokerRepository;
-import com.srt.message.repository.MessageResultRepository;
 import com.srt.message.repository.MessageRuleRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -18,27 +19,28 @@ import org.apache.commons.lang3.time.StopWatch;
 import org.springframework.amqp.core.MessageBuilder;
 import org.springframework.amqp.core.MessageProperties;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
-import org.springframework.data.redis.core.HashOperations;
+import org.springframework.context.annotation.Scope;
+import org.springframework.context.annotation.ScopedProxyMode;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 
 import java.util.HashMap;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
+import static com.srt.message.config.response.BaseResponseStatus.NOT_EXIST_BROKER;
 import static com.srt.message.utils.rabbitmq.RabbitSMSUtil.*;
 
 @Log4j2
-@Service
+@Component
+@Scope(value = "prototype", proxyMode = ScopedProxyMode.TARGET_CLASS)
 @RequiredArgsConstructor
 public class BrokerService {
     private final int BROKER_SIZE = 3;
 
     private final RedisTemplate<String, Object> redisTemplate;
+    private final RMessageResultRepository rMessageResultRepository;
 
     private final RabbitTemplate rabbitTemplate;
-
-    private final MessageResultRepository messageResultRepository;
 
     private final MessageRuleRepository messageRuleRepository;
 
@@ -46,7 +48,6 @@ public class BrokerService {
 
     private final ObjectMapper objectMapper;
 
-    private BrokerMessageDto brokerMessageDto;
     private SMSMessageDto smsMessageDto;
     private Message message;
     private List<Contact> contacts;
@@ -59,17 +60,16 @@ public class BrokerService {
         StopWatch stopWatch = new StopWatch();
         stopWatch.start();
 
-        this.brokerMessageDto = brokerMessageDto;
-        smsMessageDto = brokerMessageDto.getSmsMessageDto();
-        message = brokerMessageDto.getMessage();
-        contacts = brokerMessageDto.getContacts();
+        this.smsMessageDto = brokerMessageDto.getSmsMessageDto();
+        this.message = brokerMessageDto.getMessage();
+        this.contacts = brokerMessageDto.getContacts();
 
         Member member = brokerMessageDto.getMember();
 
         // KT, LG, SKT 순으로 정렬해서 가져옴
         List<MessageRule> messageRules = messageRuleRepository.findAllByMember(member);
 
-        int count = brokerMessageDto.getCount();
+        int count = brokerMessageDto.getContacts().size();
 
         double value = (count / 100D);
         int[] broker_count = new int[BROKER_SIZE]; // ([0] KT, [1] LG, [2] SKT)
@@ -82,6 +82,11 @@ public class BrokerService {
 
         if (sum < count) // 비율이 안떨어질 경우, 랜덤 중계사에게 배분
             broker_count[(int)(Math.random() * 3)] += count - sum;
+
+        // Redis에 메시지 상태 모두 저장
+        saveMessageResultByRedis(broker_count);
+
+        contactIdx = 0;
 
         // kt
         sendMsgToBroker(KT_WORK_ROUTING_KEY, broker_count[0]);
@@ -99,33 +104,47 @@ public class BrokerService {
         return processTime;
     }
 
+    // 레디스에 메시지 상태 정보 저장
+    private void saveMessageResultByRedis(int[] broker_count){
+        HashMap<String, String> rMessageResultMap = new HashMap<>();
+
+        for(int i = 0; i < BROKER_SIZE; i++){
+            Broker broker = brokerRepository.findById((long) i+1).orElseThrow(() -> new BaseException(NOT_EXIST_BROKER));
+            for(int j = contactIdx; j < contactIdx + broker_count[i]; j++){
+                Contact contact = contacts.get(j);
+                RMessageResult rMessageResult = RMessageResult.builder()
+                        .id(String.valueOf(j))
+                        .messageId(message.getId())
+                        .brokerId(broker.getId())
+                        .contactId(contact.getId())
+                        .messageStatus(MessageStatus.PENDING)
+                        .build();
+
+                rMessageResultMap.put(String.valueOf(i) , convertToJson(rMessageResult));
+            }
+
+            String key = message.getId() + "." + broker.getName();
+            rMessageResultRepository.saveAll(key, rMessageResultMap);
+
+            contactIdx += broker_count[i];
+        }
+    }
+
+    // 브로커에게 메시지 전송
     private void sendMsgToBroker(String routingKey, int broker_count){
         String brokerName = routingKey.split("\\.")[2].toUpperCase();
         Broker broker = brokerRepository.findByName(brokerName);
 
-        long messageId = message.getId();
-
-        HashMap<String, String> rMessageResultMap = new HashMap<>();
-
-        for (int i = contactIdx; i < broker_count; i++) {
-            smsMessageDto.setTo(contacts.get(0).getPhoneNumber());
-            Contact contact = contacts.get(0);
+        for (int i = contactIdx; i < contactIdx + broker_count; i++) {
+            smsMessageDto.setTo(contacts.get(i).getPhoneNumber());
+            Contact contact = contacts.get(i);
 
             MessageResultDto messageResultDto = MessageResultDto.builder()
-                    .messageId(messageId)
-                    .contactId(contact.getId())
-                    .brokerId(broker.getId())
-                    .messageStatus(MessageStatus.PENDING)
-                    .build();
-
-            RMessageResult rMessageResult = RMessageResult.builder()
                     .messageId(message.getId())
-                    .brokerId(broker.getId())
                     .contactId(contact.getId())
+                    .brokerId(broker.getId())
                     .messageStatus(MessageStatus.PENDING)
                     .build();
-
-            rMessageResultMap.put(String.valueOf(i), convertToJson(rMessageResult));
 
             BrokerSendMessageDto brokerSendMessageDto = new BrokerSendMessageDto(smsMessageDto, messageResultDto);
 
@@ -139,12 +158,6 @@ public class BrokerService {
 
             log.info((i + 1) + " 번째 메시지가 전송되었습니다 - " + routingKey);
         }
-
-        // RedisTemplate Map 자료구조 사용 (속도 더 빠름)
-        String key = messageId + "." + brokerName;
-        HashOperations<String, String, Object> hashOperations = redisTemplate.opsForHash();
-        redisTemplate.expire(key, 10, TimeUnit.MINUTES);
-        hashOperations.putAll(key, rMessageResultMap);
 
         contactIdx += broker_count;
         System.out.println("종료");

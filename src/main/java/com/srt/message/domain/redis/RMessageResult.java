@@ -32,4 +32,9 @@ public class RMessageResult {
     private Long brokerId;
 
     private MessageStatus messageStatus = MessageStatus.PENDING;
+
+    // 편의 메서드
+    public void changeMessageStatus(MessageStatus messageStatus){
+        this.messageStatus = messageStatus;
+    }
 }
