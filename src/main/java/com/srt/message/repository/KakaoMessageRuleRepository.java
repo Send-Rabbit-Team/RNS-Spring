@@ -13,5 +13,5 @@ public interface KakaoMessageRuleRepository extends JpaRepository<KakaoMessageRu
     @Query("select km from KakaoMessageRule km left join fetch km.kakaoBroker order by km.kakaoBroker.name asc")
     List<KakaoMessageRule> findAllByMember(Member member);
 
-    Optional<KakaoMessageRule> findByBroker(Broker broker);
+    Optional<KakaoMessageRule> findByKakaoBroker(KakaoBroker kakaoBroker);
 }
