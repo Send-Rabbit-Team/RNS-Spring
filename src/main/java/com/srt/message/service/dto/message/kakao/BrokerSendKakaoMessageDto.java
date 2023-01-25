@@ -1,5 +1,6 @@
 package com.srt.message.service.dto.message.kakao;
 
+import com.srt.message.service.dto.message_result.KakaoMessageResultDto;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
