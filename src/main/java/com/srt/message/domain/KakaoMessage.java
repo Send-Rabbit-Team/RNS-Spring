@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 
-@NamedEntityGraph(name = "Message.with.Member.SenderNumber.RepeatRule", attributeNodes = {
+@NamedEntityGraph(name = "KakaoMessage.with.Member.SenderNumber.RepeatRule", attributeNodes = {
         @NamedAttributeNode(value = "member", subgraph = "member_company"),
         @NamedAttributeNode("senderNumber"),
         @NamedAttributeNode("repeatRule")

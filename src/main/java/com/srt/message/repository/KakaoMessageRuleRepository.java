@@ -1,6 +1,6 @@
 package com.srt.message.repository;
 
-import com.srt.message.domain.Broker;
+import com.srt.message.domain.KakaoBroker;
 import com.srt.message.domain.KakaoMessageRule;
 import com.srt.message.domain.Member;
 import org.springframework.data.jpa.repository.JpaRepository;
