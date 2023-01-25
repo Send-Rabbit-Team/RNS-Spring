@@ -16,8 +16,6 @@ import java.util.List;
 public class PostSendMessageReq {
     private SMSMessageDto message;
 
-    private String senderNumber;
-
     private List<String> receivers;
 
     @ApiModelProperty(example = "100")
