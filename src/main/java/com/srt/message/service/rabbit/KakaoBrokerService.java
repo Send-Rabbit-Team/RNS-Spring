@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.srt.message.config.status.MessageStatus;
 import com.srt.message.domain.*;
+import com.srt.message.domain.redis.RKakaoMessageResult;
 import com.srt.message.domain.redis.RMessageResult;
 import com.srt.message.repository.KakaoBrokerRepository;
 import com.srt.message.repository.KakaoMessageRuleRepository;
@@ -103,14 +104,14 @@ public class KakaoBrokerService {
                     .messageStatus(MessageStatus.PENDING)
                     .build();
 
-            RMessageResult rMessageResult = RMessageResult.builder()
-                    .messageId(message.getId())
-                    .brokerId(kakaoBroker.getId())
+            RKakaoMessageResult rKakaoMessageResult = RKakaoMessageResult.builder()
+                    .kakaoMessageId(message.getId())
+                    .kakaoBrokerId(kakaoBroker.getId())
                     .contactId(contact.getId())
                     .messageStatus(MessageStatus.PENDING)
                     .build();
 
-            rMessageResultMap.put(String.valueOf(i), convertToJson(rMessageResult));
+            rMessageResultMap.put(String.valueOf(i), convertToJson(rKakaoMessageResult));
 
             BrokerSendKakaoMessageDto brokerSendKakaoMessageDto = new BrokerSendKakaoMessageDto(kakaoMessageDto, kakaoMessageResultDto);
 
