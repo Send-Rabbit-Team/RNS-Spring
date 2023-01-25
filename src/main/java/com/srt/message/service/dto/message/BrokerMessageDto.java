@@ -22,6 +22,4 @@ public class BrokerMessageDto {
     private List<Contact> contacts;
 
     private Member member;
-
-    private int count;
 }
