@@ -65,7 +65,6 @@ public class MessageService {
                 .message(message)
                 .contacts(contacts)
                 .member(member)
-                .count(messageReq.getCount())
                 .build();
 
         return brokerService.sendSmsMessage(brokerMessageDto);
