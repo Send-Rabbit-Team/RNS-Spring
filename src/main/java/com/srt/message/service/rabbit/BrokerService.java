@@ -76,7 +76,7 @@ public class BrokerService {
         int sum = 0;
 
         for(int i = 0; i < BROKER_SIZE; i++){
-            broker_count[i] = !messageRules.isEmpty() ? (int)(messageRules.get(i).getBrokerRate() * value) : (int)(33 * value); // 중계사 비율 설정 안했을 경우 33%씩 분배
+            broker_count[i] = !messageRules.isEmpty() ? (int)(messageRules.get(i).getBrokerRate() * value) : (int) Math.round((33 * value)); // 중계사 비율 설정 안했을 경우 33%씩 분배
             sum += broker_count[i];
         }
 
