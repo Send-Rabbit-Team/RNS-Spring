@@ -1,8 +1,6 @@
 package com.srt.message.domain;
 
 import com.srt.message.config.domain.BaseEntity;
-import com.srt.message.config.type.MemberType;
-import com.srt.message.config.type.TemplateType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -35,20 +33,11 @@ public class Template extends BaseEntity {
     @Column(columnDefinition = "TEXT")
     private String content;
 
-    @Comment("탬플릿 종류")
-    @Enumerated(EnumType.STRING)
-    @Column(columnDefinition = "ENUM('SMS', 'KAKAO')")
-    private TemplateType templateType;
-
     public void changeTitle(String title) {
         this.title = title;
     }
 
     public void changeContent(String content) {
         this.content = content;
-    }
-
-    public void changeTemplateType(TemplateType templateType) {
-        this.templateType = templateType;
     }
 }

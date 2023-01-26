@@ -100,8 +100,6 @@ public class TemplateService {
             template.changeTitle(patchTemplateReq.getTitle());
         if (patchTemplateReq.getContent() != null)
             template.changeContent(patchTemplateReq.getContent());
-        if (patchTemplateReq.getTemplateType() != null)
-            template.changeTemplateType(patchTemplateReq.getTemplateType());
 
         // template 저장
         Template editedTemplate = templateRepository.save(template);
