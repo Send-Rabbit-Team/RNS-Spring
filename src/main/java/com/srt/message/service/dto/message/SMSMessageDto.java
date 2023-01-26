@@ -12,7 +12,6 @@ import lombok.*;
 @Getter
 @Setter
 public class SMSMessageDto {
-
     @ApiModelProperty(
             example = "01025291674"
     )

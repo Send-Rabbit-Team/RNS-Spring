@@ -5,8 +5,6 @@ import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Repository;
 
-import java.time.Duration;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
@@ -31,6 +29,11 @@ public class RMessageResultRepositoryImpl implements RMessageResultRepository{
     public void saveAll(String key, Map<String, String> rMessageResultMap) {
         hashOperations.putAll(key, rMessageResultMap);
         redisTemplate.expire(key, 60 * 5, TimeUnit.SECONDS);
+    }
+
+    @Override
+    public boolean isExist(String key, String rMessageResultId) {
+        return hashOperations.hasKey(key, rMessageResultId);
     }
 
     @Override

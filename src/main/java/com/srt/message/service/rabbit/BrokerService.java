@@ -113,7 +113,7 @@ public class BrokerService {
             for(int j = contactIdx; j < contactIdx + broker_count[i]; j++){
                 Contact contact = contacts.get(j);
                 RMessageResult rMessageResult = RMessageResult.builder()
-                        .id(String.valueOf(j))
+                        .id(String.valueOf(j+1))
                         .messageId(message.getId())
                         .brokerId(broker.getId())
                         .contactId(contact.getId())
@@ -140,6 +140,7 @@ public class BrokerService {
             Contact contact = contacts.get(i);
 
             MessageResultDto messageResultDto = MessageResultDto.builder()
+                    .rMessageResultId(String.valueOf(i))
                     .messageId(message.getId())
                     .contactId(contact.getId())
                     .brokerId(broker.getId())
