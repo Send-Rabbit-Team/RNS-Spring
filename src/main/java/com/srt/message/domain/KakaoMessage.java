@@ -40,7 +40,7 @@ public class KakaoMessage extends BaseEntity {
     @JoinColumn(name = "repeat_rule_id")
     private RepeatRule repeatRule;
 
-    private String subject;
+    private String title;
 
     private String subTitle;
 

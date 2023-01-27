@@ -20,7 +20,7 @@ public class KakaoMessageDto {
     @JsonIgnore
     private String to;
 
-    private String subject;
+    private String title;
 
     private String subtitle;
 

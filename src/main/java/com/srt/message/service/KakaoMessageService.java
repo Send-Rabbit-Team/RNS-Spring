@@ -52,7 +52,7 @@ public class KakaoMessageService {
         KakaoMessage message = KakaoMessage.builder()
                 .member(member)
                 .senderNumber(senderNumber)
-                .subject(messageReq.getKakaoMessageDto().getSubject())
+                .title(messageReq.getKakaoMessageDto().getTitle())
                 .subTitle(messageReq.getKakaoMessageDto().getSubtitle())
                 .content(messageReq.getKakaoMessageDto().getContent())
                 .image(messageReq.getKakaoMessageDto().getImage())
