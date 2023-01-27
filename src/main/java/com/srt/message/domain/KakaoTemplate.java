@@ -14,11 +14,11 @@ import javax.persistence.*;
 @NoArgsConstructor
 @Getter
 @Entity
-public class Template extends BaseEntity {
+public class KakaoTemplate extends BaseEntity {
     @Id
     @Comment("탬플릿 아이디")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "template_id")
+    @Column(name = "kakao_template_id")
     private long id;
 
     @Comment("멤버 아이디")
@@ -26,18 +26,31 @@ public class Template extends BaseEntity {
     @JoinColumn(name = "member_id")
     private Member member;
 
-    @Comment("탬플릿 제목")
+    @Comment("알림톡 제목")
     private String title;
 
-    @Comment("탬플릿 내용")
+    @Comment("알림톡 소제목")
+    private String subTitle;
+
+    @Comment("알림톡 내용")
     @Column(columnDefinition = "TEXT")
     private String content;
+
+    @Comment("알림톡 설명")
+    @Column(columnDefinition = "TEXT")
+    private String description;
 
     public void changeTitle(String title) {
         this.title = title;
     }
-
+    public void changeSubTitle(String subTitle) {
+        this.subTitle = subTitle;
+    }
     public void changeContent(String content) {
         this.content = content;
     }
+    public void changeDescription(String description) {
+        this.description = description;
+    }
+
 }
