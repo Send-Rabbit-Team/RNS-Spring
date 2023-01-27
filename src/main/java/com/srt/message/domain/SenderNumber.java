@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.apache.commons.lang3.RandomStringUtils;
 
 import javax.persistence.*;
 
@@ -28,4 +29,13 @@ public class SenderNumber extends BaseEntity {
     private String memo;
 
     private String blockNumber;
+
+    // 편의 메서드
+    public void createBlockNumber(){
+        String start = "070-";
+        String middle = RandomStringUtils.randomNumeric(4) + "-";
+        String end = RandomStringUtils.randomNumeric(4);
+
+        this.blockNumber = start + middle + end;
+    }
 }
