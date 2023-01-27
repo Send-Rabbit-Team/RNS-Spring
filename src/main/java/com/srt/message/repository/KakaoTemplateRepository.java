@@ -14,7 +14,7 @@ public interface KakaoTemplateRepository extends JpaRepository<KakaoTemplate, Lo
 
     Optional<KakaoTemplate> findByIdAndStatus(Long templateId, BaseStatus status);
 
-    List<KakaoTemplate> findByMemberIdAndStatus(Long memberId, BaseStatus status);
+    List<KakaoTemplate> findByMemberIdAndStatusOrderByIdDesc(Long memberId, BaseStatus status);
 
     @Query(value = "select kt from KakaoTemplate kt where kt.member.id = :memberId and kt.status = :status",
     countQuery = "select count(kt) from KakaoTemplate kt where kt.member.id = :memberId and kt.status = :status")
