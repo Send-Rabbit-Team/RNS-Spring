@@ -3,6 +3,7 @@ package com.srt.message.service.dto.message.kakao;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.srt.message.config.status.MessageStatus;
+import com.srt.message.config.type.ButtonType;
 import lombok.*;
 
 import java.util.List;
@@ -38,5 +39,9 @@ public class KakaoMessageDto {
     @JsonIgnore
     private String scheduleCode;
 
-    private List<KakaoButtonDto> kakaoButtonDtoList;
+    private String buttonTitle;
+
+    private String buttonUrl;
+
+    private ButtonType buttonType;
 }

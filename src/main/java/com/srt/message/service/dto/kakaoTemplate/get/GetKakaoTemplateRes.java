@@ -1,5 +1,6 @@
 package com.srt.message.service.dto.kakaoTemplate.get;
 
+import com.srt.message.config.type.ButtonType;
 import com.srt.message.domain.KakaoTemplate;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -16,6 +17,10 @@ public class GetKakaoTemplateRes {
     private String subTitle;
     private String content;
     private String description;
+    private String buttonUrl;
+    private String buttonTitle;
+    private ButtonType buttonType;
+
 
     public static GetKakaoTemplateRes toDto(KakaoTemplate kakaoTemplate){
         return GetKakaoTemplateRes.builder()
@@ -24,6 +29,9 @@ public class GetKakaoTemplateRes {
                 .subTitle(kakaoTemplate.getSubTitle())
                 .content(kakaoTemplate.getContent())
                 .description(kakaoTemplate.getDescription())
+                .buttonUrl(kakaoTemplate.getButtonUrl())
+                .buttonTitle(kakaoTemplate.getButtonTitle())
+                .buttonType(kakaoTemplate.getButtonType())
                 .build();
     }
 }

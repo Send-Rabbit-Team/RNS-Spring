@@ -14,7 +14,7 @@ public interface TemplateRepository extends JpaRepository<Template, Long> {
 
     Optional<Template> findByIdAndStatus(Long templateId, BaseStatus status);
 
-    List<Template> findByMemberIdAndStatus(Long memberId, BaseStatus status);
+    List<Template> findByMemberIdAndStatusOrderByIdDesc(Long memberId, BaseStatus status);
 
     @Query(value = "select t from Template t where t.member.id = :memberId and t.status = :status",
     countQuery = "select count(t) from Template t where t.member.id = :memberId and t.status = :status")

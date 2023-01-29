@@ -1,10 +1,12 @@
 package com.srt.message.domain;
 
 import com.srt.message.config.domain.BaseEntity;
+import com.srt.message.config.type.ButtonType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.Comment;
 
 import javax.persistence.*;
 
@@ -49,5 +51,16 @@ public class KakaoMessage extends BaseEntity {
     private String description;
 
     private String image;
+
+    @Comment("알림톡 버튼 링크")
+    private String buttonUrl;
+
+    @Comment("알림톡 버튼 이름")
+    private String buttonTitle;
+
+    @Enumerated(EnumType.STRING)
+    @Column(columnDefinition = "ENUM('DS', 'WL', 'AL', 'BK', 'MD', 'AC')")
+    @Comment("알림톡 버튼 종류")
+    private ButtonType buttonType;
 
 }

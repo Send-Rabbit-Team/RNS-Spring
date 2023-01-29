@@ -59,7 +59,7 @@ public class KakaoTemplateService {
         getExistMember(memberId);
 
         // pageRequest 생성
-        PageRequest pageRequest = PageRequest.of(page-1, 3, Sort.by("id").descending());
+        PageRequest pageRequest = PageRequest.of(page-1, 2, Sort.by("id").descending());
 
         // template 조회
         Page<KakaoTemplate> kakaoTemplatePage = kakaoTemplateRepository.findAllTemplate(memberId, BaseStatus.ACTIVE, pageRequest);
@@ -77,7 +77,7 @@ public class KakaoTemplateService {
         getExistMember(memberId);
 
         // template 조회
-        List<KakaoTemplate> kakaoTemplateList = kakaoTemplateRepository.findByMemberIdAndStatus(memberId, BaseStatus.ACTIVE);
+        List<KakaoTemplate> kakaoTemplateList = kakaoTemplateRepository.findByMemberIdAndStatusOrderByIdDesc(memberId, BaseStatus.ACTIVE);
         if (kakaoTemplateList.isEmpty())
             throw new BaseException(NOT_EXIST_TEMPLATE);
 
@@ -104,6 +104,12 @@ public class KakaoTemplateService {
             kakaoTemplate.changeContent(patchKakaoTemplateReq.getContent());
         if (patchKakaoTemplateReq.getDescription() != null)
             kakaoTemplate.changeDescription(patchKakaoTemplateReq.getDescription());
+        if (patchKakaoTemplateReq.getButtonUrl() != null)
+            kakaoTemplate.changeButtonUrl(patchKakaoTemplateReq.getButtonUrl());
+        if (patchKakaoTemplateReq.getButtonTitle() != null)
+            kakaoTemplate.changeButtonTitle(patchKakaoTemplateReq.getButtonTitle());
+        if (patchKakaoTemplateReq.getButtonType() != null)
+            kakaoTemplate.changeButtonType(patchKakaoTemplateReq.getButtonType());
 
         // template 저장
         KakaoTemplate editedKakaoTemplate = kakaoTemplateRepository.save(kakaoTemplate);
