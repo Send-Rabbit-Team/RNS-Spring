@@ -3,7 +3,6 @@ package com.srt.message.repository;
 import com.srt.message.domain.Message;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
 
 import java.util.Optional;
 

@@ -1,10 +1,7 @@
 package com.srt.message.service;
 
 import com.srt.message.config.exception.BaseException;
-import com.srt.message.domain.Contact;
-import com.srt.message.domain.Member;
-import com.srt.message.domain.Message;
-import com.srt.message.domain.SenderNumber;
+import com.srt.message.domain.*;
 import com.srt.message.service.dto.message.BrokerMessageDto;
 import com.srt.message.service.dto.message.post.PostSendMessageReq;
 import com.srt.message.repository.*;
@@ -30,7 +27,6 @@ public class MessageService {
 
     private final BrokerService brokerService;
 
-
     public String sendMessageToBroker(PostSendMessageReq messageReq, long memberId){
         Member member = memberRepository.findById(memberId)
                         .orElseThrow(() -> new BaseException(NOT_EXIST_MEMBER));
@@ -54,11 +50,17 @@ public class MessageService {
                 .member(member)
                 .senderNumber(senderNumber)
                 .content(messageReq.getMessage().getContent())
-//                .image(messageReq.getMessage().getImage())
+                .images(messageReq.getMessage().getImages())
                 .messageType(messageReq.getMessage().getMessageType())
                 .build();
 
         messageRepository.save(message);
+
+        // 이미지 저장하기 (Base64 배열)
+//        messageReq.getMessage().getImages().stream().forEach(image -> {
+//            MessageImage messageImage = MessageImage.builder().message(message).image(image).build();
+//            messageImageRepository.save(messageImage);
+//        });
 
         BrokerMessageDto brokerMessageDto = BrokerMessageDto.builder()
                 .smsMessageDto(messageReq.getMessage())

@@ -8,7 +8,7 @@ import com.srt.message.domain.Contact;
 import com.srt.message.domain.Message;
 import com.srt.message.domain.MessageResult;
 import com.srt.message.domain.redis.RMessageResult;
-import com.srt.message.repository.redis.RMessageResultRepository;
+import com.srt.message.repository.redis.RedisHashRepository;
 import com.srt.message.service.dto.message_result.MessageResultDto;
 import com.srt.message.repository.MessageResultRepository;
 import com.srt.message.repository.cache.BrokerCacheRepository;
@@ -18,12 +18,14 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Log4j2
 @Service
+@Transactional
 @RequiredArgsConstructor
 public class SmsBrokerListener {
-    private final RMessageResultRepository rMessageResultRepository;
+    private final RedisHashRepository redisHashRepository;
 
     private final ObjectMapper objectMapper;
 
@@ -40,21 +42,21 @@ public class SmsBrokerListener {
 
     // KT RESPONSE
     @RabbitListener(queues = "q.sms.kt.receive", concurrency = "3")
-    public void receiveKTMessage(final MessageResultDto messageResultDto){
+    public void receiveKTMessage(final MessageResultDto messageResultDto) {
         updateRMessageResult(messageResultDto, KT_BROKER_NAME);
         saveMessageResult(messageResultDto, KT_BROKER_NAME);
     }
 
     // SKT RESPONSE
     @RabbitListener(queues = "q.sms.skt.receive", concurrency = "3")
-    public void receiveSKTMessage(final MessageResultDto messageResultDto){
+    public void receiveSKTMessage(final MessageResultDto messageResultDto) {
         updateRMessageResult(messageResultDto, SKT_BROKER_NAME);
         saveMessageResult(messageResultDto, SKT_BROKER_NAME);
     }
 
     // LG RESPONSE
     @RabbitListener(queues = "q.sms.lg.receive", concurrency = "3")
-    public void receiveLGMessage(final MessageResultDto messageResultDto){
+    public void receiveLGMessage(final MessageResultDto messageResultDto) {
         updateRMessageResult(messageResultDto, LG_BROKER_NAME);
         saveMessageResult(messageResultDto, LG_BROKER_NAME);
     }
@@ -64,7 +66,7 @@ public class SmsBrokerListener {
      */
     // KT
     @RabbitListener(queues = "q.sms.kt.dead")
-    public void receiveDeadKTMessage(final MessageResultDto messageResultDto){
+    public void receiveDeadKTMessage(final MessageResultDto messageResultDto) {
         messageResultDto.setMessageStatus(MessageStatus.FAIL);
         updateRMessageResult(messageResultDto, KT_BROKER_NAME);
         saveMessageResult(messageResultDto, KT_BROKER_NAME);
@@ -74,7 +76,7 @@ public class SmsBrokerListener {
 
     // LG
     @RabbitListener(queues = "q.sms.skt.dead")
-    public void receiveDeadSKTMessage(final MessageResultDto messageResultDto){
+    public void receiveDeadSKTMessage(final MessageResultDto messageResultDto) {
         messageResultDto.setMessageStatus(MessageStatus.FAIL);
         updateRMessageResult(messageResultDto, LG_BROKER_NAME);
         saveMessageResult(messageResultDto, LG_BROKER_NAME);
@@ -84,7 +86,7 @@ public class SmsBrokerListener {
 
     // SKT
     @RabbitListener(queues = "q.sms.lg.dead")
-    public void receiveDeadLGMessage(final MessageResultDto messageResultDto){
+    public void receiveDeadLGMessage(final MessageResultDto messageResultDto) {
         messageResultDto.setMessageStatus(MessageStatus.FAIL);
         updateRMessageResult(messageResultDto, SKT_BROKER_NAME);
         saveMessageResult(messageResultDto, SKT_BROKER_NAME);
@@ -92,26 +94,24 @@ public class SmsBrokerListener {
         log.warn(SKT_BROKER_NAME + " broker got dead letter - {}", messageResultDto);
     }
 
-
-    public void updateRMessageResult(final MessageResultDto messageResultDto, String brokerName){
-        Message message = messageCacheRepository.findMessageById(messageResultDto.getMessageId());
+    public void updateRMessageResult(final MessageResultDto messageResultDto, String brokerName) {
         Broker broker = brokerCacheRepository.findBrokerById(messageResultDto.getBrokerId());
         String rMessageResultId = messageResultDto.getRMessageResultId();
 
         // Redis에서 상태 가져오기
-        String key = message.getId() + "." + broker.getName();
+        String key = messageResultDto.getMessageId() + "." + broker.getName();
 
         // Redis에 해당 데이터가 없을 경우 종료
-        if(!rMessageResultRepository.isExist(key, rMessageResultId))
+        if (!redisHashRepository.isExist(key, rMessageResultId))
             return;
 
-        String jsonRMessageResult = rMessageResultRepository.findById(key, rMessageResultId);
+        String jsonRMessageResult = redisHashRepository.findById(key, rMessageResultId);
 
         // 상태 업데이트 및 저장
         RMessageResult rMessageResult = convertToRMessageResult(jsonRMessageResult);
         rMessageResult.changeMessageStatus(messageResultDto.getMessageStatus());
 
-        rMessageResultRepository.update(key, rMessageResultId, rMessageResult);
+        redisHashRepository.update(key, rMessageResultId, rMessageResult);
     }
 
     public void saveMessageResult(final MessageResultDto messageResultDto, String brokerName) {
@@ -131,7 +131,7 @@ public class SmsBrokerListener {
         log.info("MessageResult 객체가 저장되었습니다. id : {}", messageResult.getId());
     }
 
-    public RMessageResult convertToRMessageResult(String json){
+    public RMessageResult convertToRMessageResult(String json) {
         RMessageResult rMessageResult = null;
         try {
             rMessageResult = objectMapper.readValue(json, RMessageResult.class);

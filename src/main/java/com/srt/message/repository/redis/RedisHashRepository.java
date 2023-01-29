@@ -4,7 +4,7 @@ import com.srt.message.domain.redis.RMessageResult;
 
 import java.util.Map;
 
-public interface RMessageResultRepository {
+public interface RedisHashRepository {
     void save(String key, String rMessageResultId, RMessageResult rMessageResult);
 
     void saveAll(String key, Map<String, String> rMessageResultMap);

@@ -11,16 +11,16 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 @Repository
-public class RMessageResultRepositoryImpl implements RMessageResultRepository{
+public class RedisHashRepositoryImpl implements RedisHashRepository {
     private RedisTemplate<String, Object> redisTemplate;
     private ObjectMapper objectMapper;
 
     private HashOperations hashOperations;
 
-    public RMessageResultRepositoryImpl(RedisTemplate<String, Object> redisTemplate, ObjectMapper objectMapper){
+    public RedisHashRepositoryImpl(RedisTemplate<String, Object> redisTemplate, ObjectMapper objectMapper){
         this.redisTemplate = redisTemplate;
-        hashOperations = redisTemplate.opsForHash();
         this.objectMapper = objectMapper;
+        this.hashOperations = redisTemplate.opsForHash();
     }
 
     @Override

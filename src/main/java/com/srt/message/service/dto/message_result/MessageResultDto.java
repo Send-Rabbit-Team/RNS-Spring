@@ -1,6 +1,7 @@
 package com.srt.message.service.dto.message_result;
 
 import com.srt.message.config.status.MessageStatus;
+import com.srt.message.domain.redis.RMessageResult;
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -22,4 +23,14 @@ public class MessageResultDto {
     private MessageStatus messageStatus;
 
     private LocalDateTime createdAt;
+
+    public static RMessageResult toRMessageResult(MessageResultDto dto){
+        return RMessageResult.builder()
+                .id(dto.getRMessageResultId())
+                .messageId(dto.messageId)
+                .brokerId(dto.brokerId)
+                .contactId(dto.brokerId)
+                .messageStatus(dto.messageStatus)
+                .build();
+    }
 }
