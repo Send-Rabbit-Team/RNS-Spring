@@ -77,7 +77,7 @@ public class TemplateService {
         getExistMember(memberId);
 
         // template 조회
-        List<Template> templateList = templateRepository.findByMemberIdAndStatus(memberId, BaseStatus.ACTIVE);
+        List<Template> templateList = templateRepository.findByMemberIdAndStatusOrderByIdDesc(memberId, BaseStatus.ACTIVE);
         if (templateList.isEmpty())
             throw new BaseException(NOT_EXIST_TEMPLATE);
 

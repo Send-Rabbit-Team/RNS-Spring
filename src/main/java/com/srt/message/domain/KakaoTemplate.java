@@ -1,6 +1,7 @@
 package com.srt.message.domain;
 
 import com.srt.message.config.domain.BaseEntity;
+import com.srt.message.config.type.ButtonType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -40,6 +41,17 @@ public class KakaoTemplate extends BaseEntity {
     @Column(columnDefinition = "TEXT")
     private String description;
 
+    @Comment("알림톡 버튼 링크")
+    private String buttonUrl;
+
+    @Comment("알림톡 버튼 이름")
+    private String buttonTitle;
+
+    @Enumerated(EnumType.STRING)
+    @Column(columnDefinition = "ENUM('DS', 'WL', 'AL', 'BK', 'MD', 'AC')")
+    @Comment("알림톡 버튼 종류")
+    private ButtonType buttonType;
+
     public void changeTitle(String title) {
         this.title = title;
     }
@@ -49,8 +61,21 @@ public class KakaoTemplate extends BaseEntity {
     public void changeContent(String content) {
         this.content = content;
     }
+
     public void changeDescription(String description) {
         this.description = description;
     }
+    public void changeButtonUrl(String buttonUrl) {
+        this.buttonUrl = buttonUrl;
+    }
+
+    public void changeButtonTitle(String buttonTitle) {
+        this.buttonTitle = buttonTitle;
+    }
+
+    public void changeButtonType(ButtonType buttonType) {
+        this.buttonType = buttonType;
+    }
+
 
 }

@@ -1,7 +1,6 @@
 package com.srt.message.service.dto.kakaoTemplate.patch;
 
-import com.srt.message.domain.KakaoTemplate;
-import com.srt.message.domain.Member;
+import com.srt.message.config.type.ButtonType;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -15,15 +14,7 @@ public class PatchKakaoTemplateReq {
     private String subTitle;
     private String content;
     private String description;
-
-    public static KakaoTemplate toEntity(PatchKakaoTemplateReq patchTemplateReq, Member member) {
-        return KakaoTemplate.builder()
-                .id(patchTemplateReq.getTemplateId())
-                .member(member)
-                .title(patchTemplateReq.getTitle())
-                .subTitle(patchTemplateReq.getSubTitle())
-                .content(patchTemplateReq.getContent())
-                .description(patchTemplateReq.getDescription())
-                .build();
-    }
+    private String buttonUrl;
+    private String buttonTitle;
+    private ButtonType buttonType;
 }

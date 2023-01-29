@@ -4,7 +4,6 @@ import com.srt.message.config.exception.BaseException;
 import com.srt.message.domain.*;
 import com.srt.message.repository.*;
 import com.srt.message.service.dto.message.kakao.BrokerKakaoMessageDto;
-import com.srt.message.service.dto.message.kakao.KakaoButtonDto;
 import com.srt.message.service.dto.message.kakao.post.PostSendKakaoMessageReq;
 import com.srt.message.service.rabbit.KakaoBrokerService;
 import lombok.RequiredArgsConstructor;
@@ -27,8 +26,6 @@ public class KakaoMessageService {
     private final KakaoMessageRepository kakaoMessageRepository;
 
     private final KakaoBrokerService kakaoBrokerService;
-
-    private final KakaoButtonRepository kakaoButtonRepository;
 
     public String sendKakaoMessageToBroker(PostSendKakaoMessageReq messageReq, long memberId){
         Member member = memberRepository.findById(memberId)
@@ -57,15 +54,12 @@ public class KakaoMessageService {
                 .content(messageReq.getKakaoMessageDto().getContent())
                 .image(messageReq.getKakaoMessageDto().getImage())
                 .description(messageReq.getKakaoMessageDto().getDescription())
+                .buttonTitle(messageReq.getKakaoMessageDto().getButtonTitle())
+                .buttonUrl(messageReq.getKakaoMessageDto().getButtonUrl())
+                .buttonType(messageReq.getKakaoMessageDto().getButtonType())
                 .build();
 
         kakaoMessageRepository.save(message);
-
-        List<KakaoButtonDto> kakaoButtonDtoList = messageReq.getKakaoMessageDto().getKakaoButtonDtoList();
-        for (KakaoButtonDto kakaoButtonDto : kakaoButtonDtoList) {
-            KakaoButton kakaoButton = KakaoButtonDto.toEntity(kakaoButtonDto, message);
-            kakaoButtonRepository.save(kakaoButton);
-        }
 
         BrokerKakaoMessageDto brokerMessageDto = BrokerKakaoMessageDto.builder()
                 .kakaoMessageDto(messageReq.getKakaoMessageDto())
