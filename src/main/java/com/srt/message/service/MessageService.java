@@ -50,7 +50,6 @@ public class MessageService {
                 .member(member)
                 .senderNumber(senderNumber)
                 .content(messageReq.getMessage().getContent())
-                .images(messageReq.getMessage().getImages())
                 .messageType(messageReq.getMessage().getMessageType())
                 .build();
 

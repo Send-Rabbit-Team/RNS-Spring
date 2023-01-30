@@ -1,4 +1,4 @@
-package com.srt.message.broker;
+package com.srt.message.listener;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;

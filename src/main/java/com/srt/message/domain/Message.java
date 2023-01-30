@@ -45,11 +45,6 @@ public class Message extends BaseEntity {
 
     private String content;
 
-    @ElementCollection(fetch = FetchType.EAGER)
-    @CollectionTable(name = "MESSAGE_IMAGES", joinColumns = @JoinColumn(name = "messageId"))
-    @Column(name = "IMAGE")
-    private List<String> images = new ArrayList<>();
-
     @Enumerated(EnumType.STRING)
     private MessageType messageType;
 

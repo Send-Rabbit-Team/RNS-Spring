@@ -1,11 +1,12 @@
 package com.srt.message.repository.redis;
 
 import java.util.Collection;
+import java.util.concurrent.TimeUnit;
 
 public interface RedisListRepository {
-    public void rightPush(Object key, Object value);
+    public void rightPush(String key, Object value);
 
-    public void rightPushAll(Object key, Collection values);
+    public void rightPushAll(String key, Collection values, int duration);
 
-    public String leftPop(Object key);
+    public String leftPop(String key);
 }

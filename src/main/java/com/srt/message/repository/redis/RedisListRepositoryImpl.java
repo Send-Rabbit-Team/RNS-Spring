@@ -6,6 +6,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Repository;
 
 import java.util.Collection;
+import java.util.concurrent.TimeUnit;
 
 @Repository
 public class RedisListRepositoryImpl implements RedisListRepository{
@@ -21,17 +22,19 @@ public class RedisListRepositoryImpl implements RedisListRepository{
     }
 
     @Override
-    public void rightPush(Object key, Object value) {
+    public void rightPush(String key, Object value) {
          listOperations.rightPush(key, value);
+        redisTemplate.expire(key, 60 * 5, TimeUnit.SECONDS);
     }
 
     @Override
-    public void rightPushAll(Object key, Collection values) {
+    public void rightPushAll(String key, Collection values, int duration) {
         listOperations.rightPushAll(key, values);
+        redisTemplate.expire(key, duration, TimeUnit.SECONDS);
     }
 
     @Override
-    public String leftPop(Object key) {
+    public String leftPop(String key) {
         return (String) listOperations.leftPop(key);
     }
 }
