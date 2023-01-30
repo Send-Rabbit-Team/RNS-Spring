@@ -1,5 +1,6 @@
 package com.srt.message.service.dto.auth.login.post;
 
+import com.srt.message.config.type.MemberType;
 import com.srt.message.domain.Member;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.*;
@@ -29,12 +30,15 @@ public class PostLoginRes {
     )
     private String name;
 
+    private MemberType memberType;
+
     public static PostLoginRes toDto(String jwt, Member member){
         return PostLoginRes.builder()
                 .jwt(jwt)
                 .memberId(member.getId())
                 .profileImageURL(member.getProfileImageURL())
                 .name(member.getName())
+                .memberType(member.getMemberType())
                 .build();
     }
 }
