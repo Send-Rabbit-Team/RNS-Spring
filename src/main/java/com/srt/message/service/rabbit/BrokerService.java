@@ -14,6 +14,7 @@ import com.srt.message.dto.message.BrokerMessageDto;
 import com.srt.message.dto.message.SMSMessageDto;
 import com.srt.message.dto.message_result.MessageResultDto;
 import com.srt.message.repository.MessageRuleRepository;
+import com.srt.message.service.SchedulerService;
 import com.srt.message.utils.algorithm.BrokerPool;
 import com.srt.message.utils.algorithm.BrokerWeight;
 import lombok.RequiredArgsConstructor;
@@ -49,6 +50,8 @@ public class BrokerService {
 
     private final BrokerRepository brokerRepository;
     private final MessageRuleRepository messageRuleRepository;
+
+    private final SchedulerService schedulerService;
 
     private final ObjectMapper objectMapper;
 
@@ -149,6 +152,13 @@ public class BrokerService {
         String processTime = String.valueOf(stopWatch.getTime());
         log.info("Process Time: {} ", processTime);
         return processTime;
+    }
+
+    // 메시지 예약발송
+    public String reserveSmsMessage(BrokerMessageDto brokerMessageDto){
+        schedulerService.register(brokerMessageDto);
+
+        return "성공적으로 예약 발송 되었습니다.";
     }
 
     // Json 형태로 반환

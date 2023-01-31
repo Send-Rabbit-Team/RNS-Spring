@@ -6,7 +6,9 @@ import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 import org.springframework.data.redis.core.RedisKeyValueAdapter;
 import org.springframework.data.redis.repository.configuration.EnableRedisRepositories;
+import org.springframework.scheduling.annotation.EnableScheduling;
 
+@EnableScheduling
 @EnableCaching
 @EnableJpaAuditing
 @EnableRedisRepositories(enableKeyspaceEvents = RedisKeyValueAdapter.EnableKeyspaceEvents.ON_STARTUP)
@@ -15,6 +17,8 @@ public class MessageServerApplication {
 
 	public static void main(String[] args) {
 		SpringApplication.run(MessageServerApplication.class, args);
+
+
 	}
 
 }

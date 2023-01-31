@@ -8,6 +8,7 @@ import com.srt.message.domain.*;
 import com.srt.message.domain.redis.RMessageResult;
 import com.srt.message.dto.message.BrokerMessageDto;
 import com.srt.message.dto.message.get.GetMessageRes;
+import com.srt.message.dto.message.post.PostReserveMessageReq;
 import com.srt.message.dto.message.post.PostSendMessageReq;
 import com.srt.message.dto.message_result.get.GetMessageResultRes;
 import com.srt.message.repository.*;
@@ -92,6 +93,10 @@ public class MessageService {
                 .contacts(contacts)
                 .member(member)
                 .build();
+
+        // 크론 표현식 있으면 예약 발송으로 이동
+        if(!messageReq.getMessage().getCronExpression().isEmpty())
+            return brokerService.reserveSmsMessage(brokerMessageDto);
 
         return brokerService.sendSmsMessage(brokerMessageDto);
     }
