@@ -7,9 +7,9 @@ import com.srt.message.config.status.BaseStatus;
 import com.srt.message.domain.Member;
 import com.srt.message.domain.SenderNumber;
 import com.srt.message.domain.redis.AuthPhoneNumber;
-import com.srt.message.service.dto.sender_number.get.GetSenderNumberRes;
-import com.srt.message.service.dto.sender_number.post.RegisterSenderNumberReq;
-import com.srt.message.service.dto.sender_number.post.RegisterSenderNumberRes;
+import com.srt.message.dto.sender_number.get.GetSenderNumberRes;
+import com.srt.message.dto.sender_number.post.RegisterSenderNumberReq;
+import com.srt.message.dto.sender_number.post.RegisterSenderNumberRes;
 import com.srt.message.repository.MemberRepository;
 import com.srt.message.repository.SenderNumberRepository;
 import com.srt.message.repository.redis.AuthPhoneNumberRedisRepository;
@@ -63,16 +63,16 @@ public class SenderNumberService {
     }
 
     // 발신자 조회(페이징 O)
-    public PageResult<GetSenderNumberRes, SenderNumber> getPageSenderNumber(long memberId, int page) {
+    public PageResult<GetSenderNumberRes> getPageSenderNumber(long memberId, int page) {
         PageRequest pageRequest = PageRequest.of(page-1, 5, Sort.by("id").descending());
 
         Page<SenderNumber> senderNumberPage = senderNumberRepository.findAllSenderNumber(memberId, BaseStatus.ACTIVE, pageRequest);
         if (senderNumberPage.isEmpty())
             throw new BaseException(NOT_EXIST_SENDER_NUMBER);
 
-        Function<SenderNumber, GetSenderNumberRes> fn = (senderNumber -> GetSenderNumberRes.toDto(senderNumber));
+        Page<GetSenderNumberRes> senderNumberRes = senderNumberPage.map(s -> GetSenderNumberRes.toDto(s));
 
-        return new PageResult<>(senderNumberPage, fn);
+        return new PageResult<>(senderNumberRes);
     }
 
     // 발신자 조회(페이징 X)

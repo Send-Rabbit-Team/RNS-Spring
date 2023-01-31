@@ -1,4 +1,4 @@
-package com.srt.message.service.dto.auth.register.post;
+package com.srt.message.dto.auth.register.post;
 
 import com.srt.message.config.type.LoginType;
 import com.srt.message.config.type.MemberType;

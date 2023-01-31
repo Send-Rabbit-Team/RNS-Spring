@@ -5,9 +5,9 @@ import com.srt.message.config.page.PageResult;
 import com.srt.message.config.status.BaseStatus;
 import com.srt.message.domain.Member;
 import com.srt.message.domain.Template;
-import com.srt.message.service.dto.template.get.GetTemplateRes;
-import com.srt.message.service.dto.template.patch.PatchTemplateReq;
-import com.srt.message.service.dto.template.post.PostTemplateReq;
+import com.srt.message.dto.template.get.GetTemplateRes;
+import com.srt.message.dto.template.patch.PatchTemplateReq;
+import com.srt.message.dto.template.post.PostTemplateReq;
 import com.srt.message.repository.MemberRepository;
 import com.srt.message.repository.TemplateRepository;
 import lombok.RequiredArgsConstructor;
@@ -55,7 +55,7 @@ public class TemplateService {
     }
 
     // 탬플릿 전체 조회(페이징 O)
-    public PageResult<GetTemplateRes, Template> getPageTemplate(Long memberId, int page) {
+    public PageResult<GetTemplateRes> getPageTemplate(Long memberId, int page) {
         getExistMember(memberId);
 
         // pageRequest 생성
@@ -66,10 +66,9 @@ public class TemplateService {
         if (templatePage.isEmpty())
             throw new BaseException(NOT_EXIST_TEMPLATE);
 
-        // template -> template dto 함수 정의
-        Function<Template, GetTemplateRes> fn = (template -> GetTemplateRes.toDto(template));
+        Page<GetTemplateRes> templateResPage = templatePage.map(t -> GetTemplateRes.toDto(t));
 
-        return new PageResult<>(templatePage, fn);
+        return new PageResult<>(templateResPage);
     }
 
     // 탬플릿 전체 조회(페이징 X)

@@ -1,4 +1,4 @@
-package com.srt.message.service.dto.contact;
+package com.srt.message.dto.contact;
 
 import com.srt.message.domain.Contact;
 import lombok.*;

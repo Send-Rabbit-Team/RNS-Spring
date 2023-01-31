@@ -1,4 +1,4 @@
-package com.srt.message.service.dto.message_rule;
+package com.srt.message.dto.message_rule;
 
 import com.srt.message.domain.Broker;
 import com.srt.message.domain.Member;

@@ -1,4 +1,4 @@
-package com.srt.message.service.dto.auth.register.google;
+package com.srt.message.dto.auth.register.google;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

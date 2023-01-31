@@ -1,4 +1,4 @@
-package com.srt.message.service.dto.message_result;
+package com.srt.message.dto.message_result;
 
 import com.srt.message.config.status.MessageStatus;
 import lombok.*;

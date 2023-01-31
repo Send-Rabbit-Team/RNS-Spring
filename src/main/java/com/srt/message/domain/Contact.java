@@ -1,7 +1,7 @@
 package com.srt.message.domain;
 
 import com.srt.message.config.domain.BaseEntity;
-import com.srt.message.service.dto.contact.patch.PatchContactReq;
+import com.srt.message.dto.contact.patch.PatchContactReq;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;

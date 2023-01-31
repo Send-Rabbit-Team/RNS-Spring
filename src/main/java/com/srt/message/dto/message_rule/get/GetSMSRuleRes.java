@@ -1,8 +1,8 @@
-package com.srt.message.service.dto.message_rule.get;
+package com.srt.message.dto.message_rule.get;
 
 
 import com.srt.message.domain.MessageRule;
-import com.srt.message.service.dto.message_rule.MessageRuleVO;
+import com.srt.message.dto.message_rule.MessageRuleVO;
 import lombok.*;
 
 import java.util.List;

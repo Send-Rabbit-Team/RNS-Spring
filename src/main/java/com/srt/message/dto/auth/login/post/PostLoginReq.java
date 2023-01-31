@@ -1,4 +1,4 @@
-package com.srt.message.service.dto.auth.login.post;
+package com.srt.message.dto.auth.login.post;
 
 import io.swagger.annotations.ApiModelProperty;
 import lombok.*;

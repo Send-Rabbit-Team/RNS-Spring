@@ -1,4 +1,4 @@
-package com.srt.message.service.dto.jwt;
+package com.srt.message.dto.jwt;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

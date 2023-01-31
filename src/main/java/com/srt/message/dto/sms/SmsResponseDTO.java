@@ -1,4 +1,4 @@
-package com.srt.message.service.dto.sms;
+package com.srt.message.dto.sms;
 
 import lombok.*;
 

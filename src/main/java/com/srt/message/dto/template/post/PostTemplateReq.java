@@ -1,4 +1,4 @@
-package com.srt.message.service.dto.template.post;
+package com.srt.message.dto.template.post;
 
 import com.srt.message.domain.Member;
 import com.srt.message.domain.Template;

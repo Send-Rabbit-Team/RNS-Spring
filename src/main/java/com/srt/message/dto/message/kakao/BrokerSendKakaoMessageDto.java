@@ -1,6 +1,6 @@
-package com.srt.message.service.dto.message.kakao;
+package com.srt.message.dto.message.kakao;
 
-import com.srt.message.service.dto.message_result.KakaoMessageResultDto;
+import com.srt.message.dto.message_result.KakaoMessageResultDto;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;

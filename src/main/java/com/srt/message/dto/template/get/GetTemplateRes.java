@@ -1,4 +1,4 @@
-package com.srt.message.service.dto.template.get;
+package com.srt.message.dto.template.get;
 
 import com.srt.message.domain.Template;
 import lombok.AllArgsConstructor;

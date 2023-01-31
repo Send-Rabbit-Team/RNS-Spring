@@ -1,7 +1,7 @@
-package com.srt.message.service.dto.contact.get;
+package com.srt.message.dto.contact.get;
 
 import com.srt.message.domain.Contact;
-import com.srt.message.service.dto.contact.ContactDTO;
+import com.srt.message.dto.contact.ContactDTO;
 import lombok.*;
 
 import java.util.List;

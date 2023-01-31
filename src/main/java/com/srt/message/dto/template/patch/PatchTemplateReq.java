@@ -1,4 +1,4 @@
-package com.srt.message.service.dto.template.patch;
+package com.srt.message.dto.template.patch;
 
 import com.srt.message.domain.Member;
 import com.srt.message.domain.Template;

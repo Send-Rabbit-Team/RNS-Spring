@@ -1,4 +1,4 @@
-package com.srt.message.service.dto.sender_number.get;
+package com.srt.message.dto.sender_number.get;
 
 import com.srt.message.domain.SenderNumber;
 import lombok.AllArgsConstructor;

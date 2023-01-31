@@ -1,10 +1,10 @@
-package com.srt.message.service.dto.member.get;
+package com.srt.message.dto.member.get;
 
 import com.srt.message.config.type.LoginType;
 import com.srt.message.config.type.MemberType;
 import com.srt.message.domain.Company;
 import com.srt.message.domain.Member;
-import com.srt.message.service.dto.company.CompanyDTO;
+import com.srt.message.dto.company.CompanyDTO;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.*;
 

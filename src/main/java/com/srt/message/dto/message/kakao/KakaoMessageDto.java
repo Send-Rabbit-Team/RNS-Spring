@@ -1,4 +1,4 @@
-package com.srt.message.service.dto.message.kakao;
+package com.srt.message.dto.message.kakao;
 
 
 import com.fasterxml.jackson.annotation.JsonIgnore;

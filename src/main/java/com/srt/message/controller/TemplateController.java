@@ -3,10 +3,10 @@ package com.srt.message.controller;
 import com.srt.message.config.page.PageResult;
 import com.srt.message.config.response.BaseResponse;
 import com.srt.message.domain.Template;
-import com.srt.message.service.dto.jwt.JwtInfo;
-import com.srt.message.service.dto.template.get.GetTemplateRes;
-import com.srt.message.service.dto.template.patch.PatchTemplateReq;
-import com.srt.message.service.dto.template.post.PostTemplateReq;
+import com.srt.message.dto.jwt.JwtInfo;
+import com.srt.message.dto.template.get.GetTemplateRes;
+import com.srt.message.dto.template.patch.PatchTemplateReq;
+import com.srt.message.dto.template.post.PostTemplateReq;
 import com.srt.message.service.TemplateService;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
@@ -76,7 +76,7 @@ public class TemplateController {
             @ApiResponse(code = 2022, message = "존재하지 않는 탬플릿입니다."),
     })
     @GetMapping("/templates/{page}")
-    public BaseResponse<PageResult<GetTemplateRes, Template>> getPageTemplate(@PathVariable("page") int page, HttpServletRequest request){
+    public BaseResponse<PageResult<GetTemplateRes>> getPageTemplate(@PathVariable("page") int page, HttpServletRequest request){
         return new BaseResponse<>(templateService.getPageTemplate(JwtInfo.getMemberId(request), page));
     }
 

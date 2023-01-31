@@ -1,4 +1,4 @@
-package com.srt.message.service.dto.contact.patch;
+package com.srt.message.dto.contact.patch;
 
 
 import com.srt.message.domain.Contact;

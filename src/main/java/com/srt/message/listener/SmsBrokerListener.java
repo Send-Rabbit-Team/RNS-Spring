@@ -9,7 +9,7 @@ import com.srt.message.domain.Message;
 import com.srt.message.domain.MessageResult;
 import com.srt.message.domain.redis.RMessageResult;
 import com.srt.message.repository.redis.RedisHashRepository;
-import com.srt.message.service.dto.message_result.MessageResultDto;
+import com.srt.message.dto.message_result.MessageResultDto;
 import com.srt.message.repository.MessageResultRepository;
 import com.srt.message.repository.cache.BrokerCacheRepository;
 import com.srt.message.repository.cache.ContactCacheRepository;
@@ -99,19 +99,19 @@ public class SmsBrokerListener {
         String rMessageResultId = messageResultDto.getRMessageResultId();
 
         // Redis에서 상태 가져오기
-        String key = messageResultDto.getMessageId() + "." + broker.getName();
+        String statusKey = "message.status." + messageResultDto.getMessageId();
 
         // Redis에 해당 데이터가 없을 경우 종료
-        if (!redisHashRepository.isExist(key, rMessageResultId))
+        if (!redisHashRepository.isExist(statusKey, rMessageResultId))
             return;
 
-        String jsonRMessageResult = redisHashRepository.findById(key, rMessageResultId);
+        String jsonRMessageResult = redisHashRepository.findById(statusKey, rMessageResultId);
 
         // 상태 업데이트 및 저장
         RMessageResult rMessageResult = convertToRMessageResult(jsonRMessageResult);
-        rMessageResult.changeMessageStatus(messageResultDto.getMessageStatus());
+        rMessageResult.changeMessageStatus(MessageStatus.SUCCESS);
 
-        redisHashRepository.update(key, rMessageResultId, rMessageResult);
+        redisHashRepository.update(statusKey, rMessageResultId, rMessageResult);
     }
 
     public void saveMessageResult(final MessageResultDto messageResultDto, String brokerName) {

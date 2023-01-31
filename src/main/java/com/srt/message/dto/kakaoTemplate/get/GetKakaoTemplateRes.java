@@ -1,4 +1,4 @@
-package com.srt.message.service.dto.kakaoTemplate.get;
+package com.srt.message.dto.kakaoTemplate.get;
 
 import com.srt.message.config.type.ButtonType;
 import com.srt.message.domain.KakaoTemplate;

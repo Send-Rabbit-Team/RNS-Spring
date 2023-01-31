@@ -1,4 +1,4 @@
-package com.srt.message.service.dto.sms;
+package com.srt.message.dto.sms;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import io.swagger.annotations.ApiModelProperty;

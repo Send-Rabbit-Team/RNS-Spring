@@ -1,4 +1,4 @@
-package com.srt.message.service.dto.contact_group.get;
+package com.srt.message.dto.contact_group.get;
 
 import com.srt.message.domain.ContactGroup;
 import lombok.AllArgsConstructor;

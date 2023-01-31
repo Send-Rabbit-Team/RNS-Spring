@@ -1,7 +1,7 @@
 package com.srt.message.service;
 
 import com.srt.message.domain.redis.AuthPhoneNumber;
-import com.srt.message.service.dto.sms.PhoneNumberValidDTO;
+import com.srt.message.dto.sms.PhoneNumberValidDTO;
 import com.srt.message.repository.redis.AuthPhoneNumberRedisRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

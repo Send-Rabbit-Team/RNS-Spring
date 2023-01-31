@@ -1,4 +1,4 @@
-package com.srt.message.service.dto.sender_number.post;
+package com.srt.message.dto.sender_number.post;
 
 import com.srt.message.domain.Member;
 import com.srt.message.domain.SenderNumber;

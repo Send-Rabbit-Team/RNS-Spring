@@ -1,4 +1,4 @@
-package com.srt.message.service.dto.contact.post;
+package com.srt.message.dto.contact.post;
 
 import com.srt.message.domain.Contact;
 import com.srt.message.domain.ContactGroup;

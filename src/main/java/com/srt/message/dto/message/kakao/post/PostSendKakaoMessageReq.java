@@ -1,6 +1,6 @@
-package com.srt.message.service.dto.message.kakao.post;
+package com.srt.message.dto.message.kakao.post;
 
-import com.srt.message.service.dto.message.kakao.KakaoMessageDto;
+import com.srt.message.dto.message.kakao.KakaoMessageDto;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.*;
 

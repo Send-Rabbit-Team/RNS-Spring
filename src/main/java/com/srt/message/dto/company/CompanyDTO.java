@@ -1,4 +1,4 @@
-package com.srt.message.service.dto.company;
+package com.srt.message.dto.company;
 
 import com.srt.message.domain.Company;
 import io.swagger.annotations.ApiModelProperty;

@@ -1,4 +1,4 @@
-package com.srt.message.service.dto.auth.register.google;
+package com.srt.message.dto.auth.register.google;
 
 import com.srt.message.config.type.LoginType;
 import com.srt.message.config.type.MemberType;

@@ -1,4 +1,4 @@
-package com.srt.message.service.dto.kakaoTemplate.patch;
+package com.srt.message.dto.kakaoTemplate.patch;
 
 import com.srt.message.config.type.ButtonType;
 import lombok.AllArgsConstructor;

@@ -1,6 +1,6 @@
-package com.srt.message.service.dto.message_rule.post;
+package com.srt.message.dto.message_rule.post;
 
-import com.srt.message.service.dto.message_rule.MessageRuleVO;
+import com.srt.message.dto.message_rule.MessageRuleVO;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;

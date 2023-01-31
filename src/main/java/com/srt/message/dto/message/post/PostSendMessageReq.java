@@ -1,6 +1,6 @@
-package com.srt.message.service.dto.message.post;
+package com.srt.message.dto.message.post;
 
-import com.srt.message.service.dto.message.SMSMessageDto;
+import com.srt.message.dto.message.SMSMessageDto;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

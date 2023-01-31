@@ -1,4 +1,4 @@
-package com.srt.message.service.dto.contact_group.post;
+package com.srt.message.dto.contact_group.post;
 
 import com.srt.message.domain.Member;
 import io.swagger.annotations.ApiModelProperty;
