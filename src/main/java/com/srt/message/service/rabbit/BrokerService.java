@@ -158,7 +158,7 @@ public class BrokerService {
     public String reserveSmsMessage(BrokerMessageDto brokerMessageDto){
         schedulerService.register(brokerMessageDto);
 
-        return "성공적으로 예약 발송 되었습니다.";
+        return "예약성공";
     }
 
     // Json 형태로 반환

@@ -50,6 +50,5 @@ public class SMSMessageDto {
     @ApiModelProperty(
             example = "0/1 * * * * ?"
     )
-    @JsonIgnore
     private String cronExpression;
 }

@@ -95,7 +95,7 @@ public class MessageService {
                 .build();
 
         // 크론 표현식 있으면 예약 발송으로 이동
-        if(!messageReq.getMessage().getCronExpression().isEmpty())
+        if(messageReq.getMessage().getCronExpression() != null)
             return brokerService.reserveSmsMessage(brokerMessageDto);
 
         return brokerService.sendSmsMessage(brokerMessageDto);
