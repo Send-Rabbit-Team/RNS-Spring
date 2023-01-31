@@ -18,13 +18,17 @@ public class GetContactAllRes {
     public static GetContactAllRes toDto(List<Contact> contacts){
         List<ContactDTO> contactDTOList =  contacts.stream().map(
                 contact -> {
-                    return ContactDTO.builder()
+                    ContactDTO contactDTO =  ContactDTO.builder()
                             .id(contact.getId())
                             .memberId(contact.getMember().getId())
-                            .groupId(contact.getContactGroup().getId())
                             .phoneNumber(contact.getPhoneNumber())
                             .memo(contact.getMemo())
                             .build();
+
+                    if(contact.getContactGroup() != null)
+                        contactDTO.setGroupId(contact.getContactGroup().getId());
+
+                    return contactDTO;
                 }).collect(Collectors.toList());
         return new GetContactAllRes(contactDTOList);
     }
