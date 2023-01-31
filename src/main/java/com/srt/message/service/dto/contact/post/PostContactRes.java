@@ -34,10 +34,14 @@ public class PostContactRes {
     public static PostContactRes toDto(Contact contact, ContactGroup contactGroup){
         PostContactRes postContactRes = PostContactRes.builder()
                 .contactId(contact.getId())
-                .contactGroupId(contactGroup.getId())
                 .phoneNumber(contact.getPhoneNumber())
                 .memo(contact.getMemo())
                 .build();
+
+        if (contact.getContactGroup() != null) {
+            postContactRes.setContactGroupId(contact.getContactGroup().getId());
+        }
+
         return postContactRes;
     }
 }
