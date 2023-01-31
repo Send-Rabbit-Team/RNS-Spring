@@ -193,4 +193,48 @@ public class RabbitConfig {
 //                .to(dlxSMSExchange)
 //                .with(LG_WAIT_ROUTING_KEY);
 //    }
+
+    /**
+     * Dead 설정
+     */
+    // Dead Queue
+    @Bean
+    public Queue smsDeadKTQueue(){
+        return new Queue(KT_DAED_QUEUE_NAME, true);
+    }
+    @Bean
+    public Queue smsDeadSKTQueue(){
+        return new Queue(SKT_DAED_QUEUE_NAME, true);
+    }
+    @Bean
+    public Queue smsDeadLGQueue(){
+        return new Queue(LG_DAED_QUEUE_NAME, true);
+    }
+
+    // Dead Exchange
+    @Bean
+    public DirectExchange deadSMSExchange(){
+        return new DirectExchange(DEAD_EXCHANGE_NAME);
+    }
+
+    // Binding
+    @Bean
+    public Binding bindingDeadSmsKT(DirectExchange deadSMSExchange, Queue smsDeadKTQueue){
+        return BindingBuilder.bind(smsDeadKTQueue)
+                .to(deadSMSExchange)
+                .with(KT_DEAD_ROUTING_KEY);
+    }
+    @Bean
+    public Binding bindingDeadSmsSKT(DirectExchange deadSMSExchange, Queue smsDeadSKTQueue){
+        return BindingBuilder.bind(smsDeadSKTQueue)
+                .to(deadSMSExchange)
+                .with(SKT_DEAD_ROUTING_KEY);
+    }
+    @Bean
+    public Binding bindingDeadSmsLG(DirectExchange deadSMSExchange, Queue smsDeadLGQueue){
+        return BindingBuilder.bind(smsDeadLGQueue)
+                .to(deadSMSExchange)
+                .with(LG_DEAD_ROUTING_KEY);
+    }
+
 }

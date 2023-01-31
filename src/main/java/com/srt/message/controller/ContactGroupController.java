@@ -62,7 +62,7 @@ public class ContactGroupController {
             @ApiResponse(code = 1000, message = "요청에 성공하였습니다."),
     })
     @GetMapping("/list/{page}")
-    public BaseResponse<PageResult<ContactGroup>> getMemberGroup(
+    public BaseResponse<PageResult<GetContactGroupRes>> getMemberGroup(
             HttpServletRequest request,
             @PathVariable("page") int page) {
         Long memberId = JwtInfo.getMemberId(request);

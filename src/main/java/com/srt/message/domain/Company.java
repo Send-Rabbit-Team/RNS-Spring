@@ -22,4 +22,6 @@ public class Company extends BaseTimeEntity {
     private String companyName;
 
     private String bsNum;
+
+    private String kakaoBizId;
 }

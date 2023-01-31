@@ -66,6 +66,8 @@ public class PostRegisterReq {
     )
     private LoginType loginType;
 
+    private String kakaoBizId;
+
     public static Member toMemberEntity(PostRegisterReq req, Company company){
         return Member.builder()
                 .email(req.getEmail())
@@ -82,6 +84,7 @@ public class PostRegisterReq {
         return Company.builder()
                 .companyName(req.getCompanyName())
                 .bsNum(req.getBsNum())
+                .kakaoBizId(req.getKakaoBizId())
                 .build();
     }
 }

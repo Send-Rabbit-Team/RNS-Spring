@@ -4,7 +4,6 @@ import com.srt.message.config.type.LoginType;
 import com.srt.message.config.type.MemberType;
 import com.srt.message.domain.Company;
 import com.srt.message.domain.Member;
-import com.srt.message.dto.company.CompanyDTO;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.*;
 
@@ -14,7 +13,10 @@ import lombok.*;
 @Getter
 @Setter
 public class GetInfoMemberRes {
-    private CompanyDTO company;
+    @ApiModelProperty(
+            example = "1"
+    )
+    private long memberId;
 
     @ApiModelProperty(
             example = "forceTlight@gmail.com"
@@ -42,6 +44,16 @@ public class GetInfoMemberRes {
     private String profileImgUrl;
 
     @ApiModelProperty(
+            example = "카카오 엔터프라이즈"
+    )
+    private String companyName;
+
+    @ApiModelProperty(
+            example = "12345678901"
+    )
+    private String bsNum;
+
+    @ApiModelProperty(
             example = "COMPANY"
     )
     private MemberType memberType;
@@ -51,10 +63,13 @@ public class GetInfoMemberRes {
     )
     private LoginType loginType;
 
+    private String kakaoBizId;
+
     public static GetInfoMemberRes toDto(Member member){
         Company company = member.getCompany();
 
         GetInfoMemberRes getInfoMemberRes = GetInfoMemberRes.builder()
+                .memberId(member.getId())
                 .email(member.getEmail())
                 .password(member.getPassword())
                 .name(member.getName())
@@ -64,7 +79,12 @@ public class GetInfoMemberRes {
                 .loginType(member.getLoginType())
                 .build();
 
-        getInfoMemberRes.setCompany(CompanyDTO.toDto(company));
+        if(company != null){
+            getInfoMemberRes.setCompanyName(company.getCompanyName());
+            getInfoMemberRes.setBsNum(company.getBsNum());
+            getInfoMemberRes.setKakaoBizId(company.getKakaoBizId());
+        }
+
 
         return getInfoMemberRes;
     }

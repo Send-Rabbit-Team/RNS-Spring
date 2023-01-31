@@ -58,6 +58,8 @@ public class GoogleRegisterRes {
     )
     private LoginType loginType;
 
+    private String kakaoBizId;
+
     public static GoogleRegisterRes toDto(Member member){
         Company company = member.getCompany();
 
@@ -73,6 +75,7 @@ public class GoogleRegisterRes {
         if(company != null){
             res.setCompanyName(company.getCompanyName());
             res.setBsNum(company.getBsNum());
+            res.setKakaoBizId(company.getKakaoBizId());
         }
 
         return res;
