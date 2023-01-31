@@ -2,10 +2,10 @@ package com.srt.message.controller;
 
 import com.srt.message.config.response.BaseResponse;
 import com.srt.message.service.KakaoMessageRuleService;
-import com.srt.message.service.dto.jwt.JwtInfo;
-import com.srt.message.service.kakaoMessageRule.get.GetKakaoMessageRuleRes;
-import com.srt.message.service.kakaoMessageRule.patch.PatchKakaoMessageRuleReq;
-import com.srt.message.service.kakaoMessageRule.post.PostKakaoMessageRuleReq;
+import com.srt.message.dto.jwt.JwtInfo;
+import com.srt.message.dto.kakaoMessageRule.get.GetKakaoMessageRuleRes;
+import com.srt.message.dto.kakaoMessageRule.patch.PatchKakaoMessageRuleReq;
+import com.srt.message.dto.kakaoMessageRule.post.PostKakaoMessageRuleReq;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.web.bind.annotation.*;

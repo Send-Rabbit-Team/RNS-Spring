@@ -1,4 +1,4 @@
-package com.srt.message.service.kakaoMessageRule.post;
+package com.srt.message.dto.kakaoMessageRule.patch;
 
 import com.srt.message.domain.KakaoBroker;
 import com.srt.message.domain.KakaoMessageRule;
@@ -12,21 +12,23 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
-public class PostKakaoMessageRuleReq {
+public class PatchKakaoMessageRuleReq {
+    private long kakaoMessageRuleId;
     private long kakaoBrokerId;
     private String kakaoBrokerName;
     private int kakaoBrokerRate;
 
-    public static KakaoMessageRule toEntity(PostKakaoMessageRuleReq postKakaoMessageRuleReq, Member member) {
+    public static KakaoMessageRule toEntity(PatchKakaoMessageRuleReq patchKakaoMessageRuleReq, Member member) {
         KakaoBroker kakaoBroker = KakaoBroker.builder()
-                .id(postKakaoMessageRuleReq.getKakaoBrokerId())
-                .name(postKakaoMessageRuleReq.getKakaoBrokerName())
+                .id(patchKakaoMessageRuleReq.getKakaoMessageRuleId())
+                .name(patchKakaoMessageRuleReq.getKakaoBrokerName())
                 .build();
 
         KakaoMessageRule kakaoMessageRule = KakaoMessageRule.builder()
+                .id(patchKakaoMessageRuleReq.getKakaoBrokerId())
                 .member(member)
                 .kakaoBroker(kakaoBroker)
-                .brokerRate(postKakaoMessageRuleReq.getKakaoBrokerRate())
+                .brokerRate(patchKakaoMessageRuleReq.getKakaoBrokerRate())
                 .build();
 
         return kakaoMessageRule;

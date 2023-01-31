@@ -1,4 +1,4 @@
-package com.srt.message.service.kakaoMessageRule.get;
+package com.srt.message.dto.kakaoMessageRule.get;
 
 import com.srt.message.domain.KakaoMessageRule;
 import lombok.AllArgsConstructor;
