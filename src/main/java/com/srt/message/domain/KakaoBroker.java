@@ -2,6 +2,7 @@ package com.srt.message.domain;
 
 import com.srt.message.config.domain.BaseTimeEntity;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -11,6 +12,7 @@ import javax.persistence.*;
 @NoArgsConstructor
 @Getter
 @Entity
+@Builder
 public class KakaoBroker extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

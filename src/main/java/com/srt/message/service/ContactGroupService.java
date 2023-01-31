@@ -131,12 +131,13 @@ public class ContactGroupService {
     }
 
     // 그룹 조회
-    public PageResult<ContactGroup> getMemberContactGroup(long memberId, int page) {
+    public PageResult<GetContactGroupRes> getMemberContactGroup(long memberId, int page) {
         PageRequest pageRequest = PageRequest.of(page - 1, 5, Sort.by("id").descending());
 
-        Page<ContactGroup> contactPage = contactGroupRepository.findAllContactGroup(memberId, BaseStatus.ACTIVE, pageRequest);
+        Page<GetContactGroupRes> contactGroupResPage = contactGroupRepository.findAllContactGroup(memberId, BaseStatus.ACTIVE, pageRequest)
+                .map(c -> GetContactGroupRes.toDto(c));
 
-        return new PageResult<>(contactPage);
+        return new PageResult<>(contactGroupResPage);
     }
 
     public Member getExistMember(long memberId){

@@ -63,6 +63,8 @@ public class PostRegisterRes {
     )
     private LoginType loginType;
 
+    private String kakaoBizId;
+
     public static PostRegisterRes toDto(Member member){
         Company company = member.getCompany();
 
@@ -80,6 +82,7 @@ public class PostRegisterRes {
         if(company != null){
             res.setCompanyName(company.getCompanyName());
             res.setBsNum(company.getBsNum());
+            res.setKakaoBizId(company.getKakaoBizId());
         }
 
         return res;
