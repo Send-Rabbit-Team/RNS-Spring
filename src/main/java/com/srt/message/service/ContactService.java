@@ -7,14 +7,14 @@ import com.srt.message.config.status.BaseStatus;
 import com.srt.message.domain.Contact;
 import com.srt.message.domain.ContactGroup;
 import com.srt.message.domain.Member;
-import com.srt.message.service.dto.contact.ContactDTO;
-import com.srt.message.service.dto.contact.get.GetContactAllRes;
-import com.srt.message.service.dto.contact.get.GetContactRes;
-import com.srt.message.service.dto.contact.get.GetGroupContactRes;
-import com.srt.message.service.dto.contact.patch.PatchContactReq;
-import com.srt.message.service.dto.contact.patch.PatchContactRes;
-import com.srt.message.service.dto.contact.post.PostContactReq;
-import com.srt.message.service.dto.contact.post.PostContactRes;
+import com.srt.message.dto.contact.ContactDTO;
+import com.srt.message.dto.contact.get.GetContactAllRes;
+import com.srt.message.dto.contact.get.GetContactRes;
+import com.srt.message.dto.contact.get.GetGroupContactRes;
+import com.srt.message.dto.contact.patch.PatchContactReq;
+import com.srt.message.dto.contact.patch.PatchContactRes;
+import com.srt.message.dto.contact.post.PostContactReq;
+import com.srt.message.dto.contact.post.PostContactRes;
 import com.srt.message.repository.ContactRepository;
 import com.srt.message.repository.ContactGroupRepository;
 import com.srt.message.repository.MemberRepository;
@@ -127,11 +127,13 @@ public class ContactService {
     }
 
     // 연락처 검색
-    public PageResult<ContactDTO, Contact> searchContact(String phoneNumber, int currentPage, long memberId) {
+    public PageResult<ContactDTO> searchContact(String phoneNumber, int currentPage, long memberId) {
         PageRequest pageRequest = PageRequest.of(currentPage-1, 5, Sort.by("id").descending());
-        Page<Contact> contactPage = contactRepository.findbyPhoneNumber(phoneNumber, pageRequest, memberId,BaseStatus.ACTIVE);
-        Function<Contact, ContactDTO> fn = (contact -> ContactDTO.toDto(contact));
-        return new PageResult<>(contactPage, fn);
+
+        Page<ContactDTO> contactPage = contactRepository.findbyPhoneNumber(phoneNumber, pageRequest, memberId,BaseStatus.ACTIVE)
+                .map(c -> ContactDTO.toDto(c));
+
+        return new PageResult<>(contactPage);
     }
 
     // 연락처 그룹으로 필터링
@@ -144,6 +146,23 @@ public class ContactService {
         return contactList.stream().map(contact -> GetGroupContactRes.toDto(contact)).collect(Collectors.toList());
     };
 
+    // 전체 연락처 조회(페이징)
+    public PageResult<GetContactRes> getMemberContact(long memberId, int page) {
+        PageRequest pageRequest = PageRequest.of(page-1, 5, Sort.by("id").descending());
+
+        Page<GetContactRes> contactPage = contactRepository.findAllContact(memberId, BaseStatus.ACTIVE, pageRequest)
+                .map(c -> GetContactRes.toDto(c));
+
+        return new PageResult<>(contactPage);
+    }
+
+    public GetContactAllRes getMemberContactAll(long memberId){
+        List<Contact> contactList = contactRepository.findByMemberIdAndStatus(memberId, BaseStatus.ACTIVE);
+        GetContactAllRes getContactAllRes = GetContactAllRes.toDto(contactList);
+        return getContactAllRes;
+    }
+
+
     // 편의 메서드
     public void checkMatchMember(Contact contact, long memberId){
         if(contact.getMember().getId() != memberId)
@@ -154,19 +173,5 @@ public class ContactService {
         Contact contact = contactRepository.findByIdAndStatus(contactId,BaseStatus.ACTIVE)
                 .orElseThrow(()-> new BaseException(NOT_EXIST_CONTACT_NUMBER));
         return contact;
-    }
-
-    // 전체 연락처 조회(페이징)
-    public PageResult<GetContactRes, Contact> getMemberContact(long memberId, int page) {
-        PageRequest pageRequest = PageRequest.of(page-1, 5, Sort.by("id").descending());
-        Page<Contact> contactPage = contactRepository.findAllContact(memberId, BaseStatus.ACTIVE, pageRequest);
-        Function<Contact, GetContactRes> fn = (contact -> GetContactRes.toDto(contact));
-        return new PageResult<>(contactPage, fn);
-    }
-
-    public GetContactAllRes getMemberContactAll(long memberId){
-        List<Contact> contactList = contactRepository.findByMemberIdAndStatus(memberId, BaseStatus.ACTIVE);
-        GetContactAllRes getContactAllRes = GetContactAllRes.toDto(contactList);
-        return getContactAllRes;
     }
 }

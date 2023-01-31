@@ -1,19 +1,12 @@
 package com.srt.message.domain;
 
 import com.srt.message.config.domain.BaseEntity;
-import com.srt.message.config.exception.BaseException;
-import com.srt.message.repository.MemberRepository;
-import com.srt.message.repository.MessageRuleRepository;
-import com.srt.message.service.MessageRuleService;
-import com.srt.message.service.dto.message_rule.patch.PatchSMSRuleReq;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
-
-import static com.srt.message.config.response.BaseResponseStatus.NOT_MATCH_MEMBER;
 
 @Builder
 @AllArgsConstructor

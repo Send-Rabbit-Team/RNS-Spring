@@ -143,54 +143,54 @@ public class RabbitConfig {
      * DLX 설정
      */
     // DLX Queue
-    @Bean
-    public Queue smsWaitKTQueue(){
-        Map<String, Object> args = new HashMap<>();
-        args.put("x-message-ttl", WAIT_TTL);
-        args.put("x-dead-letter-exchange", SMS_EXCHANGE_NAME);
-        args.put("x-dead-letter-routing-key", KT_WORK_ROUTING_KEY);
-        return new Queue(KT_WAIT_QUEUE_NAME, true);
-    }
-
-    @Bean
-    public Queue smsWaitSKTQueue(){
-        Map<String, Object> args = new HashMap<>();
-        args.put("x-message-ttl", WAIT_TTL);
-        return new Queue(SKT_WAIT_QUEUE_NAME, true);
-    }
-
-    @Bean
-    public Queue smsWaitLGQueue(){
-        Map<String, Object> args = new HashMap<>();
-        args.put("x-message-ttl", WAIT_TTL);
-        return new Queue(LG_WAIT_QUEUE_NAME, true);
-    }
-
-    // DLX Exchange
-    @Bean
-    public DirectExchange dlxSMSExchange(){
-        return new DirectExchange(DLX_EXCHANGE_NAME);
-    }
-
-    // DLX Binding
-    @Bean
-    public Binding bindingDLXSmsKT(DirectExchange dlxSMSExchange, Queue smsWaitKTQueue){
-        return BindingBuilder.bind(smsWaitKTQueue)
-                .to(dlxSMSExchange)
-                .with(KT_WAIT_ROUTING_KEY);
-    }
-
-    @Bean
-    public Binding bindingDLXSmsSKT(DirectExchange dlxSMSExchange, Queue smsWaitSKTQueue){
-        return BindingBuilder.bind(smsWaitSKTQueue)
-                .to(dlxSMSExchange)
-                .with(SKT_WAIT_ROUTING_KEY);
-    }
-
-    @Bean
-    public Binding bindingDLXSmsLG(DirectExchange dlxSMSExchange, Queue smsWaitLGQueue){
-        return BindingBuilder.bind(smsWaitLGQueue)
-                .to(dlxSMSExchange)
-                .with(LG_WAIT_ROUTING_KEY);
-    }
+//    @Bean
+//    public Queue smsWaitKTQueue(){
+//        Map<String, Object> args = new HashMap<>();
+//        args.put("x-message-ttl", WAIT_TTL);
+//        args.put("x-dead-letter-exchange", SMS_EXCHANGE_NAME);
+//        args.put("x-dead-letter-routing-key", KT_WORK_ROUTING_KEY);
+//        return new Queue(KT_WAIT_QUEUE_NAME, true);
+//    }
+//
+//    @Bean
+//    public Queue smsWaitSKTQueue(){
+//        Map<String, Object> args = new HashMap<>();
+//        args.put("x-message-ttl", WAIT_TTL);
+//        return new Queue(SKT_WAIT_QUEUE_NAME, true);
+//    }
+//
+//    @Bean
+//    public Queue smsWaitLGQueue(){
+//        Map<String, Object> args = new HashMap<>();
+//        args.put("x-message-ttl", WAIT_TTL);
+//        return new Queue(LG_WAIT_QUEUE_NAME, true);
+//    }
+//
+//    // DLX Exchange
+//    @Bean
+//    public DirectExchange dlxSMSExchange(){
+//        return new DirectExchange(DLX_EXCHANGE_NAME);
+//    }
+//
+//    // DLX Binding
+//    @Bean
+//    public Binding bindingDLXSmsKT(DirectExchange dlxSMSExchange, Queue smsWaitKTQueue){
+//        return BindingBuilder.bind(smsWaitKTQueue)
+//                .to(dlxSMSExchange)
+//                .with(KT_WAIT_ROUTING_KEY);
+//    }
+//
+//    @Bean
+//    public Binding bindingDLXSmsSKT(DirectExchange dlxSMSExchange, Queue smsWaitSKTQueue){
+//        return BindingBuilder.bind(smsWaitSKTQueue)
+//                .to(dlxSMSExchange)
+//                .with(SKT_WAIT_ROUTING_KEY);
+//    }
+//
+//    @Bean
+//    public Binding bindingDLXSmsLG(DirectExchange dlxSMSExchange, Queue smsWaitLGQueue){
+//        return BindingBuilder.bind(smsWaitLGQueue)
+//                .to(dlxSMSExchange)
+//                .with(LG_WAIT_ROUTING_KEY);
+//    }
 }

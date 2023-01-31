@@ -7,9 +7,9 @@ import com.srt.message.domain.KakaoTemplate;
 import com.srt.message.domain.Member;
 import com.srt.message.repository.KakaoTemplateRepository;
 import com.srt.message.repository.MemberRepository;
-import com.srt.message.service.dto.kakaoTemplate.get.GetKakaoTemplateRes;
-import com.srt.message.service.dto.kakaoTemplate.patch.PatchKakaoTemplateReq;
-import com.srt.message.service.dto.kakaoTemplate.post.PostKakaoTemplateReq;
+import com.srt.message.dto.kakaoTemplate.get.GetKakaoTemplateRes;
+import com.srt.message.dto.kakaoTemplate.patch.PatchKakaoTemplateReq;
+import com.srt.message.dto.kakaoTemplate.post.PostKakaoTemplateReq;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -55,7 +55,7 @@ public class KakaoTemplateService {
     }
 
     // 탬플릿 전체 조회(페이징 O)
-    public PageResult<GetKakaoTemplateRes, KakaoTemplate> getPageKakaoTemplate(Long memberId, int page) {
+    public PageResult<GetKakaoTemplateRes> getPageKakaoTemplate(Long memberId, int page) {
         getExistMember(memberId);
 
         // pageRequest 생성
@@ -66,10 +66,9 @@ public class KakaoTemplateService {
         if (kakaoTemplatePage.isEmpty())
             throw new BaseException(NOT_EXIST_TEMPLATE);
 
-        // template -> template dto 함수 정의
-        Function<KakaoTemplate, GetKakaoTemplateRes> fn = (kakaoTemplate -> GetKakaoTemplateRes.toDto(kakaoTemplate));
+        Page<GetKakaoTemplateRes> kakaoTemplateRes = kakaoTemplatePage.map(k -> GetKakaoTemplateRes.toDto(k));
 
-        return new PageResult<>(kakaoTemplatePage, fn);
+        return new PageResult<>(kakaoTemplateRes);
     }
 
     // 탬플릿 전체 조회(페이징 X)

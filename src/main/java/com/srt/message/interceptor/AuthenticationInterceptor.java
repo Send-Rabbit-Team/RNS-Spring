@@ -1,7 +1,7 @@
 package com.srt.message.interceptor;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.srt.message.service.dto.jwt.JwtInfo;
+import com.srt.message.dto.jwt.JwtInfo;
 import com.srt.message.jwt.JwtService;
 import com.srt.message.jwt.NoIntercept;
 import com.srt.message.service.AuthService;
