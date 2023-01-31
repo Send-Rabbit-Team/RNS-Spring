@@ -2,13 +2,14 @@ package com.srt.message.repository.redis;
 
 import com.srt.message.domain.redis.RMessageResult;
 
-import java.util.List;
 import java.util.Map;
 
-public interface RMessageResultRepository {
+public interface RedisHashRepository {
     void save(String key, String rMessageResultId, RMessageResult rMessageResult);
 
     void saveAll(String key, Map<String, String> rMessageResultMap);
+
+    boolean isExist(String key, String rMessageResultId);
 
     Map<String, String> findAll(String key);
 

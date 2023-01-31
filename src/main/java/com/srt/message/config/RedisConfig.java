@@ -1,6 +1,7 @@
 package com.srt.message.config;
 
 import com.srt.message.domain.redis.RMessageResult;
+import com.srt.message.service.redis.RedisKeyExpiredListener;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.CacheManager;
@@ -14,6 +15,9 @@ import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.data.redis.listener.PatternTopic;
+import org.springframework.data.redis.listener.RedisMessageListenerContainer;
+import org.springframework.data.redis.listener.adapter.MessageListenerAdapter;
 import org.springframework.data.redis.repository.configuration.EnableRedisRepositories;
 import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
@@ -32,7 +36,6 @@ public class RedisConfig {
 
         return new LettuceConnectionFactory("localhost", 6379);
     }
-
     @Bean
     public RedisTemplate<?, ?> redisTemplate(RedisConnectionFactory redisConnectionFactory){
         RedisTemplate<String, Object> redisTemplate = new RedisTemplate<>();
@@ -47,6 +50,7 @@ public class RedisConfig {
         return redisTemplate;
     }
 
+    // 레디스 캐시 설정
     @Bean
     public CacheManager cacheManager(RedisConnectionFactory redisConnectionFactory){
         RedisCacheConfiguration redisCacheConfiguration = RedisCacheConfiguration.defaultCacheConfig()
@@ -55,5 +59,18 @@ public class RedisConfig {
                 .disableCachingNullValues()
                 .entryTtl(Duration.ofMinutes(5L));
         return RedisCacheManager.RedisCacheManagerBuilder.fromConnectionFactory(redisConnectionFactory).cacheDefaults(redisCacheConfiguration).build();
+    }
+
+    // 레디스 TTL 이벤트 설정
+    @Bean
+    public MessageListenerAdapter messageListenerAdapter(RedisKeyExpiredListener listenerAdapter){
+        return new MessageListenerAdapter(listenerAdapter, "receiveMessage");
+    }
+    @Bean
+    public RedisMessageListenerContainer redisMessageListenerContainer(RedisConnectionFactory connectionFactory, MessageListenerAdapter listenerAdapter){
+        RedisMessageListenerContainer container = new RedisMessageListenerContainer();
+        container.setConnectionFactory(connectionFactory);
+        container.addMessageListener(listenerAdapter, new PatternTopic("__key*__:expired"));
+        return container;
     }
 }

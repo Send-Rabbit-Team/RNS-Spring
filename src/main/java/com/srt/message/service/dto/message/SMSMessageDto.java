@@ -6,13 +6,15 @@ import com.srt.message.config.type.MessageType;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.*;
 
+import java.util.List;
+import java.util.Set;
+
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
 @Setter
 public class SMSMessageDto {
-
     @ApiModelProperty(
             example = "01025291674"
     )
@@ -33,9 +35,9 @@ public class SMSMessageDto {
     private String content;
 
     @ApiModelProperty(
-            example = "BSAKJNDNKASDJkfetjoi312oiadsioo21basdop"
+            example = "[BSAKJNDNKASDJkfetjoi312oiadsioo21basdop, asdjknasdnasdnjsadkj1241]"
     )
-    private String image;
+    private List<String> images;
 
     @ApiModelProperty(hidden = true)
     private MessageStatus messageStatus;

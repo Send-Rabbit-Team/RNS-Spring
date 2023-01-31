@@ -8,11 +8,13 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @NamedEntityGraph(name = "Message.with.Member.SenderNumber.RepeatRule", attributeNodes = {
         @NamedAttributeNode(value = "member", subgraph = "member_company"),
         @NamedAttributeNode("senderNumber"),
-        @NamedAttributeNode("repeatRule")
+        @NamedAttributeNode("repeatRule"),
 },
         subgraphs = @NamedSubgraph(name = "member_company", attributeNodes = {
                 @NamedAttributeNode("company")
@@ -43,8 +45,8 @@ public class Message extends BaseEntity {
 
     private String content;
 
-    private String image;
-
     @Enumerated(EnumType.STRING)
     private MessageType messageType;
+
+    // 편의 메서드
 }

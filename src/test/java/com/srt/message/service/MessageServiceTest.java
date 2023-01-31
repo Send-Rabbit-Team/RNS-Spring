@@ -39,7 +39,7 @@ class MessageServiceTest {
         PostSendMessageReq postSendMessageReq = PostSendMessageReq.builder()
                 .message(smsMessageDto)
                 .count(10000) // 1만개 테스트
-                .senderNumber("01025291674")
+//                .senderNumber("01025291674")
                 .receivers(receivers)
                 .build();
 

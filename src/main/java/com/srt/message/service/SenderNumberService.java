@@ -54,6 +54,9 @@ public class SenderNumberService {
 
         SenderNumber senderNumber = RegisterSenderNumberReq.toEntity(registerSenderNumberReq, member);
 
+        // 발신자 차단 번호 생성
+        senderNumber.createBlockNumber();
+
         senderNumberRepository.save(senderNumber);
 
         return RegisterSenderNumberRes.toDto(senderNumber);
