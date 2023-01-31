@@ -1,7 +1,7 @@
 package com.srt.message.domain;
 
 import com.srt.message.config.domain.BaseEntity;
-import com.srt.message.service.dto.contact_group.post.PostContactGroupReq;
+import com.srt.message.dto.contact_group.post.PostContactGroupReq;
 import lombok.*;
 
 import javax.persistence.*;

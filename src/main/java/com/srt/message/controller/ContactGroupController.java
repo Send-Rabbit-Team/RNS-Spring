@@ -3,13 +3,13 @@ package com.srt.message.controller;
 import com.srt.message.config.page.PageResult;
 import com.srt.message.config.response.BaseResponse;
 import com.srt.message.domain.ContactGroup;
-import com.srt.message.service.dto.contact_group.get.GetContactGroupRes;
-import com.srt.message.service.dto.contact_group.ContactGroupDTO;
-import com.srt.message.service.dto.contact_group.patch.PatchContactGroupReq;
-import com.srt.message.service.dto.contact_group.patch.PatchContactGroupRes;
-import com.srt.message.service.dto.contact_group.post.PostContactGroupReq;
-import com.srt.message.service.dto.contact_group.post.PostContactGroupRes;
-import com.srt.message.service.dto.jwt.JwtInfo;
+import com.srt.message.dto.contact_group.get.GetContactGroupRes;
+import com.srt.message.dto.contact_group.ContactGroupDTO;
+import com.srt.message.dto.contact_group.patch.PatchContactGroupReq;
+import com.srt.message.dto.contact_group.patch.PatchContactGroupRes;
+import com.srt.message.dto.contact_group.post.PostContactGroupReq;
+import com.srt.message.dto.contact_group.post.PostContactGroupRes;
+import com.srt.message.dto.jwt.JwtInfo;
 import com.srt.message.service.ContactGroupService;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
@@ -62,7 +62,7 @@ public class ContactGroupController {
             @ApiResponse(code = 1000, message = "요청에 성공하였습니다."),
     })
     @GetMapping("/list/{page}")
-    public BaseResponse<PageResult<GetContactGroupRes, ContactGroup>> getMemberGroup(
+    public BaseResponse<PageResult<ContactGroup>> getMemberGroup(
             HttpServletRequest request,
             @PathVariable("page") int page) {
         Long memberId = JwtInfo.getMemberId(request);

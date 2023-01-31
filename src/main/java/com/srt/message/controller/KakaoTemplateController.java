@@ -4,10 +4,10 @@ import com.srt.message.config.page.PageResult;
 import com.srt.message.config.response.BaseResponse;
 import com.srt.message.domain.KakaoTemplate;
 import com.srt.message.service.KakaoTemplateService;
-import com.srt.message.service.dto.jwt.JwtInfo;
-import com.srt.message.service.dto.kakaoTemplate.get.GetKakaoTemplateRes;
-import com.srt.message.service.dto.kakaoTemplate.patch.PatchKakaoTemplateReq;
-import com.srt.message.service.dto.kakaoTemplate.post.PostKakaoTemplateReq;
+import com.srt.message.dto.jwt.JwtInfo;
+import com.srt.message.dto.kakaoTemplate.get.GetKakaoTemplateRes;
+import com.srt.message.dto.kakaoTemplate.patch.PatchKakaoTemplateReq;
+import com.srt.message.dto.kakaoTemplate.post.PostKakaoTemplateReq;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
@@ -77,7 +77,7 @@ public class KakaoTemplateController {
             @ApiResponse(code = 2022, message = "존재하지 않는 탬플릿입니다."),
     })
     @GetMapping("/templates/{page}")
-    public BaseResponse<PageResult<GetKakaoTemplateRes, KakaoTemplate>> getPageTemplate(@PathVariable("page") int page, HttpServletRequest request){
+    public BaseResponse<PageResult<GetKakaoTemplateRes>> getPageTemplate(@PathVariable("page") int page, HttpServletRequest request){
         return new BaseResponse<>(kakaoTemplateService.getPageKakaoTemplate(JwtInfo.getMemberId(request), page));
     }
 

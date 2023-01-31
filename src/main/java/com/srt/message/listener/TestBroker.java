@@ -1,7 +1,7 @@
 package com.srt.message.listener;
 
 import com.srt.message.config.type.MessageType;
-import com.srt.message.service.dto.message.SMSMessageDto;
+import com.srt.message.dto.message.SMSMessageDto;
 import com.srt.message.jwt.NoIntercept;
 import lombok.RequiredArgsConstructor;
 import org.springframework.amqp.core.*;

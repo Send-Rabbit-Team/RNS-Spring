@@ -1,12 +1,12 @@
 package com.srt.message.controller;
 
 import com.srt.message.config.response.BaseResponse;
-import com.srt.message.service.dto.message_rule.get.GetSMSRuleRes;
-import com.srt.message.service.dto.jwt.JwtInfo;
-import com.srt.message.service.dto.message_rule.patch.PatchSMSRuleReq;
-import com.srt.message.service.dto.message_rule.patch.PatchSMSRuleRes;
-import com.srt.message.service.dto.message_rule.post.PostSMSRuleReq;
-import com.srt.message.service.dto.message_rule.post.PostSMSRuleRes;
+import com.srt.message.dto.message_rule.get.GetSMSRuleRes;
+import com.srt.message.dto.jwt.JwtInfo;
+import com.srt.message.dto.message_rule.patch.PatchSMSRuleReq;
+import com.srt.message.dto.message_rule.patch.PatchSMSRuleRes;
+import com.srt.message.dto.message_rule.post.PostSMSRuleReq;
+import com.srt.message.dto.message_rule.post.PostSMSRuleRes;
 import com.srt.message.service.MessageRuleService;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
@@ -16,7 +16,6 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.List;
 
 @Log4j2
 @RestController

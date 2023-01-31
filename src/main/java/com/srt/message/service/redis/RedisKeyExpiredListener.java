@@ -3,27 +3,20 @@ package com.srt.message.service.redis;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.srt.message.config.exception.BaseException;
-import com.srt.message.config.response.BaseResponseStatus;
 import com.srt.message.config.status.MessageStatus;
-import com.srt.message.domain.Broker;
 import com.srt.message.domain.Contact;
 import com.srt.message.domain.Message;
 import com.srt.message.domain.MessageResult;
 import com.srt.message.domain.redis.RMessageResult;
 import com.srt.message.repository.MessageResultRepository;
-import com.srt.message.repository.cache.BrokerCacheRepository;
 import com.srt.message.repository.cache.ContactCacheRepository;
 import com.srt.message.repository.cache.MessageCacheRepository;
-import com.srt.message.service.dto.message_result.MessageResultDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
-import org.hibernate.LockMode;
-import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.redis.core.ListOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
-import javax.persistence.LockModeType;
 import java.util.List;
 import java.util.stream.Collectors;
 
