@@ -7,6 +7,7 @@ import com.srt.message.config.type.LoginType;
 import com.srt.message.config.type.MemberType;
 import com.srt.message.domain.Company;
 import com.srt.message.domain.Member;
+import com.srt.message.domain.SenderNumber;
 import com.srt.message.domain.redis.AuthPhoneNumber;
 import com.srt.message.dto.auth.login.post.PostLoginReq;
 import com.srt.message.dto.auth.login.post.PostLoginRes;
@@ -19,6 +20,7 @@ import com.srt.message.dto.member.get.GetInfoMemberRes;
 import com.srt.message.jwt.JwtService;
 import com.srt.message.repository.CompanyRepository;
 import com.srt.message.repository.MemberRepository;
+import com.srt.message.repository.SenderNumberRepository;
 import com.srt.message.repository.redis.AuthPhoneNumberRedisRepository;
 import com.srt.message.utils.encrypt.SHA256;
 import lombok.RequiredArgsConstructor;
@@ -39,6 +41,8 @@ public class AuthService {
     private final AuthPhoneNumberRedisRepository authPhoneNumberRedisRepository;
 
     private final LoginMember loginMember;
+
+    private final SenderNumberRepository senderNumberRepository;
 
     // 회원가입
     @Transactional(readOnly = false)
@@ -76,6 +80,15 @@ public class AuthService {
 
         authPhoneNumberRedisRepository.delete(authPhoneNumber);
 
+        // 발신번호 저장
+        SenderNumber senderNumber = SenderNumber.builder()
+                .member(member)
+                .memo(postRegisterReq.getName())
+                .phoneNumber(postRegisterReq.getPhoneNumber())
+                .build();
+        senderNumber.createBlockNumber();
+        senderNumberRepository.save(senderNumber);
+
         return PostRegisterRes.toDto(member);
     }
 
@@ -95,6 +108,15 @@ public class AuthService {
         Member member = GoogleRegisterReq.toMemberEntity(googleRegisterReq, company);
         member.changeLoginTypeToGoogle();
         memberRepository.save(member);
+
+        // 발신번호 저장
+        SenderNumber senderNumber = SenderNumber.builder()
+                .member(member)
+                .memo(googleRegisterReq.getName())
+                .phoneNumber(googleRegisterReq.getPhoneNumber())
+                .build();
+        senderNumber.createBlockNumber();
+        senderNumberRepository.save(senderNumber);
 
         return GoogleRegisterRes.toDto(member);
     }
