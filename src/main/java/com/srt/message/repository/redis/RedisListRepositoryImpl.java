@@ -37,4 +37,9 @@ public class RedisListRepositoryImpl implements RedisListRepository{
     public String leftPop(String key) {
         return (String) listOperations.leftPop(key);
     }
+
+    @Override
+    public void remove(String key) {
+        redisTemplate.delete(key);
+    }
 }
