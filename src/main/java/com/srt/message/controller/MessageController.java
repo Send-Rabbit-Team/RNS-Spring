@@ -81,4 +81,21 @@ public class MessageController {
 
         return new BaseResponse<>("메시지 갯수: " + postSendKakaoMessageReq.getCount() + ", 메시지 발송 걸린 시간: " + Double.parseDouble(processTime) / 1000 + "초");
     }
+
+    // 예약 취소
+    @ApiOperation(
+            value = "예약된 메시지 취소",
+            notes = "예약된 메시지를 취소하는 기능이다."
+    )
+    @ApiResponses({
+            @ApiResponse(code = 1000, message = "요청에 성공하였습니다."),
+            @ApiResponse(code = 2016, message = "해당 사용자의 데이터가 아닙니다."),
+            @ApiResponse(code = 2023, message = "존재하는 메시지가 아닙니다.")
+    })
+    @GetMapping("/reserve/cancel/{messageId}")
+    public BaseResponse<String> cancelReserveMessage(@PathVariable("messageId") long messageId, HttpServletRequest request) {
+        String response = messageService.cancelReserveMessage(messageId, JwtInfo.getMemberId(request));
+
+        return new BaseResponse<>(response);
+    }
 }

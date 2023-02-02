@@ -51,6 +51,8 @@ public class MessageService {
 
     private final BrokerService brokerService;
 
+    private final SchedulerService schedulerService;
+
     // 메시지 중계사에게 전송
     public String sendMessageToBroker(PostSendMessageReq messageReq, long memberId){
         Member member = memberRepository.findById(memberId)
@@ -92,5 +94,16 @@ public class MessageService {
             return brokerService.reserveSmsMessage(brokerMessageDto);
 
         return brokerService.sendSmsMessage(brokerMessageDto);
+    }
+
+    // 예약 취소
+    public String cancelReserveMessage(long messageId, long memberId){
+        Message message = messageRepository.findById(memberId)
+                .orElseThrow(() -> new BaseException(NOT_EXIST_MESSAGE));
+
+        if(message.getMember().getId() != memberId)
+            throw new BaseException(NOT_MATCH_MEMBER);
+
+        return schedulerService.remove(messageId);
     }
 }

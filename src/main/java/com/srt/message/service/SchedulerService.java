@@ -31,7 +31,7 @@ public class SchedulerService {
         CronTrigger cronTrigger = new CronTrigger(cronExpression);
 
         ScheduledFuture<?> task = taskScheduler.schedule(() -> {
-            if(checkSchedulerLock(taskId))
+            if (checkSchedulerLock(taskId))
                 return;
 
             brokerService.sendSmsMessage(brokerMessageDto);
@@ -39,13 +39,19 @@ public class SchedulerService {
         scheduledTasks.put(taskId, task);
     }
 
-    public void remove(long messageId) {
-        log.info(messageId + "번 스케쥴러를 중지합니다.");
-        scheduledTasks.get(messageId).cancel(true);
+    public String remove(long messageId) {
+        if (scheduledTasks.get(messageId) != null){
+            scheduledTasks.get(messageId).cancel(true);
+            log.info(messageId + "번 스케쥴러를 중지합니다.");
+
+            return messageId + "의 메시지 발송 예약이 취소되었습니다.";
+        }else{
+            return "해당 메시지는 예약된 메시지가 아닙니다";
+        }
     }
 
     // 스케쥴러 락
-    public boolean checkSchedulerLock(long taskId){
+    public boolean checkSchedulerLock(long taskId) {
         String redisKey = "scheduler.lock.message." + taskId;
         if (redisTemplate.opsForValue().get(redisKey) != null) // 이미 락이 걸려있을 경우
             return true;
