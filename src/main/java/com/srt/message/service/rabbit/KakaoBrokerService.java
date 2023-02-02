@@ -7,6 +7,7 @@ import com.srt.message.config.status.BaseStatus;
 import com.srt.message.config.status.MessageStatus;
 import com.srt.message.domain.*;
 import com.srt.message.domain.redis.RKakaoMessageResult;
+import com.srt.message.dto.message_result.MessageResultDto;
 import com.srt.message.repository.KakaoMessageRuleRepository;
 import com.srt.message.dto.message.kakao.BrokerKakaoMessageDto;
 import com.srt.message.dto.message.kakao.BrokerSendKakaoMessageDto;
@@ -35,8 +36,8 @@ import static com.srt.message.utils.rabbitmq.RabbitKakaoUtil.*;
 @Service
 @RequiredArgsConstructor
 public class KakaoBrokerService {
-    private final int TMP_MESSAGE_DURATION = 5 * 1;
-    private final int VALUE_MESSAGE_DURATION = 30 * 1;
+    private final int TMP_MESSAGE_DURATION = 5 * 60;
+    private final int VALUE_MESSAGE_DURATION = 30 * 60;
 
     private final RabbitTemplate rabbitTemplate;
     private final ObjectMapper objectMapper;
@@ -62,9 +63,10 @@ public class KakaoBrokerService {
         this.contacts = brokerKakaoMessageDto.getContacts();
         Member member = brokerKakaoMessageDto.getMember();
 
-        // 수신자에 따라 Kakao MessageResult Dto 생성
+        // 수신자에 따라 KakaoMessageResultDto 생성
         int idx = 0;
-        List<String> kakaoMessageResultDtoList = new ArrayList<>();
+        List<String> rKakaoMessageResultDtoList = new ArrayList<>();
+        List<KakaoMessageResultDto> kakaoMessageResultDtoList = new ArrayList<>();
         for (Contact contact : contacts) {
             KakaoMessageResultDto kakaoMessageResultDto = KakaoMessageResultDto.builder()
                     .rMessageResultId(String.valueOf(++idx))
@@ -72,15 +74,16 @@ public class KakaoBrokerService {
                     .contactId(contact.getId())
                     .messageStatus(MessageStatus.PENDING)
                     .build();
-            kakaoMessageResultDtoList.add(convertToJson(kakaoMessageResultDto));
+            rKakaoMessageResultDtoList.add(convertToJson(kakaoMessageResultDto));
+            kakaoMessageResultDtoList.add(kakaoMessageResultDto);
         }
 
-        // Redis Repository에 Kakao MessageResult Dto 저장
+        // Redis Repository에 임시 저장
         String tmpKey = "message.tmp." + kakaoMessage.getId();
-        redisListRepository.rightPushAll(tmpKey, kakaoMessageResultDtoList, TMP_MESSAGE_DURATION);
+        redisListRepository.rightPushAll(tmpKey, rKakaoMessageResultDtoList, TMP_MESSAGE_DURATION);
 
         String valueKey = "message.value." + kakaoMessage.getId();
-        redisListRepository.rightPushAll(valueKey, kakaoMessageResultDtoList, VALUE_MESSAGE_DURATION);
+        redisListRepository.rightPushAll(valueKey, rKakaoMessageResultDtoList, VALUE_MESSAGE_DURATION);
 
         // Message Rule 설정
         List<KakaoMessageRule> messageRules = kakaoMessageRuleRepository.findByMemberIdAndStatus(member.getId(), BaseStatus.ACTIVE);
@@ -101,15 +104,10 @@ public class KakaoBrokerService {
             String routingKey = "kakao.send." + kakaoBroker.getName().toLowerCase();
             kakaoMessageDto.setTo(contacts.get(i).getPhoneNumber());
 
-            // message result dto에 값 넣어 dto -> entity -> redis repository에 넣기 위한 리스트에 담기
-            KakaoMessageResultDto kakaoMessageResultDto = null;
-            try {
-                kakaoMessageResultDto = objectMapper.readValue(redisListRepository.leftPop(tmpKey), KakaoMessageResultDto.class);
-                kakaoMessageResultDto.setBrokerId(kakaoBroker.getId());
-            } catch (JsonProcessingException je) {
-                throw new BaseException(JSON_PROCESSING_ERROR);
-            }
-            redisListRepository.leftPop(valueKey);
+            KakaoMessageResultDto kakaoMessageResultDto = kakaoMessageResultDtoList.get(i);
+            kakaoMessageResultDto.setBrokerId(kakaoBroker.getId());
+
+
             RKakaoMessageResult rKakaoMessageResult = KakaoMessageResultDto.toRMessageResult(kakaoMessageResultDto);
             rMessageResultList.put(rKakaoMessageResult.getId(), convertToJson(rKakaoMessageResult));
 
@@ -128,6 +126,10 @@ public class KakaoBrokerService {
         // 전송 결과 redis repositry에 저장
         String statusKey = "message.status." + kakaoMessage.getId();
         kakaoRedisHashRepository.saveAll(statusKey, rMessageResultList);
+
+        // 임시 저장된 값 제거
+        redisListRepository.remove(tmpKey);
+        redisListRepository.remove(valueKey);
 
         // 시간 측정 결과
         stopWatch.stop();
