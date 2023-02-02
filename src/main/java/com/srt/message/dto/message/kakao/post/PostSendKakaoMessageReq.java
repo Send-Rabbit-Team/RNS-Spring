@@ -14,8 +14,6 @@ import java.util.List;
 public class PostSendKakaoMessageReq {
     private KakaoMessageDto kakaoMessageDto;
 
-    private String senderNumber;
-
     private List<String> receivers;
 
     @ApiModelProperty(example = "100")
