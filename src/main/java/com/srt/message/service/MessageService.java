@@ -8,7 +8,6 @@ import com.srt.message.domain.*;
 import com.srt.message.domain.redis.RMessageResult;
 import com.srt.message.dto.message.BrokerMessageDto;
 import com.srt.message.dto.message.get.GetMessageRes;
-import com.srt.message.dto.message.post.PostReserveMessageReq;
 import com.srt.message.dto.message.post.PostSendMessageReq;
 import com.srt.message.dto.message_result.get.GetMessageResultRes;
 import com.srt.message.repository.*;
@@ -80,12 +79,6 @@ public class MessageService {
                 .build();
 
         messageRepository.save(message);
-
-        // 이미지 저장하기 (Base64 배열)
-//        messageReq.getMessage().getImages().stream().forEach(image -> {
-//            MessageImage messageImage = MessageImage.builder().message(message).image(image).build();
-//            messageImageRepository.save(messageImage);
-//        });
 
         BrokerMessageDto brokerMessageDto = BrokerMessageDto.builder()
                 .smsMessageDto(messageReq.getMessage())

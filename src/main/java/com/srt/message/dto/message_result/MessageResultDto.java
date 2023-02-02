@@ -1,6 +1,10 @@
 package com.srt.message.dto.message_result;
 
 import com.srt.message.config.status.MessageStatus;
+import com.srt.message.domain.Broker;
+import com.srt.message.domain.Contact;
+import com.srt.message.domain.Message;
+import com.srt.message.domain.MessageResult;
 import com.srt.message.domain.redis.RMessageResult;
 import lombok.*;
 
