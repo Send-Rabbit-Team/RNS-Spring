@@ -26,4 +26,24 @@ public interface MessageRepository extends JpaRepository<Message, Long> {
     @Query(value = "select m from Message m where m.member.id = :memberId and m.messageType = :messageType",
             countQuery = "select count(m) from Message m where m.member.id = :memberId and m.messageType = :messageType")
     Page<Message> findMessagesByMessageType(MessageType messageType, long memberId, Pageable pageable);
+
+    // 수신자 검색 페이징 조회
+    @Query(value = "select mr.message from MessageResult mr left join mr.message where mr.message.member.id = :memberId " +
+            "and mr.contact.phoneNumber = :receiveNumber")
+    Page<Message> findByReceiveNumber(String receiveNumber, long memberId, Pageable pageable);
+
+    // 발신자 검색 페이징 조회
+    @Query(value = "select mr.message from MessageResult mr left join mr.message m where mr.message.member.id = :memberId " +
+            "and m.senderNumber.phoneNumber = :senderNumber")
+    Page<Message> findBySenderNumber(String senderNumber, long memberId, Pageable pageable);
+
+    // 메모 키워드 검색 페이징 조회
+    @Query(value = "select mr.message from MessageResult mr left join mr.message where mr.message.member.id = :memberId " +
+            "and mr.contact.memo like %:keyword%")
+    Page<Message> findByMemo(String keyword, long memberId, Pageable pageable);
+
+    // 메시지 내용 키워드 검색 페이징 조회
+    @Query(value = "select mr.message from MessageResult mr join mr.message where mr.message.member.id = :memberId " +
+            "and mr.message.content like %:keyword%")
+    Page<Message> findByMessageContent(String keyword, long memberId, Pageable pageable);
 }

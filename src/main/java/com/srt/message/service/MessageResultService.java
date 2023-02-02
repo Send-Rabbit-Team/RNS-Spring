@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.srt.message.config.page.PageResult;
 import com.srt.message.config.type.MessageType;
+import com.srt.message.config.type.MsgSearchType;
 import com.srt.message.domain.Broker;
 import com.srt.message.domain.Contact;
 import com.srt.message.domain.Message;
@@ -46,7 +47,7 @@ public class MessageResultService {
     public PageResult<GetMessageRes> getAllMessages(long memberId, int page){
         PageRequest pageRequest = PageRequest.of(page-1, 10, Sort.by("id").descending());
         Page<GetMessageRes> messagePage = messageRepository.findAllMessage(memberId, pageRequest)
-                .map(m -> GetMessageRes.toDto(m));
+                .map(GetMessageRes::toDto);
 
         return new PageResult<>(messagePage);
     }
@@ -68,7 +69,7 @@ public class MessageResultService {
         }else{ // RDBMS에서 조회
             List<MessageResult> messageResults = messageResultRepository.findAllByMessageId(messageId);
             messageResults.stream()
-                    .map(m -> getMessageResultRes(m)).forEach(r -> messageResultResList.add(r));
+                    .map(this::getMessageResultRes).forEach(r -> messageResultResList.add(r));
         }
 
         return messageResultResList;
@@ -80,7 +81,33 @@ public class MessageResultService {
         PageRequest pageRequest = PageRequest.of(page-1, 10, Sort.by("id").descending());
 
         return messageRepository.findMessagesByMessageType(messageType, memberId, pageRequest)
-                .map(m -> GetMessageRes.toDto(m)).toList();
+                .map(GetMessageRes::toDto).toList();
+    }
+
+    // 검색 조회 (메모, 수신, 발신 번호)
+    public List<GetMessageRes> getMessageBySearching(String searchType, String keyword, long memberId, int page){
+        MsgSearchType msgSearchType = MsgSearchType.valueOf(searchType);
+        PageRequest pageRequest = PageRequest.of(page-1, 10, Sort.by("id").descending());
+
+        List<GetMessageRes> getMessageResList = null;
+        if(msgSearchType == MsgSearchType.RECEIVER){ // 수신자 번호 검색했을 때
+            getMessageResList = messageRepository.findByReceiveNumber(keyword, memberId, pageRequest)
+                   .map(GetMessageRes::toDto).toList();
+
+        }else if(msgSearchType == MsgSearchType.SENDER){ // 발신자 번호 검색했을 때
+            getMessageResList = messageRepository.findBySenderNumber(keyword, memberId, pageRequest)
+                    .map(GetMessageRes::toDto).toList();
+
+        }else if(msgSearchType == MsgSearchType.MEMO) { // 메모 키워드로 검색했을 때
+            getMessageResList = messageRepository.findByMemo(keyword, memberId, pageRequest)
+                    .map(GetMessageRes::toDto).toList();
+
+        }else if(msgSearchType == MsgSearchType.MESSAGE) { // 메시지 내용으로 검색했을 때
+            getMessageResList = messageRepository.findByMessageContent(keyword, memberId, pageRequest)
+                    .map(GetMessageRes::toDto).toList();
+        }
+
+        return getMessageResList;
     }
 
     /**

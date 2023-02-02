@@ -3,6 +3,7 @@ package com.srt.message.controller;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.srt.message.config.page.PageResult;
 import com.srt.message.config.response.BaseResponse;
+import com.srt.message.config.type.MsgSearchType;
 import com.srt.message.dto.jwt.JwtInfo;
 import com.srt.message.dto.message.get.GetMessageRes;
 import com.srt.message.dto.message_result.get.GetMessageResultRes;
@@ -59,8 +60,23 @@ public class MessageResultController {
             @ApiResponse(code = 1000, message = "요청에 성공하였습니다.")
     })
     @GetMapping("/filter/{page}")
-    public BaseResponse<List<GetMessageRes>> getMessagesByType(@PathVariable("page") int page, @RequestParam(value = "type") String type, HttpServletRequest request) {
+    public BaseResponse<List<GetMessageRes>> getMessagesByType(@PathVariable("page") int page, @RequestParam("type") String type, HttpServletRequest request) {
         List<GetMessageRes> messageResList = messageResultService.getMessagesByType(type, JwtInfo.getMemberId(request), page);
+
+        return new BaseResponse<>(messageResList);
+    }
+
+    @ApiOperation(
+            value = "메시지 검색 조회",
+            notes = "메시지 목록들을 검색을 통해 조회할 수 있는 기능이다. (수신자 번호, 발신자 번호, 연락처 메모, 메시지 내용 키워드 조회 기능을 제공)"
+    )
+    @ApiResponses({
+            @ApiResponse(code = 1000, message = "요청에 성공하였습니다.")
+    })
+    @GetMapping("/search/{page}")
+    public BaseResponse<List<GetMessageRes>> getMessagesBySearching(@PathVariable("page") int page, @RequestParam(value = "type") String searchType
+            , @RequestParam("keyword") String keyword, HttpServletRequest request) {
+        List<GetMessageRes> messageResList = messageResultService.getMessageBySearching(searchType, keyword, JwtInfo.getMemberId(request), page);
 
         return new BaseResponse<>(messageResList);
     }
