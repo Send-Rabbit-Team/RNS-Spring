@@ -27,6 +27,13 @@ public interface MessageRepository extends JpaRepository<Message, Long> {
             countQuery = "select count(m) from Message m where m.member.id = :memberId and m.messageType = :messageType")
     Page<Message> findMessagesByMessageType(MessageType messageType, long memberId, Pageable pageable);
 
+    // 예약된 메시지 필터 페이징 조회
+    @Query(value = "select m from Message m join ReserveMessage rm where m.member.id = :memberId and m.id = rm.message.id " +
+            "and rm.status = 'ACTIVE'",
+            countQuery = "select count(m) from Message m where m.member.id = :memberId and m.messageType = :messageType")
+    Page<Message> findReserveMessage(long memberId, Pageable pageable);
+
+
     // 수신자 검색 페이징 조회
     @Query(value = "select mr.message from MessageResult mr left join mr.message where mr.message.member.id = :memberId " +
             "and mr.contact.phoneNumber = :receiveNumber")

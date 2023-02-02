@@ -84,6 +84,14 @@ public class MessageResultService {
                 .map(GetMessageRes::toDto).toList();
     }
 
+    // 예약된 메시지 필터 조회
+    public List<GetMessageRes> getReserveMessages(long memberId, int page){
+        PageRequest pageRequest = PageRequest.of(page-1, 10, Sort.by("id").descending());
+
+        return messageRepository.findReserveMessage(memberId, pageRequest)
+                .map(GetMessageRes::toDto).toList();
+    }
+
     // 검색 조회 (메모, 수신, 발신 번호)
     public List<GetMessageRes> getMessageBySearching(String searchType, String keyword, long memberId, int page){
         MsgSearchType msgSearchType = MsgSearchType.valueOf(searchType);

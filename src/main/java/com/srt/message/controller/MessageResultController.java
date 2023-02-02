@@ -3,7 +3,6 @@ package com.srt.message.controller;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.srt.message.config.page.PageResult;
 import com.srt.message.config.response.BaseResponse;
-import com.srt.message.config.type.MsgSearchType;
 import com.srt.message.dto.jwt.JwtInfo;
 import com.srt.message.dto.message.get.GetMessageRes;
 import com.srt.message.dto.message_result.get.GetMessageResultRes;
@@ -54,14 +53,28 @@ public class MessageResultController {
 
     @ApiOperation(
             value = "메시지 유형별 필터 조회",
-            notes = "발송한 메시지들을 사용자가 선택한 유형으로 필터 조회하는 기능이다."
+            notes = "발송한 메시지들을 사용자가 선택한 유형으로 필터 조회하는 기능이다. (SMS / LMS / MMS)"
     )
     @ApiResponses({
             @ApiResponse(code = 1000, message = "요청에 성공하였습니다.")
     })
-    @GetMapping("/filter/{page}")
+    @GetMapping("/filter/type/{page}")
     public BaseResponse<List<GetMessageRes>> getMessagesByType(@PathVariable("page") int page, @RequestParam("type") String type, HttpServletRequest request) {
         List<GetMessageRes> messageResList = messageResultService.getMessagesByType(type, JwtInfo.getMemberId(request), page);
+
+        return new BaseResponse<>(messageResList);
+    }
+
+    @ApiOperation(
+            value = "예약된 메시지 필터 조회",
+            notes = "예약된 메시지들을 필터 조회하는 기능이다."
+    )
+    @ApiResponses({
+            @ApiResponse(code = 1000, message = "요청에 성공하였습니다.")
+    })
+    @GetMapping("/filter/reserve/{page}")
+    public BaseResponse<List<GetMessageRes>> getReserveMessages(@PathVariable("page") int page, HttpServletRequest request) {
+        List<GetMessageRes> messageResList = messageResultService.getReserveMessages(JwtInfo.getMemberId(request), page);
 
         return new BaseResponse<>(messageResList);
     }
