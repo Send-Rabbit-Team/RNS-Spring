@@ -80,18 +80,16 @@ public class MessageService {
 
         messageRepository.save(message);
 
-        // 이미지 저장하기 (Base64 배열)
-//        messageReq.getMessage().getImages().stream().forEach(image -> {
-//            MessageImage messageImage = MessageImage.builder().message(message).image(image).build();
-//            messageImageRepository.save(messageImage);
-//        });
-
         BrokerMessageDto brokerMessageDto = BrokerMessageDto.builder()
                 .smsMessageDto(messageReq.getMessage())
                 .message(message)
                 .contacts(contacts)
                 .member(member)
                 .build();
+
+        // 크론 표현식 있으면 예약 발송으로 이동
+        if(messageReq.getMessage().getCronExpression() != null)
+            return brokerService.reserveSmsMessage(brokerMessageDto);
 
         return brokerService.sendSmsMessage(brokerMessageDto);
     }

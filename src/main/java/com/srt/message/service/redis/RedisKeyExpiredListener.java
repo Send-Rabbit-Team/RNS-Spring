@@ -52,7 +52,13 @@ public class RedisKeyExpiredListener{
                         }
                     }).collect(Collectors.toList());
 
+            // 데이터베이스에 저장이 안된 로그들 Redis에서 추출해서 저장
             List<MessageResult> messageResultList = RMessageResultList.stream()
+                    .filter(m -> {
+                        Contact contact = contactCacheRepository.findContactById(m.getContactId());
+                        Message message = messageCacheRepository.findMessageById(m.getMessageId());
+
+                        return checkNotSaveInMessageResult(contact, message);})
                     .map(m -> {
                         Contact contact = contactCacheRepository.findContactById(m.getContactId());
                         Message message = messageCacheRepository.findMessageById(m.getMessageId());
@@ -68,5 +74,9 @@ public class RedisKeyExpiredListener{
 
             log.warn("Redis TTL expired event occurred - expiredKey: {}", expiredKey);
         }
+    }
+
+    public boolean checkNotSaveInMessageResult(Contact contact, Message message){
+        return messageResultRepository.findByContactAndMessage(contact, message).isEmpty();
     }
 }

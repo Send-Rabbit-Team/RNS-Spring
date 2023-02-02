@@ -14,11 +14,16 @@ import com.srt.message.repository.MessageResultRepository;
 import com.srt.message.repository.cache.BrokerCacheRepository;
 import com.srt.message.repository.cache.ContactCacheRepository;
 import com.srt.message.repository.cache.MessageCacheRepository;
+import io.swagger.v3.oas.models.links.Link;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
 
 @Log4j2
 @Service
@@ -39,23 +44,25 @@ public class SmsBrokerListener {
     private final String SKT_BROKER_NAME = "skt";
     private final String LG_BROKER_NAME = "lg";
 
+    private ArrayList<MessageResult> messageResultList = new ArrayList<>();
+
 
     // KT RESPONSE
-    @RabbitListener(queues = "q.sms.kt.receive", concurrency = "3")
+    @RabbitListener(queues = "q.sms.kt.receive", concurrency = "3", containerFactory = "prefetchContainerFactory")
     public void receiveKTMessage(final MessageResultDto messageResultDto) {
         updateRMessageResult(messageResultDto, KT_BROKER_NAME);
         saveMessageResult(messageResultDto, KT_BROKER_NAME);
     }
 
     // SKT RESPONSE
-    @RabbitListener(queues = "q.sms.skt.receive", concurrency = "3")
+    @RabbitListener(queues = "q.sms.skt.receive", concurrency = "3", containerFactory = "prefetchContainerFactory")
     public void receiveSKTMessage(final MessageResultDto messageResultDto) {
         updateRMessageResult(messageResultDto, SKT_BROKER_NAME);
         saveMessageResult(messageResultDto, SKT_BROKER_NAME);
     }
 
     // LG RESPONSE
-    @RabbitListener(queues = "q.sms.lg.receive", concurrency = "3")
+    @RabbitListener(queues = "q.sms.lg.receive", concurrency = "3", containerFactory = "prefetchContainerFactory")
     public void receiveLGMessage(final MessageResultDto messageResultDto) {
         updateRMessageResult(messageResultDto, LG_BROKER_NAME);
         saveMessageResult(messageResultDto, LG_BROKER_NAME);
@@ -126,6 +133,7 @@ public class SmsBrokerListener {
                 .messageStatus(messageResultDto.getMessageStatus())
                 .build();
 
+//        addMessageResultList(messageResult);
         messageResultRepository.save(messageResult);
 
         log.info("MessageResult 객체가 저장되었습니다. id : {}", messageResult.getId());
@@ -140,4 +148,17 @@ public class SmsBrokerListener {
         }
         return rMessageResult;
     }
+
+    // MessageResult bulk insert
+//    @Transactional
+//    public void addMessageResultList(MessageResult messageResult){
+//        if(messageResultList.size() >= 1000){
+//            ArrayList<MessageResult> tmpList = (ArrayList<MessageResult>) messageResultList.clone();
+//            messageResultList.clear();
+//
+//            messageResultRepository.saveAll(tmpList);
+//            tmpList.stream().forEach(m -> log.info("MessageResult 객체가 저장되었습니다. id : {}", m.getId()));
+//        }
+//        messageResultList.add(messageResult);
+//    }
 }

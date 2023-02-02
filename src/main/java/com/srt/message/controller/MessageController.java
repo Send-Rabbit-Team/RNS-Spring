@@ -61,9 +61,11 @@ public class MessageController {
     })
     @PostMapping("/send/sms")
     public BaseResponse<String> sendMessage(@RequestBody PostSendMessageReq postSendMessageReq, HttpServletRequest request){
-        String processTime = messageService.sendMessageToBroker(postSendMessageReq, JwtInfo.getMemberId(request));
+        String response = messageService.sendMessageToBroker(postSendMessageReq, JwtInfo.getMemberId(request));
+        if(response.startsWith("예약성공"))
+            return new BaseResponse<>("성공적으로 예약 발송 되었습니다.");
 
-        return new BaseResponse<>("메시지 갯수: " + postSendMessageReq.getCount() + ", 메시지 발송 걸린 시간: " + Double.parseDouble(processTime) / 1000 + "초");
+        return new BaseResponse<>("메시지 갯수: " + postSendMessageReq.getCount() + ", 메시지 발송 걸린 시간: " + Double.parseDouble(response) / 1000 + "초");
     }
 
     @ApiOperation(

@@ -48,14 +48,7 @@ public class SMSMessageDto {
     private MessageType messageType;
 
     @ApiModelProperty(
-            example = "추후 추가 예정"
+            example = "0/1 * * * * ?"
     )
-    @JsonIgnore
-    private String reserveTime;
-
-    @ApiModelProperty(
-            example = "추후 추가 예정"
-    )
-    @JsonIgnore
-    private String scheduleCode;
+    private String cronExpression;
 }
