@@ -45,11 +45,6 @@ public class SchedulerService {
                 return;
 
             brokerService.sendSmsMessage(brokerMessageDto);
-
-            ReserveMessage reserveMessage = ReserveMessage.builder()
-                    .message(brokerMessageDto.getMessage())
-                    .build();
-            reserveMessageRepository.save(reserveMessage);
         }, cronTrigger);
 
         scheduledTasks.put(taskId, task);
