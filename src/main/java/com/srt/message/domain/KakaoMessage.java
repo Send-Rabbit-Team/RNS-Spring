@@ -12,7 +12,6 @@ import javax.persistence.*;
 
 @NamedEntityGraph(name = "KakaoMessage.with.Member.SenderNumber.RepeatRule", attributeNodes = {
         @NamedAttributeNode(value = "member", subgraph = "member_company"),
-        @NamedAttributeNode("senderNumber"),
         @NamedAttributeNode("repeatRule")
 },
         subgraphs = @NamedSubgraph(name = "member_company", attributeNodes = {
@@ -34,9 +33,7 @@ public class KakaoMessage extends BaseEntity {
     @JoinColumn(name = "member_id")
     private Member member;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "sender_number_id")
-    private SenderNumber senderNumber;
+    private String sender;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "repeat_rule_id")

@@ -1,8 +1,6 @@
 package com.srt.message.utils.algorithm;
 
-import com.srt.message.domain.Broker;
-
-public class BrokerWeight {
+public class BrokerWeight<Broker> {
     private Broker broker;
     private int weight;
 

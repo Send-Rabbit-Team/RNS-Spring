@@ -21,4 +21,8 @@ public class ReserveMessage extends BaseEntity {
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "message_id")
     private Message message;
+
+    private String cronRule;
+
+    private String cronText;
 }

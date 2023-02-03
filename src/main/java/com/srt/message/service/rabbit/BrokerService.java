@@ -7,6 +7,7 @@ import com.srt.message.domain.*;
 import com.srt.message.domain.redis.RMessageResult;
 import com.srt.message.dto.message.BrokerSendMessageDto;
 import com.srt.message.repository.BrokerRepository;
+import com.srt.message.repository.ReserveMessageRepository;
 import com.srt.message.repository.redis.RedisHashRepository;
 import com.srt.message.repository.redis.RedisListRepository;
 import com.srt.message.dto.message.BrokerMessageDto;
@@ -49,6 +50,8 @@ public class BrokerService {
 
     private final BrokerRepository brokerRepository;
     private final MessageRuleRepository messageRuleRepository;
+
+    private final ReserveMessageRepository reserveMessageRepository;
 
     private final SchedulerService schedulerService;
 
@@ -112,7 +115,7 @@ public class BrokerService {
         HashMap<String, String> rMessageResultList = new HashMap<>();
         // 각 중개사 비율에 맞게 보내기
         for (int i = 0; i < contacts.size(); i++) {
-            Broker broker = brokerPool.getNext().getBroker();
+            Broker broker = (Broker) brokerPool.getNext().getBroker();
             String routingKey = "sms.send." + broker.getName().toLowerCase();
 
             smsMessageDto.setTo(contacts.get(i).getPhoneNumber());
@@ -154,6 +157,11 @@ public class BrokerService {
 
     // 메시지 예약발송
     public String reserveSmsMessage(BrokerMessageDto brokerMessageDto){
+        ReserveMessage reserveMessage = ReserveMessage.builder()
+                .message(brokerMessageDto.getMessage())
+                .build();
+        reserveMessageRepository.save(reserveMessage);
+
         schedulerService.register(brokerMessageDto);
 
         return "예약성공";

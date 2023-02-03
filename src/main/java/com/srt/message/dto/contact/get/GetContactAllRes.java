@@ -24,6 +24,7 @@ public class GetContactAllRes {
                             .groupId(contact.getContactGroup().getId())
                             .phoneNumber(contact.getPhoneNumber())
                             .memo(contact.getMemo())
+                            .groupName(contact.getContactGroup().getName())
                             .build();
                 }).collect(Collectors.toList());
         return new GetContactAllRes(contactDTOList);

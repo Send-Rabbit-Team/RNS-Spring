@@ -5,7 +5,6 @@ import com.srt.message.service.KakaoMessageRuleService;
 import com.srt.message.dto.jwt.JwtInfo;
 import com.srt.message.dto.kakaoMessageRule.get.GetKakaoMessageRuleRes;
 import com.srt.message.dto.kakaoMessageRule.patch.PatchKakaoMessageRuleReq;
-import com.srt.message.dto.kakaoMessageRule.post.PostKakaoMessageRuleReq;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.web.bind.annotation.*;
@@ -24,13 +23,6 @@ public class KakaoMessageRuleController {
     public BaseResponse<List<GetKakaoMessageRuleRes>> createKakaoMessageRuleService(
             HttpServletRequest request) {
         return new BaseResponse<>(kakaoMessageRuleService.getKakaoMessageRule(JwtInfo.getMemberId(request)));
-    }
-
-    @PostMapping("/create")
-    public BaseResponse<List<GetKakaoMessageRuleRes>> createKakaoMessageRuleService(
-            @RequestBody List<PostKakaoMessageRuleReq> postKakaoMessageRuleReqList,
-            HttpServletRequest request) {
-        return new BaseResponse<>(kakaoMessageRuleService.createKakaoMessageRule(postKakaoMessageRuleReqList, JwtInfo.getMemberId(request)));
     }
 
     @PatchMapping("/edit")
