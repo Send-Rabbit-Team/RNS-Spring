@@ -44,6 +44,7 @@ public enum BaseResponseStatus {
     NOT_EXIST_CONTACT(false, 2024, "존재하지 않는 연락처입니다."),
     NOT_EXIST_TEMPLATE(true, 2025, "존재하지 않는 탬플릿입니다."),
     NOT_EXIST_MESSAGE_RULE(false, 2026, "존재하지 않는 발송 규칙입니다."),
+    ALREADY_CANCEL_RESERVE(false, 2027, "이미 취소된 예약 메시지입니다."),
 
 
 

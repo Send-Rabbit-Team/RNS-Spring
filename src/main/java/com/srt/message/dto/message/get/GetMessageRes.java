@@ -33,6 +33,7 @@ public class GetMessageRes {
 
     public static GetMessageRes toDto(Message message){
         return GetMessageRes.builder()
+                .messageId(message.getId())
                 .senderNumber(message.getSenderNumber().getPhoneNumber())
                 .content(message.getContent())
                 .messageType(message.getMessageType())

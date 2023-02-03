@@ -45,7 +45,7 @@ public class MessageController {
     })
     @PostMapping("/upload/test")
     @NoIntercept
-    public BaseResponse<String> imageUploadTest(@RequestParam("image") MultipartFile multipartFile){
+    public BaseResponse<String> imageUploadTest(@RequestParam("image") MultipartFile multipartFile) {
         objectStorageService.uploadImageTest(multipartFile);
 
         return new BaseResponse<>(FILE_UPLOAD_SUCCESS);
@@ -60,9 +60,9 @@ public class MessageController {
             @ApiResponse(code = 1000, message = "요청에 성공하였습니다.")
     })
     @PostMapping("/send/sms")
-    public BaseResponse<String> sendMessage(@RequestBody PostSendMessageReq postSendMessageReq, HttpServletRequest request){
+    public BaseResponse<String> sendMessage(@RequestBody PostSendMessageReq postSendMessageReq, HttpServletRequest request) {
         String response = messageService.sendMessageToBroker(postSendMessageReq, JwtInfo.getMemberId(request));
-        if(response.startsWith("예약성공"))
+        if (response.startsWith("예약성공"))
             return new BaseResponse<>("성공적으로 예약 발송 되었습니다.");
 
         return new BaseResponse<>("메시지 갯수: " + postSendMessageReq.getCount() + ", 메시지 발송 걸린 시간: " + Double.parseDouble(response) / 1000 + "초");
@@ -76,38 +76,26 @@ public class MessageController {
             @ApiResponse(code = 1000, message = "요청에 성공하였습니다.")
     })
     @PostMapping("/send/kakao")
-    public BaseResponse<String> sendKakaoMessage(@RequestBody PostSendKakaoMessageReq postSendKakaoMessageReq, HttpServletRequest request){
+    public BaseResponse<String> sendKakaoMessage(@RequestBody PostSendKakaoMessageReq postSendKakaoMessageReq, HttpServletRequest request) {
         String processTime = kakaoMessageService.sendKakaoMessageToBroker(postSendKakaoMessageReq, JwtInfo.getMemberId(request));
 
         return new BaseResponse<>("메시지 갯수: " + postSendKakaoMessageReq.getCount() + ", 메시지 발송 걸린 시간: " + Double.parseDouble(processTime) / 1000 + "초");
     }
 
+    // 예약 취소
     @ApiOperation(
-            value = "발송된 메시지 조회",
-            notes = "발송된 메시지들을 페이징 형태로 조회한다."
+            value = "예약된 메시지 취소",
+            notes = "예약된 메시지를 취소하는 기능이다."
     )
     @ApiResponses({
-            @ApiResponse(code = 1000, message = "요청에 성공하였습니다.")
+            @ApiResponse(code = 1000, message = "요청에 성공하였습니다."),
+            @ApiResponse(code = 2016, message = "해당 사용자의 데이터가 아닙니다."),
+            @ApiResponse(code = 2023, message = "존재하는 메시지가 아닙니다.")
     })
-    @GetMapping("/list/{page}")
-    public BaseResponse<PageResult<GetMessageRes>> getMessagesByPaging(@PathVariable("page") int page, HttpServletRequest request){
-        PageResult<GetMessageRes> messageRes = messageService.getMessagesByPaging(JwtInfo.getMemberId(request), page);
+    @GetMapping("/reserve/cancel/{messageId}")
+    public BaseResponse<String> cancelReserveMessage(@PathVariable("messageId") long messageId, HttpServletRequest request) {
+        String response = messageService.cancelReserveMessage(messageId, JwtInfo.getMemberId(request));
 
-        return new BaseResponse<>(messageRes);
-    }
-
-    @ApiOperation(
-            value = "메시지 처리 결과 조회",
-            notes = "메시지 처리 결과들을 조회한다. 만약에, 상태 DB에 저장되있을 경우 레디스에서 불러오고, 아니면" +
-                    "RDBMS에서 조회한다."
-    )
-    @ApiResponses({
-            @ApiResponse(code = 1000, message = "요청에 성공하였습니다.")
-    })
-    @GetMapping("/result/{messageId}")
-    public BaseResponse<List<GetMessageResultRes>> getMessagesByPaging(@PathVariable("messageId") long messageId) throws JsonProcessingException {
-        List<GetMessageResultRes> messageResultRes = messageService.getAllMessageResult(messageId);
-
-        return new BaseResponse<>(messageResultRes);
+        return new BaseResponse<>(response);
     }
 }
