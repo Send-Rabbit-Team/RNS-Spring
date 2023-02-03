@@ -19,6 +19,8 @@ public class ContactDTO {
 
     private String memo;
 
+    private String groupName;
+
     public static ContactDTO toDto(Contact contact){
         ContactDTO contactDTO =
                 ContactDTO.builder()
@@ -26,6 +28,7 @@ public class ContactDTO {
                         .memberId(contact.getMember().getId())
                         .phoneNumber(contact.getPhoneNumber())
                         .memo(contact.getMemo())
+                        .groupName(contact.getContactGroup().getName())
                         .build();
 
         if (contact.getContactGroup() != null) {
