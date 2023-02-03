@@ -11,7 +11,7 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 @Repository
-public class RedisHashRepositoryImpl<ENTITY> implements RedisHashRepository<ENTITY> {
+public class RedisHashRepositoryImpl<RMessageResult> implements RedisHashRepository<RMessageResult> {
     private RedisTemplate<String, Object> redisTemplate;
     private ObjectMapper objectMapper;
 
@@ -24,7 +24,7 @@ public class RedisHashRepositoryImpl<ENTITY> implements RedisHashRepository<ENTI
     }
 
     @Override
-    public void save(String key, String rMessageResultId, ENTITY rMessageResult) {
+    public void save(String key, String rMessageResultId, RMessageResult rMessageResult) {
         hashOperations.put(key, rMessageResultId, convertToJson(rMessageResult));
         redisTemplate.expire(key, 60 * 5, TimeUnit.SECONDS);
     }
@@ -51,7 +51,7 @@ public class RedisHashRepositoryImpl<ENTITY> implements RedisHashRepository<ENTI
     }
 
     @Override
-    public void update(String key, String rMessageResultId, ENTITY rMessageResult) {
+    public void update(String key, String rMessageResultId, RMessageResult rMessageResult) {
         save(key, rMessageResultId, rMessageResult);
         redisTemplate.expire(key, 60 * 5, TimeUnit.SECONDS);
     }
