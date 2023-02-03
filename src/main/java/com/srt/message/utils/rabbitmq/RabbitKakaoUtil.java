@@ -2,6 +2,9 @@ package com.srt.message.utils.rabbitmq;
 
 public class RabbitKakaoUtil {
 
+        // TTL
+        public static final int KAKAO_WAIT_TTL = 3000;
+
         // KAKAO EXCHANGE
         public static final String KAKAO_WORK_EXCHANGE_NAME = "dx.kakao.work";
         public static final String KAKAO_DLX_EXCHANGE_NAME = "dx.kakao.wait";
