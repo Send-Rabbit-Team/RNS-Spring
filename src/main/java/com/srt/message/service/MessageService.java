@@ -51,6 +51,8 @@ public class MessageService {
 
     private final BrokerService brokerService;
 
+    private final SchedulerService schedulerService;
+
     // 메시지 중계사에게 전송
     public String sendMessageToBroker(PostSendMessageReq messageReq, long memberId){
         Member member = memberRepository.findById(memberId)
@@ -94,57 +96,14 @@ public class MessageService {
         return brokerService.sendSmsMessage(brokerMessageDto);
     }
 
-    // 발송한 메시지 페이징 조회
-    public PageResult<GetMessageRes> getMessagesByPaging(long memberId, int page){
-        PageRequest pageRequest = PageRequest.of(page-1, 10, Sort.by("id").descending());
-        Page<GetMessageRes> messagePage = messageRepository.findAllMessage(memberId, pageRequest)
-                .map(m -> GetMessageRes.toDto(m));
+    // 예약 취소
+    public String cancelReserveMessage(long messageId, long memberId){
+        Message message = messageRepository.findById(memberId)
+                .orElseThrow(() -> new BaseException(NOT_EXIST_MESSAGE));
 
-        return new PageResult<>(messagePage);
-    }
+        if(message.getMember().getId() != memberId)
+            throw new BaseException(NOT_MATCH_MEMBER);
 
-    // 메시지 처리 결과 모두 조회
-    public List<GetMessageResultRes> getAllMessageResult(long messageId) throws JsonProcessingException {
-        List<GetMessageResultRes> messageResultResList = new ArrayList<>();
-
-        // 레디스에 상태 값 저장되어 있는지 확인
-        String statusKey = "message.status." + messageId;
-        Map<String,String> statusMap = redisHashRepository.findAll(statusKey);
-        if(!statusMap.isEmpty()){ // 상태 정보가 들어있을 경우 REDIS로 조회
-
-            for(Map.Entry<String, String> entry: statusMap.entrySet()){
-                String rMessageResultJson = entry.getValue();
-                RMessageResult rMessageResult = objectMapper.readValue(rMessageResultJson, RMessageResult.class);
-
-                messageResultResList.add(getMessageResultRes(rMessageResult));
-            }
-        }else{ // RDBMS에서 조회
-            List<MessageResult> messageResults = messageResultRepository.findAllByMessageId(messageId);
-            messageResults.stream()
-                    .map(m -> getMessageResultRes(m)).forEach(r -> messageResultResList.add(r));
-        }
-
-        return messageResultResList;
-    }
-
-    // 편의 메서드
-    public GetMessageResultRes getMessageResultRes(RMessageResult rMessageResult){
-        Message message = messageCacheRepository.findMessageById(rMessageResult.getMessageId());
-        Contact contact = contactCacheRepository.findContactById(rMessageResult.getContactId());
-        Broker broker = brokerCacheRepository.findBrokerById(rMessageResult.getBrokerId());
-
-        return GetMessageResultRes.builder()
-                .contactPhoneNumber(contact.getPhoneNumber())
-                .brokerName(broker.getName())
-                .messageStatus(rMessageResult.getMessageStatus())
-                .build();
-    }
-
-    public GetMessageResultRes getMessageResultRes(MessageResult messageResult){
-        return GetMessageResultRes.builder()
-                .contactPhoneNumber(messageResult.getContact().getPhoneNumber())
-                .brokerName(messageResult.getBroker().getName())
-                .messageStatus(messageResult.getMessageStatus())
-                .build();
+        return schedulerService.remove(messageId);
     }
 }
