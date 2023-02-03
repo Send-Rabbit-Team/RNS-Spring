@@ -25,8 +25,8 @@ public class TemplateController {
     private final TemplateService templateService;
 
     @ApiOperation(
-            value = "탬플릿 저장",
-            notes = "새로운 탬플릿을 저장할 수 있다."
+            value = "메시지 탬플릿 저장",
+            notes = "새로운 메시지 탬플릿을 저장할 수 있다."
     )
     @ApiResponses({
             @ApiResponse(code = 1000, message = "요청에 성공하였습니다."),
@@ -34,6 +34,8 @@ public class TemplateController {
     })
     @PostMapping("/template/register")
     public BaseResponse<GetTemplateRes> registerTemplate(@RequestBody PostTemplateReq postTemplateReq, HttpServletRequest request){
+        log.info("메시지 탬플릿 저장 - memberId: {}, postTemplateReq: {}", JwtInfo.getMemberId(request), postTemplateReq);
+
         return new BaseResponse<>(templateService.registerTemplate(JwtInfo.getMemberId(request), postTemplateReq));
     }
 
@@ -49,6 +51,8 @@ public class TemplateController {
     })
     @GetMapping("/template/{templateId}")
     public BaseResponse<GetTemplateRes> getOneTemplate(@PathVariable("templateId") long templateId, HttpServletRequest request){
+        log.info("메시지 탬플릿 단일 조회 - memberId: {}, templateId: {}", JwtInfo.getMemberId(request), templateId);
+
         return new BaseResponse<>(templateService.getOneTemplate(JwtInfo.getMemberId(request), templateId));
     }
 
@@ -63,6 +67,8 @@ public class TemplateController {
     })
     @GetMapping("/templates/all")
     public BaseResponse<List<GetTemplateRes>> getAllTemplate(HttpServletRequest request){
+        log.info("사용자 탬플릿 조회- memberId: {}", JwtInfo.getMemberId(request));
+
         return new BaseResponse<>(templateService.getAllTemplate(JwtInfo.getMemberId(request)));
     }
 
@@ -77,6 +83,8 @@ public class TemplateController {
     })
     @GetMapping("/templates/{page}")
     public BaseResponse<PageResult<GetTemplateRes>> getPageTemplate(@PathVariable("page") int page, HttpServletRequest request){
+        log.info("사용자 탬플릿 페이징 조회- memberId: {}, page: {}", JwtInfo.getMemberId(request), page);
+
         return new BaseResponse<>(templateService.getPageTemplate(JwtInfo.getMemberId(request), page));
     }
 
@@ -92,6 +100,8 @@ public class TemplateController {
     })
     @PatchMapping("/template/edit")
     public BaseResponse<GetTemplateRes> editTemplate(@RequestBody PatchTemplateReq patchTemplateReq, HttpServletRequest request) {
+        log.info("사용자 탬플릿 페이징 수정 - memberId: {}, patchTemplateReq: {}", JwtInfo.getMemberId(request), patchTemplateReq);
+
         return new BaseResponse<>(templateService.editTemplate(JwtInfo.getMemberId(request), patchTemplateReq));
     }
 
@@ -108,6 +118,8 @@ public class TemplateController {
     @PatchMapping("/template/delete/{templateId}")
     public BaseResponse<GetTemplateRes> deleteTemplate(@PathVariable("templateId") Long templateId, HttpServletRequest request) {
         GetTemplateRes getTemplateRes = templateService.deleteTemplate(JwtInfo.getMemberId(request), templateId);
+
+        log.info("사용자 탬플릿 페이징 삭제 - memberId: {}, templateId: {}", JwtInfo.getMemberId(request), templateId);
         return new BaseResponse<>(getTemplateRes);
     }
 

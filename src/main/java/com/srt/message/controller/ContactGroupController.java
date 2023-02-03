@@ -32,6 +32,7 @@ public class ContactGroupController {
     // 그룹 저장
     @PostMapping("/save")
     public BaseResponse<PostContactGroupRes> saveGroup(@RequestBody PostContactGroupReq postContactGroupReq, HttpServletRequest request) {
+        log.info("그룹 저장 - memberId: {}, page: {}", JwtInfo.getMemberId(request), postContactGroupReq.getName());
 
         return new BaseResponse<>(contactGroupService.saveContactGroup(postContactGroupReq, JwtInfo.getMemberId(request)));
     }
@@ -40,6 +41,8 @@ public class ContactGroupController {
     @PatchMapping("/edit")
     public BaseResponse<PatchContactGroupRes> editGroup(@RequestBody PatchContactGroupReq patchContactGroupReq, HttpServletRequest request) {
         PatchContactGroupRes patchContactGroupRes = contactGroupService.editContactGroup(patchContactGroupReq, JwtInfo.getMemberId(request)); // 수정
+        log.info("그룹 수정 - memberId: {}, groupId: {}, groupName: {}", JwtInfo.getMemberId(request)
+                , patchContactGroupReq.getContactGroupId(), patchContactGroupReq.getName());
 
         return new BaseResponse<>(patchContactGroupRes);
     }
@@ -48,6 +51,7 @@ public class ContactGroupController {
     @PatchMapping("/delete/{groupId}")
     public BaseResponse<String> deleteGroup(@PathVariable("groupId") long contactGroupId, HttpServletRequest request) {
         contactGroupService.deleteContactGroup(contactGroupId, JwtInfo.getMemberId(request));
+        log.info("그룹 삭제 - memberId: {}, groupId: {}", JwtInfo.getMemberId(request), contactGroupId);
 
         return new BaseResponse<>("그룹이 정상적으로 삭제 되었습니다.");
     }
@@ -66,19 +70,22 @@ public class ContactGroupController {
             HttpServletRequest request,
             @PathVariable("page") int page) {
         Long memberId = JwtInfo.getMemberId(request);
+        log.info("수신자 그룹 조회 - memberId: {}", JwtInfo.getMemberId(request));
+
         return new BaseResponse<>(contactGroupService.getMemberContactGroup(memberId, page));
     }
 
     // 그룹 찾기
     @ApiOperation(
             value = "그룹 찾기",
-            notes = "그룹 찾기 API"
+            notes = "그룹ID를 통해 그룹을 찾는다."
     )
     @ApiResponses({
             @ApiResponse(code = 1000, message = "요청에 성공하였습니다.")
     })
     @GetMapping("/{groupId}")
-    public BaseResponse<ContactGroupDTO> find(@PathVariable long groupId) {
+    public BaseResponse<ContactGroupDTO> find(@PathVariable long groupId, HttpServletRequest request) {
+        log.info("groupId로 그룹 찾기 - memberId: {}, groupId: {}", JwtInfo.getMemberId(request), groupId);
 
         return new BaseResponse<>(contactGroupService.findContactGroupById(groupId));
     }
@@ -92,6 +99,8 @@ public class ContactGroupController {
     })
     @GetMapping("/getAll")
     public BaseResponse<List<ContactGroupDTO>> getAll(HttpServletRequest request){
+        log.info("그룹 목록 불러오기 - memberId: {}", JwtInfo.getMemberId(request));
+
         return new BaseResponse<>(contactGroupService.getAllContactGroup(JwtInfo.getMemberId((request))));
     }
 

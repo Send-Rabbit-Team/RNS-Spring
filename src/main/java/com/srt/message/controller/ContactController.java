@@ -42,6 +42,7 @@ public class ContactController {
     @PostMapping("/create")
     public BaseResponse<PostContactRes> saveContact(@RequestBody PostContactReq postContactReq, HttpServletRequest request){
         PostContactRes postContactRes = contactService.saveContact(postContactReq, JwtInfo.getMemberId(request));
+        log.info("연락처 저장 - memberId: {}, phoneNumber: {}", JwtInfo.getMemberId(request), postContactReq.getPhoneNumber());
 
         return new BaseResponse<>(postContactRes);
     }
@@ -59,6 +60,7 @@ public class ContactController {
     @PatchMapping("/edit")
     public BaseResponse<PatchContactRes> editContact(@RequestBody PatchContactReq patchContactReq, HttpServletRequest request){
         PatchContactRes patchContactRes = contactService.editContact(patchContactReq, JwtInfo.getMemberId(request)); // 수정
+        log.info("연락처 수정 - memberId: {}, phoneNumber: {}", JwtInfo.getMemberId(request), patchContactReq.getPhoneNumber());
 
         return new BaseResponse<>(patchContactRes);
     }
@@ -77,6 +79,7 @@ public class ContactController {
     @PatchMapping("/delete/{contactId}")
     public BaseResponse<String> deleteContact(@PathVariable long contactId, HttpServletRequest request){
         contactService.deleteContact(contactId, JwtInfo.getMemberId(request));
+        log.info("연락처 삭제 - memberId: {}, contactId: {}", JwtInfo.getMemberId(request), contactId);
 
         return new BaseResponse<>("연락처가 정상적으로 삭제 되었습니다.");
     }
@@ -95,6 +98,7 @@ public class ContactController {
     @PatchMapping("/quit/{contactId}")
     public BaseResponse<String> quitContactGroup(@PathVariable("contactId") long contactId, HttpServletRequest request){
         contactService.quitContactGroup(contactId, JwtInfo.getMemberId(request));
+        log.info("그룹 해제 - memberId: {}, contactId: {}", JwtInfo.getMemberId(request), contactId);
 
         return new BaseResponse<>("연락처가 그룹에서 해제 되었습니다.");
     }
@@ -109,6 +113,8 @@ public class ContactController {
     })
     @GetMapping("/search/{currentPage}")
     public BaseResponse<PageResult<ContactDTO>> search(@PathVariable int currentPage, @RequestParam String phoneNumber, HttpServletRequest request){
+        log.info("연락처 검색 - memberId: {}, contactId: {}", JwtInfo.getMemberId(request), phoneNumber);
+
         return new BaseResponse<>(contactService.searchContact(phoneNumber,currentPage,JwtInfo.getMemberId(request)));
     };
 
@@ -122,12 +128,16 @@ public class ContactController {
     })
     @GetMapping("/byGroup")
     public BaseResponse<List<GetGroupContactRes>> filterByGroup(@RequestParam long groupId, HttpServletRequest request){
+        log.info("그룹으로 연락처 찾기 - memberId: {}, groupId: {}", JwtInfo.getMemberId(request), groupId);
+
         return new BaseResponse<>(contactService.filterContactByGroup(groupId, JwtInfo.getMemberId(request)));
     }
 
     // 아이디로 연락처 찾기
     @GetMapping("/{contactId}")
-    public BaseResponse<ContactDTO> find(@PathVariable int contactId){
+    public BaseResponse<ContactDTO> find(@PathVariable int contactId, HttpServletRequest request){
+        log.info("contactId로 연락처 찾기 - memberId: {}, groupId: {}", JwtInfo.getMemberId(request), contactId);
+
         return new BaseResponse<>(contactService.findContactById(contactId));
     }
 
@@ -143,6 +153,8 @@ public class ContactController {
     public BaseResponse<PageResult<GetContactRes>> getMemberContactListPaging(
             HttpServletRequest request,
             @PathVariable("page") int page) {
+        log.info("연락처 전체 조회 (페이징) - memberId: {}, page: {}", JwtInfo.getMemberId(request), page);
+
         PageResult<GetContactRes> memberContactList = contactService.getMemberContact(JwtInfo.getMemberId(request), page);
         return new BaseResponse<>(memberContactList);
     }
@@ -156,9 +168,9 @@ public class ContactController {
     })
     @GetMapping("/list")
     public BaseResponse<GetContactAllRes> getMemberContactList(HttpServletRequest request){
+        log.info("연락처 전체 조회 - memberId: {}", JwtInfo.getMemberId(request));
+
         GetContactAllRes getContactAllRes = contactService.getMemberContactAll(JwtInfo.getMemberId(request));
         return new BaseResponse<>(getContactAllRes);
     }
-
-
 }

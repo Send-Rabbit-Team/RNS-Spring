@@ -16,6 +16,7 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -25,6 +26,7 @@ import java.util.List;
 
 import static com.srt.message.config.response.BaseResponseStatus.FILE_UPLOAD_SUCCESS;
 
+@Log4j2
 @RestController
 @RequestMapping("/message")
 @RequiredArgsConstructor
@@ -65,6 +67,8 @@ public class MessageController {
         if (response.startsWith("예약성공"))
             return new BaseResponse<>("성공적으로 예약 발송 되었습니다.");
 
+        log.info("중계사 문자 전송 - memberId: {}, postSendMessageReq: {}", JwtInfo.getMemberId(request), postSendMessageReq.getMessage());
+
         return new BaseResponse<>("메시지 갯수: " + postSendMessageReq.getCount() + ", 메시지 발송 걸린 시간: " + Double.parseDouble(response) / 1000 + "초");
     }
 
@@ -78,6 +82,8 @@ public class MessageController {
     @PostMapping("/send/kakao")
     public BaseResponse<String> sendKakaoMessage(@RequestBody PostSendKakaoMessageReq postSendKakaoMessageReq, HttpServletRequest request) {
         String processTime = kakaoMessageService.sendKakaoMessageToBroker(postSendKakaoMessageReq, JwtInfo.getMemberId(request));
+
+        log.info("중계사 알림톡 전송 - memberId: {}, postSendMessageReq: {}", JwtInfo.getMemberId(request), postSendKakaoMessageReq);
 
         return new BaseResponse<>("메시지 갯수: " + postSendKakaoMessageReq.getCount() + ", 메시지 발송 걸린 시간: " + Double.parseDouble(processTime) / 1000 + "초");
     }
@@ -95,6 +101,8 @@ public class MessageController {
     @GetMapping("/reserve/cancel/{messageId}")
     public BaseResponse<String> cancelReserveMessage(@PathVariable("messageId") long messageId, HttpServletRequest request) {
         String response = messageService.cancelReserveMessage(messageId, JwtInfo.getMemberId(request));
+
+        log.info("예약된 메시지 취소 - memberId: {}, postSendMessageReq: {}", JwtInfo.getMemberId(request), messageId);
 
         return new BaseResponse<>(response);
     }

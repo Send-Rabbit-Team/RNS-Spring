@@ -41,8 +41,7 @@ public class SenderNumberController {
         Long memberId = JwtInfo.getMemberId(request);
         RegisterSenderNumberRes registerSenderNumberRes = senderNumberService.registerSenderNumber(memberId, registerSenderNumberReq);
 
-        log.info("SenderNumber-register: ", registerSenderNumberRes.getPhoneNumber());
-
+        log.info("발신자 번호 등록 - memberId: {}, senderNumber: {}", JwtInfo.getMemberId(request), registerSenderNumberReq.getPhoneNumber());
         return new BaseResponse<>(registerSenderNumberRes);
     }
 
@@ -59,6 +58,8 @@ public class SenderNumberController {
     public BaseResponse<PageResult<GetSenderNumberRes>> getPageSenderNumber(
             HttpServletRequest request,
             @PathVariable("page") int page) {
+        log.info("발신자 페이징 번호 조회 - memberId: {}", JwtInfo.getMemberId(request));
+
         return new BaseResponse<>(senderNumberService.getPageSenderNumber(JwtInfo.getMemberId(request), page));
     }
 
@@ -72,6 +73,8 @@ public class SenderNumberController {
     })
     @GetMapping("/all")
     public BaseResponse<List<GetSenderNumberRes>> getAllSenderNumber(HttpServletRequest request) {
+        log.info("발신자 페이징 번호 조회 - memberId: {}", JwtInfo.getMemberId(request));
+
         return new BaseResponse<>(senderNumberService.getAllSenderNumber(JwtInfo.getMemberId(request)));
     }
 
@@ -87,6 +90,8 @@ public class SenderNumberController {
     @PatchMapping("/delete/{senderNumberId}")
     public BaseResponse<String> deleteSenderNumber(@PathVariable long senderNumberId, HttpServletRequest request) {
         senderNumberService.deleteSenderNumber(senderNumberId, JwtInfo.getMemberId(request));
+        log.info("발신자 번호 삭제 - memberId: {}, senderNumberId: {}", JwtInfo.getMemberId(request), senderNumberId);
+
         return new BaseResponse<>("성공");
     }
 
@@ -101,6 +106,7 @@ public class SenderNumberController {
     })
     @GetMapping("/block/{senderNumberId}")
     public BaseResponse<String> getBlockNumber(@PathVariable long senderNumberId, HttpServletRequest request){
+        log.info("발신자 차단 번호 조회 - memberId: {}, senderNumberId: {}", JwtInfo.getMemberId(request), senderNumberId);
 
         return new BaseResponse<>(senderNumberService.getBlockNumber(senderNumberId,JwtInfo.getMemberId(request)));
     }

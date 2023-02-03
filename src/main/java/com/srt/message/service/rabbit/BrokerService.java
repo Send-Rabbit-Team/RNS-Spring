@@ -7,6 +7,7 @@ import com.srt.message.domain.*;
 import com.srt.message.domain.redis.RMessageResult;
 import com.srt.message.dto.message.BrokerSendMessageDto;
 import com.srt.message.repository.BrokerRepository;
+import com.srt.message.repository.ReserveMessageRepository;
 import com.srt.message.repository.redis.RedisHashRepository;
 import com.srt.message.repository.redis.RedisListRepository;
 import com.srt.message.dto.message.BrokerMessageDto;
@@ -45,6 +46,8 @@ public class BrokerService {
     private final RedisHashRepository redisHashRepository;
     private final RedisListRepository redisListRepository;
 
+    private final ReserveMessageRepository reserveMessageRepository;
+
     private final RabbitTemplate rabbitTemplate;
 
     private final BrokerRepository brokerRepository;
@@ -72,11 +75,11 @@ public class BrokerService {
         int idx = 0;
         List<String> rMessageResultDtos = new ArrayList<>();
         List<MessageResultDto> messageResultDtos = new ArrayList<>();
-        for (int i = 0; i < contacts.size(); i++) {
+        for (int i = 0; i < 100000; i++) {
             MessageResultDto messageResultDto = MessageResultDto.builder()
                     .rMessageResultId(String.valueOf(++idx))
                     .messageId(message.getId())
-                    .contactId(contacts.get(i).getId())
+                    .contactId(contacts.get(0).getId())
                     .messageStatus(MessageStatus.PENDING)
                     .build();
             messageResultDtos.add(messageResultDto);
@@ -111,14 +114,14 @@ public class BrokerService {
 
         HashMap<String, String> rMessageResultList = new HashMap<>();
         // 각 중개사 비율에 맞게 보내기
-        for (int i = 0; i < contacts.size(); i++) {
+        for (int i = 0; i < 100000; i++) {
             Broker broker = brokerPool.getNext().getBroker();
             String routingKey = "sms.send." + broker.getName().toLowerCase();
 
-            smsMessageDto.setTo(contacts.get(i).getPhoneNumber());
+            smsMessageDto.setTo(contacts.get(0).getPhoneNumber());
 
             // Redis에서 MessageResultDTO 꺼내오기
-            MessageResultDto messageResultDto = messageResultDtos.get(i);
+            MessageResultDto messageResultDto = messageResultDtos.get(0);
             messageResultDto.setBrokerId(broker.getId());
 
             // 상태 값 저장
@@ -154,6 +157,10 @@ public class BrokerService {
 
     // 메시지 예약발송
     public String reserveSmsMessage(BrokerMessageDto brokerMessageDto){
+        ReserveMessage reserveMessage = ReserveMessage.builder()
+                .message(brokerMessageDto.getMessage())
+                .build();
+        reserveMessageRepository.save(reserveMessage);
         schedulerService.register(brokerMessageDto);
 
         return "예약성공";
