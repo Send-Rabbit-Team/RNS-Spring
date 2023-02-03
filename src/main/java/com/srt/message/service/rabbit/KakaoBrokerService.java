@@ -2,18 +2,16 @@ package com.srt.message.service.rabbit;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.srt.message.config.exception.BaseException;
 import com.srt.message.config.status.BaseStatus;
 import com.srt.message.config.status.MessageStatus;
 import com.srt.message.domain.*;
 import com.srt.message.domain.redis.RKakaoMessageResult;
-import com.srt.message.dto.message_result.MessageResultDto;
 import com.srt.message.repository.KakaoMessageRuleRepository;
 import com.srt.message.dto.message.kakao.BrokerKakaoMessageDto;
 import com.srt.message.dto.message.kakao.BrokerSendKakaoMessageDto;
 import com.srt.message.dto.message.kakao.KakaoMessageDto;
 import com.srt.message.dto.message_result.KakaoMessageResultDto;
-import com.srt.message.repository.redis.KakaoRedisHashRepository;
+import com.srt.message.repository.redis.RedisHashRepository;
 import com.srt.message.repository.redis.RedisListRepository;
 import com.srt.message.utils.algorithm.KakaoBrokerPool;
 import com.srt.message.utils.algorithm.KakaoBrokerWeight;
@@ -29,7 +27,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import static com.srt.message.config.response.BaseResponseStatus.JSON_PROCESSING_ERROR;
 import static com.srt.message.utils.rabbitmq.RabbitKakaoUtil.*;
 
 @Log4j2
@@ -45,7 +42,7 @@ public class KakaoBrokerService {
     private final KakaoMessageRuleRepository kakaoMessageRuleRepository;
 
     private final RedisListRepository redisListRepository;
-    private final KakaoRedisHashRepository kakaoRedisHashRepository;
+    private final RedisHashRepository redisHashRepository;
 
     private KakaoMessageDto kakaoMessageDto;
     private KakaoMessage kakaoMessage;
@@ -125,7 +122,7 @@ public class KakaoBrokerService {
 
         // 전송 결과 redis repositry에 저장
         String statusKey = "message.status." + kakaoMessage.getId();
-        kakaoRedisHashRepository.saveAll(statusKey, rMessageResultList);
+        redisHashRepository.saveAll(statusKey, rMessageResultList);
 
         // 임시 저장된 값 제거
         redisListRepository.remove(tmpKey);

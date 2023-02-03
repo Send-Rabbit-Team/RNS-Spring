@@ -4,8 +4,8 @@ import com.srt.message.domain.redis.RMessageResult;
 
 import java.util.Map;
 
-public interface RedisHashRepository {
-    void save(String key, String rMessageResultId, RMessageResult rMessageResult);
+public interface RedisHashRepository<ENTITY> {
+    void save(String key, String rMessageResultId, ENTITY rMessageResult);
 
     void saveAll(String key, Map<String, String> rMessageResultMap);
 
@@ -15,5 +15,5 @@ public interface RedisHashRepository {
 
     String findById(String key, String rMessageResultId);
 
-    void update(String key, String rMessageResultId, RMessageResult rMessageResult);
+    void update(String key, String rMessageResultId, ENTITY rMessageResult);
 }
