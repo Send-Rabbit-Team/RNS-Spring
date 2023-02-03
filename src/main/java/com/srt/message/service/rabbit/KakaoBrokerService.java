@@ -13,8 +13,8 @@ import com.srt.message.dto.message.kakao.KakaoMessageDto;
 import com.srt.message.dto.message_result.KakaoMessageResultDto;
 import com.srt.message.repository.redis.RedisHashRepository;
 import com.srt.message.repository.redis.RedisListRepository;
-import com.srt.message.utils.algorithm.KakaoBrokerPool;
-import com.srt.message.utils.algorithm.KakaoBrokerWeight;
+import com.srt.message.utils.algorithm.BrokerPool;
+import com.srt.message.utils.algorithm.BrokerWeight;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.lang3.time.StopWatch;
@@ -84,20 +84,20 @@ public class KakaoBrokerService {
 
         // Message Rule 설정
         List<KakaoMessageRule> messageRules = kakaoMessageRuleRepository.findByMemberIdAndStatus(member.getId(), BaseStatus.ACTIVE);
-        ArrayList<KakaoBrokerWeight> kakaoBrokerWeightList = new ArrayList<>();
+        ArrayList<BrokerWeight> kakaoBrokerWeightList = new ArrayList<>();
         for (KakaoMessageRule messageRule : messageRules) {
-            kakaoBrokerWeightList.add(new KakaoBrokerWeight(messageRule.getKakaoBroker(), messageRule.getBrokerRate()));
+            kakaoBrokerWeightList.add(new BrokerWeight(messageRule.getKakaoBroker(), messageRule.getBrokerRate()));
         }
 
         // 발송 비율에 따라 랜덤으로 발송 순서 정함
-        KakaoBrokerPool brokerPool = new KakaoBrokerPool(kakaoBrokerWeightList);
+        BrokerPool brokerPool = new BrokerPool(kakaoBrokerWeightList);
 
         // 메시지 발송
         HashMap<String, String> rMessageResultList = new HashMap<>();
         for (int i = 0; i < contacts.size(); i++) {
 
             // 수신할 브로커(라우팅키)와 수신자 번호 지정
-            KakaoBroker kakaoBroker = brokerPool.getNext().getKakaoBroker();
+            KakaoBroker kakaoBroker = (KakaoBroker) brokerPool.getNext().getBroker();
             String routingKey = "kakao.send." + kakaoBroker.getName().toLowerCase();
             kakaoMessageDto.setTo(contacts.get(i).getPhoneNumber());
 

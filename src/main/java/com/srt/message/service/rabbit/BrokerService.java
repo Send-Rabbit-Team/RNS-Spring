@@ -112,7 +112,7 @@ public class BrokerService {
         HashMap<String, String> rMessageResultList = new HashMap<>();
         // 각 중개사 비율에 맞게 보내기
         for (int i = 0; i < contacts.size(); i++) {
-            Broker broker = brokerPool.getNext().getBroker();
+            Broker broker = (Broker) brokerPool.getNext().getBroker();
             String routingKey = "sms.send." + broker.getName().toLowerCase();
 
             smsMessageDto.setTo(contacts.get(i).getPhoneNumber());
