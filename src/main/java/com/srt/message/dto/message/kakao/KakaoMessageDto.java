@@ -14,8 +14,6 @@ import java.util.List;
 @Getter
 @Setter
 public class KakaoMessageDto {
-    private long messageId;
-
     private String from;
 
     @JsonIgnore

@@ -8,8 +8,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
-import java.util.ArrayList;
-import java.util.List;
 
 @NamedEntityGraph(name = "Message.with.Member.SenderNumber.RepeatRule", attributeNodes = {
         @NamedAttributeNode(value = "member", subgraph = "member_company"),
@@ -42,6 +40,8 @@ public class Message extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "repeat_rule_id")
     private RepeatRule repeatRule;
+
+    private String subject;
 
     private String content;
 

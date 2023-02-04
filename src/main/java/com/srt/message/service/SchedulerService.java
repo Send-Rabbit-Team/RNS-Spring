@@ -30,6 +30,8 @@ public class SchedulerService {
     private final BrokerService brokerService;
     private final TaskScheduler taskScheduler;
 
+    private final ReserveMessageRepository reserveMessageRepository;
+
     private final RedisTemplate<String, String> redisTemplate;
 
     // 스케쥴러 등록
@@ -43,7 +45,6 @@ public class SchedulerService {
                 return;
 
             brokerService.sendSmsMessage(brokerMessageDto);
-
         }, cronTrigger);
 
         scheduledTasks.put(taskId, task);

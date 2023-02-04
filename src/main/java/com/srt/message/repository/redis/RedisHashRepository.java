@@ -1,10 +1,9 @@
 package com.srt.message.repository.redis;
 
-import com.srt.message.domain.redis.RMessageResult;
 
 import java.util.Map;
 
-public interface RedisHashRepository {
+public interface RedisHashRepository<RMessageResult> {
     void save(String key, String rMessageResultId, RMessageResult rMessageResult);
 
     void saveAll(String key, Map<String, String> rMessageResultMap);

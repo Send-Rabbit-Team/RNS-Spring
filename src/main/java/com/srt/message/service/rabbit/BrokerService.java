@@ -46,12 +46,12 @@ public class BrokerService {
     private final RedisHashRepository redisHashRepository;
     private final RedisListRepository redisListRepository;
 
-    private final ReserveMessageRepository reserveMessageRepository;
-
     private final RabbitTemplate rabbitTemplate;
 
     private final BrokerRepository brokerRepository;
     private final MessageRuleRepository messageRuleRepository;
+
+    private final ReserveMessageRepository reserveMessageRepository;
 
     private final SchedulerService schedulerService;
 
@@ -75,11 +75,11 @@ public class BrokerService {
         int idx = 0;
         List<String> rMessageResultDtos = new ArrayList<>();
         List<MessageResultDto> messageResultDtos = new ArrayList<>();
-        for (int i = 0; i < 100000; i++) {
+        for (int i = 0; i < contacts.size(); i++) {
             MessageResultDto messageResultDto = MessageResultDto.builder()
                     .rMessageResultId(String.valueOf(++idx))
                     .messageId(message.getId())
-                    .contactId(contacts.get(0).getId())
+                    .contactId(contacts.get(i).getId())
                     .messageStatus(MessageStatus.PENDING)
                     .build();
             messageResultDtos.add(messageResultDto);
@@ -114,14 +114,14 @@ public class BrokerService {
 
         HashMap<String, String> rMessageResultList = new HashMap<>();
         // 각 중개사 비율에 맞게 보내기
-        for (int i = 0; i < 100000; i++) {
-            Broker broker = brokerPool.getNext().getBroker();
+        for (int i = 0; i < contacts.size(); i++) {
+            Broker broker = (Broker) brokerPool.getNext().getBroker();
             String routingKey = "sms.send." + broker.getName().toLowerCase();
 
-            smsMessageDto.setTo(contacts.get(0).getPhoneNumber());
+            smsMessageDto.setTo(contacts.get(i).getPhoneNumber());
 
             // Redis에서 MessageResultDTO 꺼내오기
-            MessageResultDto messageResultDto = messageResultDtos.get(0);
+            MessageResultDto messageResultDto = messageResultDtos.get(i);
             messageResultDto.setBrokerId(broker.getId());
 
             // 상태 값 저장
@@ -157,10 +157,15 @@ public class BrokerService {
 
     // 메시지 예약발송
     public String reserveSmsMessage(BrokerMessageDto brokerMessageDto){
+        SMSMessageDto messageDto = brokerMessageDto.getSmsMessageDto();
+
         ReserveMessage reserveMessage = ReserveMessage.builder()
                 .message(brokerMessageDto.getMessage())
+                .cronExpression(messageDto.getCronExpression())
+                .cronText(messageDto.getCronText())
                 .build();
         reserveMessageRepository.save(reserveMessage);
+
         schedulerService.register(brokerMessageDto);
 
         return "예약성공";

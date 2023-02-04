@@ -5,7 +5,6 @@ import com.srt.message.service.KakaoMessageRuleService;
 import com.srt.message.dto.jwt.JwtInfo;
 import com.srt.message.dto.kakaoMessageRule.get.GetKakaoMessageRuleRes;
 import com.srt.message.dto.kakaoMessageRule.patch.PatchKakaoMessageRuleReq;
-import com.srt.message.dto.kakaoMessageRule.post.PostKakaoMessageRuleReq;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
@@ -37,22 +36,6 @@ public class KakaoMessageRuleController {
         log.info("알림톡 브로커 전송 규칙 불러오기 - memberId: {}", JwtInfo.getMemberId(request));
 
         return new BaseResponse<>(kakaoMessageRuleService.getKakaoMessageRule(JwtInfo.getMemberId(request)));
-    }
-
-    @ApiOperation(
-            value = "알림톡 브로커 전송 규칙 생성하기",
-            notes = "알림톡 브로커들의 전송 규칙들을 생성한다."
-    )
-    @ApiResponses({
-            @ApiResponse(code = 1000, message = "요청에 성공하였습니다.")
-    })
-    @PostMapping("/create")
-    public BaseResponse<List<GetKakaoMessageRuleRes>> createKakaoMessageRules(
-            @RequestBody List<PostKakaoMessageRuleReq> postKakaoMessageRuleReqList,
-            HttpServletRequest request) {
-
-        log.info("알림톡 브로커 전송 규칙 생성하기 - memberId: {}", JwtInfo.getMemberId(request));
-        return new BaseResponse<>(kakaoMessageRuleService.createKakaoMessageRule(postKakaoMessageRuleReqList, JwtInfo.getMemberId(request)));
     }
 
     @ApiOperation(

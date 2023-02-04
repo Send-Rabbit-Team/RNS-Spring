@@ -32,8 +32,8 @@ public class SenderNumber extends BaseEntity {
 
     // 편의 메서드
     public void createBlockNumber(){
-        String start = "070-";
-        String middle = RandomStringUtils.randomNumeric(4) + "-";
+        String start = "070";
+        String middle = RandomStringUtils.randomNumeric(4);
         String end = RandomStringUtils.randomNumeric(4);
 
         this.blockNumber = start + middle + end;

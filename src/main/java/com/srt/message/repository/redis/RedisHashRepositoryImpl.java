@@ -11,7 +11,7 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 @Repository
-public class RedisHashRepositoryImpl implements RedisHashRepository {
+public class RedisHashRepositoryImpl<RMessageResult> implements RedisHashRepository<RMessageResult> {
     private RedisTemplate<String, Object> redisTemplate;
     private ObjectMapper objectMapper;
 

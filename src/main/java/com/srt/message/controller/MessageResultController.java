@@ -5,6 +5,7 @@ import com.srt.message.config.page.PageResult;
 import com.srt.message.config.response.BaseResponse;
 import com.srt.message.dto.jwt.JwtInfo;
 import com.srt.message.dto.message.get.GetMessageRes;
+import com.srt.message.dto.message_result.get.GetListMessageResultRes;
 import com.srt.message.dto.message_result.get.GetMessageResultRes;
 import com.srt.message.service.MessageResultService;
 import io.swagger.annotations.ApiOperation;
@@ -48,9 +49,9 @@ public class MessageResultController {
             @ApiResponse(code = 1000, message = "요청에 성공하였습니다.")
     })
     @GetMapping("/info/{messageId}")
-    public BaseResponse<List<GetMessageResultRes>> getMessageResultsById(@PathVariable("messageId") long messageId
+    public BaseResponse<GetListMessageResultRes> getMessageResultsById(@PathVariable("messageId") long messageId
             , HttpServletRequest request) throws JsonProcessingException {
-        List<GetMessageResultRes> messageResultRes = messageResultService.getMessageResultsById(messageId);
+        GetListMessageResultRes messageResultRes = messageResultService.getMessageResultsById(messageId);
         log.info("메시지 처리 결과 조회 - memberId: {}, messageId: {}", JwtInfo.getMemberId(request), messageId);
 
         return new BaseResponse<>(messageResultRes);

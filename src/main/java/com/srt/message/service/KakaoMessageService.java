@@ -13,14 +13,12 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 import static com.srt.message.config.response.BaseResponseStatus.*;
-import static com.srt.message.config.status.BaseStatus.ACTIVE;
 
 @Log4j2
 @Service
 @RequiredArgsConstructor
 public class KakaoMessageService {
     private final MemberRepository memberRepository;
-    private final SenderNumberRepository senderNumberRepository;
     private final ContactRepository contactRepository;
 
     private final KakaoMessageRepository kakaoMessageRepository;
@@ -28,27 +26,21 @@ public class KakaoMessageService {
     private final KakaoBrokerService kakaoBrokerService;
 
     public String sendKakaoMessageToBroker(PostSendKakaoMessageReq messageReq, long memberId){
+        // Find Member
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new BaseException(NOT_EXIST_MEMBER));
+        log.info("member : " + member);
 
+        // Find Contacts
         List<Contact> contacts = contactRepository.findByPhoneNumberIn(messageReq.getReceivers());
-        // 연락처 예외 처리
         if(contacts.contains(null) || contacts.isEmpty())
             throw new BaseException(NOT_EXIST_CONTACT_NUMBER);
+        log.info("contacts : " + contacts);
 
-        // 발신자 번호 예외 처리
-        SenderNumber senderNumber = senderNumberRepository.findByPhoneNumberAndStatus(messageReq.getSenderNumber(), ACTIVE)
-                .orElseThrow(() -> new BaseException(NOT_EXIST_SENDER_NUMBER));
-
-        log.info("senderNumber - memberId {}", senderNumber.getMember().getId());
-        log.info("member - memberId {}", member.getId());
-
-        if(senderNumber.getMember().getId() != member.getId())
-            throw new BaseException(NOT_MATCH_SENDER_NUMBER);
-
-        KakaoMessage message = KakaoMessage.builder()
+        // Save Kakao Message
+        KakaoMessage kakaoMessage = KakaoMessage.builder()
                 .member(member)
-                .senderNumber(senderNumber)
+                .sender(messageReq.getKakaoMessageDto().getFrom())
                 .title(messageReq.getKakaoMessageDto().getTitle())
                 .subTitle(messageReq.getKakaoMessageDto().getSubtitle())
                 .content(messageReq.getKakaoMessageDto().getContent())
@@ -58,16 +50,16 @@ public class KakaoMessageService {
                 .buttonUrl(messageReq.getKakaoMessageDto().getButtonUrl())
                 .buttonType(messageReq.getKakaoMessageDto().getButtonType())
                 .build();
-
-        kakaoMessageRepository.save(message);
+        kakaoMessageRepository.save(kakaoMessage);
+        log.info("kakaoMessage : " + kakaoMessage);
 
         BrokerKakaoMessageDto brokerMessageDto = BrokerKakaoMessageDto.builder()
                 .kakaoMessageDto(messageReq.getKakaoMessageDto())
-                .kakaoMessage(message)
+                .kakaoMessage(kakaoMessage)
                 .contacts(contacts)
                 .member(member)
                 .build();
-
+        log.info("brokerMessageDto : " + brokerMessageDto);
         return kakaoBrokerService.sendKakaoMessage(brokerMessageDto);
     }
 

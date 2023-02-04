@@ -76,6 +76,7 @@ public class MessageService {
         Message message = Message.builder()
                 .member(member)
                 .senderNumber(senderNumber)
+                .subject(messageReq.getMessage().getSubject())
                 .content(messageReq.getMessage().getContent())
                 .messageType(messageReq.getMessage().getMessageType())
                 .build();
