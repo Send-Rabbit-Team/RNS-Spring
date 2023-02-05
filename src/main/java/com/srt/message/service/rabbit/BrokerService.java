@@ -157,8 +157,12 @@ public class BrokerService {
 
     // 메시지 예약발송
     public String reserveSmsMessage(BrokerMessageDto brokerMessageDto){
+        SMSMessageDto messageDto = brokerMessageDto.getSmsMessageDto();
+
         ReserveMessage reserveMessage = ReserveMessage.builder()
                 .message(brokerMessageDto.getMessage())
+                .cronExpression(messageDto.getCronExpression())
+                .cronText(messageDto.getCronText())
                 .build();
         reserveMessageRepository.save(reserveMessage);
 

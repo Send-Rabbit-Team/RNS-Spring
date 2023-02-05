@@ -66,7 +66,7 @@ public class AuthController {
     @NoIntercept
     public BaseResponse<PostLoginRes> defaultSignIn(@RequestBody PostLoginReq postLoginReq){
         PostLoginRes postLoginRes = authService.defaultSignIn(postLoginReq);
-        log.info("Default Sign-In - jwt: {}" + postLoginRes.getJwt());
+        log.info("일반 로그인 - jwt: {}" + postLoginRes.getJwt());
 
         System.out.println("postLoginRes Image = " + postLoginRes.getProfileImageURL());
         return new BaseResponse<>(postLoginRes);
@@ -76,6 +76,7 @@ public class AuthController {
     @PostMapping("/google")
     public BaseResponse<Object> getGoogleUserInfo(@RequestBody CredentialResponse credentialResponse) throws JsonProcessingException {
         GoogleUserInfoDTO googleUserInfoDTO = googleOAuthService.getUserInfo(credentialResponse);
+
         return new BaseResponse<>(googleUserInfoDTO);
     }
 
@@ -92,7 +93,7 @@ public class AuthController {
     @PostMapping("/google/register")
     public BaseResponse<GoogleRegisterRes> googleSignUp(@RequestBody GoogleRegisterReq googleRegisterReq){
         GoogleRegisterRes googleRegisterRes = authService.googleSignUp(googleRegisterReq);
-        log.info("Google Sign-Up - email: {}" + googleRegisterRes.getEmail());
+        log.info("구글 회원가입 - email: {}" + googleRegisterRes.getEmail());
 
         return new BaseResponse<>(googleRegisterRes);
     }
@@ -112,7 +113,7 @@ public class AuthController {
     public BaseResponse<PostLoginRes> googleSignIn(@RequestBody CredentialResponse credentialResponse){
         GoogleUserInfoDTO googleUserInfoDTO = googleOAuthService.getUserInfo(credentialResponse);
         PostLoginRes postLoginRes = authService.googleSignIn(googleUserInfoDTO.getEmail());
-        log.info("Google Sign-In - jwt: {}" + postLoginRes.getJwt());
+        log.info("구글 로그인 - jwt: {}" + postLoginRes.getJwt());
 
         return new BaseResponse<>(postLoginRes);
     }
@@ -131,7 +132,7 @@ public class AuthController {
         Long memberId = JwtInfo.getMemberId(request);
 
         GetInfoMemberRes getInfoMemberRes = authService.getUserInfoByJwt(memberId);
-        log.info("userInfo - memberId: {}", memberId);
+        log.info("사용자 정보 조회 - memberId: {}", memberId);
 
         return new BaseResponse<>(getInfoMemberRes);
     }

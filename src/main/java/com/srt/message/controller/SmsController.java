@@ -2,6 +2,7 @@ package com.srt.message.controller;
 
 import com.srt.message.config.exception.BaseException;
 import com.srt.message.config.response.BaseResponse;
+import com.srt.message.dto.jwt.JwtInfo;
 import com.srt.message.dto.sms.MessageDTO;
 import com.srt.message.dto.sms.PhoneNumberValidDTO;
 import com.srt.message.jwt.NoIntercept;
@@ -10,6 +11,7 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -17,6 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import static com.srt.message.config.response.BaseResponseStatus.*;
 
+@Log4j2
 @RestController
 @RequestMapping("/sms")
 @RequiredArgsConstructor
@@ -39,6 +42,7 @@ public class SmsController {
         }catch (Exception e){
             throw new BaseException(SEND_MESSAGE_ERROR);
         }
+        log.info("핸드폰 인증 문자 전송 - phoneNumber: {}", messageDTO.getTo());
 
         return new BaseResponse<>(SEND_MESSAGE_SUCCESS);
     }
@@ -55,6 +59,7 @@ public class SmsController {
     @PostMapping("/valid")
     public BaseResponse<String> sendSms(@RequestBody PhoneNumberValidDTO phoneNumberValidDTO){
         smsService.validAuthToken(phoneNumberValidDTO);
+        log.info("핸드폰 인증 번호 확인 - phoneNumber: {}, valid: {}", phoneNumberValidDTO.getPhoneNumber(), phoneNumberValidDTO.getAuthToken());
 
         return new BaseResponse<>(PHONE_NUMBER_AUTH_SUCCESS);
     }

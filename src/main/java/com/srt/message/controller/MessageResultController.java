@@ -5,17 +5,20 @@ import com.srt.message.config.page.PageResult;
 import com.srt.message.config.response.BaseResponse;
 import com.srt.message.dto.jwt.JwtInfo;
 import com.srt.message.dto.message.get.GetMessageRes;
+import com.srt.message.dto.message_result.get.GetListMessageResultRes;
 import com.srt.message.dto.message_result.get.GetMessageResultRes;
 import com.srt.message.service.MessageResultService;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
+@Log4j2
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/message/result")
@@ -32,6 +35,7 @@ public class MessageResultController {
     @GetMapping("/{page}")
     public BaseResponse<PageResult<GetMessageRes>> getMessagesByPaging(@PathVariable("page") int page, HttpServletRequest request) {
         PageResult<GetMessageRes> messageRes = messageResultService.getAllMessages(JwtInfo.getMemberId(request), page);
+        log.info("발송된 메시지 조회 - memberId: {}, postSendMessageReq: {}", JwtInfo.getMemberId(request), page);
 
         return new BaseResponse<>(messageRes);
     }
@@ -45,8 +49,10 @@ public class MessageResultController {
             @ApiResponse(code = 1000, message = "요청에 성공하였습니다.")
     })
     @GetMapping("/info/{messageId}")
-    public BaseResponse<List<GetMessageResultRes>> getMessageResultsById(@PathVariable("messageId") long messageId) throws JsonProcessingException {
-        List<GetMessageResultRes> messageResultRes = messageResultService.getMessageResultsById(messageId);
+    public BaseResponse<GetListMessageResultRes> getMessageResultsById(@PathVariable("messageId") long messageId
+            , HttpServletRequest request) throws JsonProcessingException {
+        GetListMessageResultRes messageResultRes = messageResultService.getMessageResultsById(messageId);
+        log.info("메시지 처리 결과 조회 - memberId: {}, messageId: {}", JwtInfo.getMemberId(request), messageId);
 
         return new BaseResponse<>(messageResultRes);
     }
@@ -61,6 +67,7 @@ public class MessageResultController {
     @GetMapping("/filter/type/{page}")
     public BaseResponse<List<GetMessageRes>> getMessagesByType(@PathVariable("page") int page, @RequestParam("type") String type, HttpServletRequest request) {
         List<GetMessageRes> messageResList = messageResultService.getMessagesByType(type, JwtInfo.getMemberId(request), page);
+        log.info("메시지 유형별 필터 조회 - memberId: {}, type: {}", JwtInfo.getMemberId(request), type);
 
         return new BaseResponse<>(messageResList);
     }
@@ -75,6 +82,7 @@ public class MessageResultController {
     @GetMapping("/filter/reserve/{page}")
     public BaseResponse<List<GetMessageRes>> getReserveMessages(@PathVariable("page") int page, HttpServletRequest request) {
         List<GetMessageRes> messageResList = messageResultService.getReserveMessages(JwtInfo.getMemberId(request), page);
+        log.info("예약된 메시지 필터 조회 - memberId: {}, page: {}", JwtInfo.getMemberId(request), page);
 
         return new BaseResponse<>(messageResList);
     }
@@ -90,6 +98,7 @@ public class MessageResultController {
     public BaseResponse<List<GetMessageRes>> getMessagesBySearching(@PathVariable("page") int page, @RequestParam(value = "type") String searchType
             , @RequestParam("keyword") String keyword, HttpServletRequest request) {
         List<GetMessageRes> messageResList = messageResultService.getMessageBySearching(searchType, keyword, JwtInfo.getMemberId(request), page);
+        log.info("메시지 검색 조회 - memberId: {}, type: {}, keyword: {}", JwtInfo.getMemberId(request), searchType, keyword);
 
         return new BaseResponse<>(messageResList);
     }

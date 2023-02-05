@@ -1,7 +1,8 @@
-package com.srt.message.dto.message.get;
+package com.srt.message.dto.message;
 
 import com.srt.message.config.type.MessageType;
 import com.srt.message.domain.Message;
+import com.srt.message.dto.message_result.get.GetMessageResultRes;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.*;
 
@@ -10,7 +11,7 @@ import lombok.*;
 @NoArgsConstructor
 @Getter
 @Setter
-public class GetMessageRes {
+public class GetReserveMessageRes {
     @ApiModelProperty(
             example = "1"
     )
@@ -32,16 +33,26 @@ public class GetMessageRes {
     private MessageType messageType;
 
     @ApiModelProperty(
+            example = "0/1 * * * * ?"
+    )
+    private String cronExpression;
+
+    @ApiModelProperty(
+            example = "매일 오전 3시"
+    )
+    private String cronText;
+
+    @ApiModelProperty(
             example = "2023-02-01 14:24:25"
     )
     private String createdAt;
 
-    public static GetMessageRes toDto(Message message){
+    public static GetReserveMessageRes toDto(Message message){
 
         String content = (message.getSubject() == null)? message.getContent():
                 message.getSubject() + "\n" + message.getContent();
 
-        return GetMessageRes.builder()
+        return GetReserveMessageRes.builder()
                 .messageId(message.getId())
                 .senderNumber(message.getSenderNumber().getPhoneNumber())
                 .content(content)

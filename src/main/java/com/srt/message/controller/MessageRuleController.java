@@ -37,6 +37,7 @@ public class MessageRuleController {
     @PostMapping("/create")
     public BaseResponse<PostSMSRuleRes> createMessageRule(PostSMSRuleReq postSMSRuleReq, HttpServletRequest request){
        PostSMSRuleRes postSMSRuleRes = messageRuleService.createSMSRule(postSMSRuleReq, JwtInfo.getMemberId(request));
+       log.info("SMS 메시지 분배 발송 규칙 생성 - memberId: {}, postSMSRuleReq: {}", JwtInfo.getMemberId(request), postSMSRuleReq);
 
        return new BaseResponse<>(postSMSRuleRes);
     }
@@ -52,6 +53,7 @@ public class MessageRuleController {
     @GetMapping("/getAll")
     public BaseResponse<GetSMSRuleRes> getAll(HttpServletRequest request){
         GetSMSRuleRes getSMSRuleRes = messageRuleService.getAll(JwtInfo.getMemberId(request));
+        log.info("SMS 메시지 분배 발송 규칙 불러오기 - memberId: {}", JwtInfo.getMemberId(request));
 
         return new BaseResponse<>(getSMSRuleRes);
     }
@@ -68,6 +70,7 @@ public class MessageRuleController {
     @PatchMapping("/edit")
     public BaseResponse<PatchSMSRuleRes> edit(@RequestBody PatchSMSRuleReq patchSMSRuleReq, HttpServletRequest request){
         PatchSMSRuleRes getSMSRuleRes = messageRuleService.edit(patchSMSRuleReq,JwtInfo.getMemberId(request));
+        log.info("SMS 메시지 분배 발송 규칙 수정하기 - memberId: {}, patchSMSRuleReq: {}", JwtInfo.getMemberId(request), patchSMSRuleReq);
 
         return new BaseResponse<>(getSMSRuleRes);
     }

@@ -37,7 +37,7 @@ public class SMSMessageDto {
     @ApiModelProperty(
             example = "[BSAKJNDNKASDJkfetjoi312oiadsioo21basdop, asdjknasdnasdnjsadkj1241]"
     )
-    private List<String> images;
+    private String[] images;
 
     @ApiModelProperty(hidden = true)
     private MessageStatus messageStatus;
@@ -47,8 +47,16 @@ public class SMSMessageDto {
     )
     private MessageType messageType;
 
+    /**
+     * 예약 발송
+     */
     @ApiModelProperty(
             example = "0/1 * * * * ?"
     )
     private String cronExpression;
+
+    @ApiModelProperty(
+            example = "매일 오전 3시"
+    )
+    private String cronText;
 }

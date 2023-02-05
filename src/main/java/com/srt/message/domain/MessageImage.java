@@ -1,6 +1,5 @@
 package com.srt.message.domain;
 
-import com.srt.message.config.domain.BaseEntity;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -13,16 +12,14 @@ import javax.persistence.*;
 @NoArgsConstructor
 @Entity
 @Getter
-public class ReserveMessage extends BaseEntity {
+public class MessageImage {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "message_id")
     private Message message;
 
-    private String cronExpression;
-
-    private String cronText;
+    private String data;
 }

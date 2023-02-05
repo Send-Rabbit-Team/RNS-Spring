@@ -11,6 +11,7 @@ import com.srt.message.domain.Message;
 import com.srt.message.domain.MessageResult;
 import com.srt.message.domain.redis.RMessageResult;
 import com.srt.message.dto.message.get.GetMessageRes;
+import com.srt.message.dto.message_result.get.GetListMessageResultRes;
 import com.srt.message.dto.message_result.get.GetMessageResultRes;
 import com.srt.message.repository.*;
 import com.srt.message.repository.cache.BrokerCacheRepository;
@@ -53,7 +54,8 @@ public class MessageResultService {
     }
 
     // 메시지 처리 결과 모두 조회
-    public List<GetMessageResultRes> getMessageResultsById(long messageId) throws JsonProcessingException {
+    public GetListMessageResultRes getMessageResultsById(long messageId) throws JsonProcessingException {
+        GetListMessageResultRes response = new GetListMessageResultRes();
         List<GetMessageResultRes> messageResultResList = new ArrayList<>();
 
         // 레디스에 상태 값 저장되어 있는지 확인
@@ -64,15 +66,25 @@ public class MessageResultService {
                 String rMessageResultJson = entry.getValue();
                 RMessageResult rMessageResult = objectMapper.readValue(rMessageResultJson, RMessageResult.class);
 
+                response.addBrokerCount(rMessageResult.getBrokerId());
+                response.addStatusCount(rMessageResult.getMessageStatus());
+
                 messageResultResList.add(getMessageResultRes(rMessageResult));
             }
         }else{ // RDBMS에서 조회
-            List<MessageResult> messageResults = messageResultRepository.findAllByMessageId(messageId);
+            List<MessageResult> messageResults = messageResultRepository.findAllByMessageIdOrderByIdDesc(messageId);
             messageResults.stream()
-                    .map(this::getMessageResultRes).forEach(r -> messageResultResList.add(r));
+                    .map(this::getMessageResultRes).forEach(r -> {
+                        messageResultResList.add(r);
+                        response.addBrokerCount(r.getBrokerId());
+                        response.addStatusCount(r.getMessageStatus());
+                    });
         }
 
-        return messageResultResList;
+        response.setMessageResultRes(messageResultResList);
+        response.setTotalCount(messageResultResList.size());
+
+        return response;
     }
 
     // 메시지 유형별 필터 조회
@@ -124,8 +136,12 @@ public class MessageResultService {
     public GetMessageResultRes getMessageResultRes(MessageResult messageResult){
         return GetMessageResultRes.builder()
                 .contactPhoneNumber(messageResult.getContact().getPhoneNumber())
+                .contactGroup(messageResult.getContact().getContactGroup().getName())
+                .memo(messageResult.getContact().getMemo())
+                .brokerId(messageResult.getBroker().getId())
                 .brokerName(messageResult.getBroker().getName())
                 .messageStatus(messageResult.getMessageStatus())
+                .createdAt(messageResult.getCreatedAt() == null? null: messageResult.getCreatedAt().toString())
                 .build();
     }
     public GetMessageResultRes getMessageResultRes(RMessageResult rMessageResult){
@@ -135,6 +151,9 @@ public class MessageResultService {
 
         return GetMessageResultRes.builder()
                 .contactPhoneNumber(contact.getPhoneNumber())
+                .contactGroup(contact.getContactGroup().getName())
+                .memo(contact.getMemo())
+                .brokerId(broker.getId())
                 .brokerName(broker.getName())
                 .messageStatus(rMessageResult.getMessageStatus())
                 .build();
