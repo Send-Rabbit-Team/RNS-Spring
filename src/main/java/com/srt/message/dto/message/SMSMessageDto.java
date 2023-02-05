@@ -37,7 +37,7 @@ public class SMSMessageDto {
     @ApiModelProperty(
             example = "[BSAKJNDNKASDJkfetjoi312oiadsioo21basdop, asdjknasdnasdnjsadkj1241]"
     )
-    private List<String> images;
+    private String[] images;
 
     @ApiModelProperty(hidden = true)
     private MessageStatus messageStatus;

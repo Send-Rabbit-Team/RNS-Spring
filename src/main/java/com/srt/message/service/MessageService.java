@@ -1,31 +1,19 @@
 package com.srt.message.service;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.srt.message.config.exception.BaseException;
-import com.srt.message.config.page.PageResult;
+import com.srt.message.config.type.MessageType;
 import com.srt.message.domain.*;
-import com.srt.message.domain.redis.RMessageResult;
 import com.srt.message.dto.message.BrokerMessageDto;
-import com.srt.message.dto.message.get.GetMessageRes;
 import com.srt.message.dto.message.post.PostSendMessageReq;
-import com.srt.message.dto.message_result.get.GetMessageResultRes;
 import com.srt.message.repository.*;
-import com.srt.message.repository.cache.BrokerCacheRepository;
-import com.srt.message.repository.cache.ContactCacheRepository;
-import com.srt.message.repository.cache.MessageCacheRepository;
-import com.srt.message.repository.redis.RedisHashRepository;
 import com.srt.message.service.rabbit.BrokerService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import static com.srt.message.config.response.BaseResponseStatus.*;
 import static com.srt.message.config.status.BaseStatus.ACTIVE;
@@ -41,26 +29,20 @@ public class MessageService {
     private final ContactRepository contactRepository;
 
     private final MessageRepository messageRepository;
-    private final MessageResultRepository messageResultRepository;
-
-    private final RedisHashRepository redisHashRepository;
-
-    private final MessageCacheRepository messageCacheRepository;
-    private final BrokerCacheRepository brokerCacheRepository;
-    private final ContactCacheRepository contactCacheRepository;
+    private final MessageImageRepository messageImageRepository;
 
     private final BrokerService brokerService;
 
     private final SchedulerService schedulerService;
 
     // 메시지 중계사에게 전송
-    public String sendMessageToBroker(PostSendMessageReq messageReq, long memberId){
+    public String sendMessageToBroker(PostSendMessageReq messageReq, long memberId) {
         Member member = memberRepository.findById(memberId)
-                        .orElseThrow(() -> new BaseException(NOT_EXIST_MEMBER));
+                .orElseThrow(() -> new BaseException(NOT_EXIST_MEMBER));
 
         List<Contact> contacts = contactRepository.findByPhoneNumberIn(messageReq.getReceivers());
         // 연락처 예외 처리
-        if(contacts.contains(null) || contacts.isEmpty())
+        if (contacts.contains(null) || contacts.isEmpty())
             throw new BaseException(NOT_EXIST_CONTACT_NUMBER);
 
         // 발신자 번호 예외 처리
@@ -70,7 +52,7 @@ public class MessageService {
         log.info("senderNumber - memberId {}", senderNumber.getMember().getId());
         log.info("member - memberId {}", member.getId());
 
-        if(senderNumber.getMember().getId() != member.getId())
+        if (senderNumber.getMember().getId() != member.getId())
             throw new BaseException(NOT_MATCH_SENDER_NUMBER);
 
         Message message = Message.builder()
@@ -83,6 +65,20 @@ public class MessageService {
 
         messageRepository.save(message);
 
+        // MMS 타입인 경우 이미지 저장
+        if (message.getMessageType() == MessageType.MMS) {
+            String[] images = messageReq.getMessage().getImages();
+            List<MessageImage> messageImages = new ArrayList<>();
+            for (int i = 0; i < messageImages.size(); i++) {
+                MessageImage messageImage = MessageImage.builder()
+                        .message(message)
+                        .data(images[i])
+                        .build();
+                messageImages.add(messageImage);
+            }
+            messageImageRepository.saveAll(messageImages);
+        }
+
         BrokerMessageDto brokerMessageDto = BrokerMessageDto.builder()
                 .smsMessageDto(messageReq.getMessage())
                 .message(message)
@@ -91,18 +87,18 @@ public class MessageService {
                 .build();
 
         // 크론 표현식 있으면 예약 발송으로 이동
-        if(messageReq.getMessage().getCronExpression() != null)
+        if (messageReq.getMessage().getCronExpression() != null)
             return brokerService.reserveSmsMessage(brokerMessageDto);
 
         return brokerService.sendSmsMessage(brokerMessageDto);
     }
 
     // 예약 취소
-    public String cancelReserveMessage(long messageId, long memberId){
+    public String cancelReserveMessage(long messageId, long memberId) {
         Message message = messageRepository.findById(memberId)
                 .orElseThrow(() -> new BaseException(NOT_EXIST_MESSAGE));
 
-        if(message.getMember().getId() != memberId)
+        if (message.getMember().getId() != memberId)
             throw new BaseException(NOT_MATCH_MEMBER);
 
         return schedulerService.remove(messageId);
