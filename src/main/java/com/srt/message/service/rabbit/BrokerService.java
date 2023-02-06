@@ -3,6 +3,7 @@ package com.srt.message.service.rabbit;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.srt.message.config.status.MessageStatus;
+import com.srt.message.config.status.ReserveStatus;
 import com.srt.message.domain.*;
 import com.srt.message.domain.redis.RMessageResult;
 import com.srt.message.dto.message.BrokerSendMessageDto;
@@ -153,22 +154,6 @@ public class BrokerService {
         String processTime = String.valueOf(stopWatch.getTime());
         log.info("Process Time: {} ", processTime);
         return processTime;
-    }
-
-    // 메시지 예약발송
-    public String reserveSmsMessage(BrokerMessageDto brokerMessageDto){
-        SMSMessageDto messageDto = brokerMessageDto.getSmsMessageDto();
-
-        ReserveMessage reserveMessage = ReserveMessage.builder()
-                .message(brokerMessageDto.getMessage())
-                .cronExpression(messageDto.getCronExpression())
-                .cronText(messageDto.getCronText())
-                .build();
-        reserveMessageRepository.save(reserveMessage);
-
-        schedulerService.register(brokerMessageDto);
-
-        return "예약성공";
     }
 
     // Json 형태로 반환

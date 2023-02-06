@@ -11,6 +11,7 @@ import com.srt.message.domain.Message;
 import com.srt.message.domain.MessageResult;
 import com.srt.message.domain.redis.RMessageResult;
 import com.srt.message.dto.message.get.GetMessageRes;
+import com.srt.message.dto.message.get.GetReserveMessageRes;
 import com.srt.message.dto.message_result.get.GetListMessageResultRes;
 import com.srt.message.dto.message_result.get.GetMessageResultRes;
 import com.srt.message.repository.*;
@@ -22,6 +23,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -34,6 +37,8 @@ import java.util.Map;
 @Service
 public class MessageResultService {
     private final ObjectMapper objectMapper;
+    private final RedisTemplate<String, Object> redisTemplate;
+
     private final MessageRepository messageRepository;
     private final MessageResultRepository messageResultRepository;
 
@@ -44,13 +49,27 @@ public class MessageResultService {
     private final RedisHashRepository redisHashRepository;
 
 
-    // 발송한 메시지 페이징 조회
+    // 발송한 메시지 페이징 조회 (예약 메시지는 포함 안됨)
     public PageResult<GetMessageRes> getAllMessages(long memberId, int page){
         PageRequest pageRequest = PageRequest.of(page-1, 10, Sort.by("id").descending());
         Page<GetMessageRes> messagePage = messageRepository.findAllMessage(memberId, pageRequest)
                 .map(GetMessageRes::toDto);
 
         return new PageResult<>(messagePage);
+    }
+
+    // 예약 메시지 페이징 조회
+    public PageResult<GetReserveMessageRes> getReserveMessages(long memberId, int page) {
+        PageRequest pageRequest = PageRequest.of(page-1, 10, Sort.by("id").descending());
+        Page<GetReserveMessageRes> reserveMessagePage = messageRepository.findAllReserveMessage(memberId, pageRequest)
+                .map(rm -> {
+                    String countKey = "reserve." + rm.getMessage().getId() + ".count";
+                    String sendCount = redisTemplate.opsForValue().get(countKey) == null? "0": (String) redisTemplate.opsForValue().get(countKey);
+
+                    return GetReserveMessageRes.toDto(rm, sendCount);
+                });
+
+        return new PageResult<>(reserveMessagePage);
     }
 
     // 메시지 처리 결과 모두 조회
@@ -96,14 +115,6 @@ public class MessageResultService {
                 .map(GetMessageRes::toDto));
     }
 
-    // 예약된 메시지 필터 조회
-    public PageResult<GetMessageRes> getReserveMessages(long memberId, int page){
-        PageRequest pageRequest = PageRequest.of(page-1, 10, Sort.by("id").descending());
-
-        return new PageResult<>(messageRepository.findReserveMessage(memberId, pageRequest)
-                .map(GetMessageRes::toDto));
-    }
-
     // 검색 조회 (메모, 수신, 발신 번호)
     public PageResult<GetMessageRes> getMessageBySearching(String searchType, String keyword, long memberId, int page){
         MsgSearchType msgSearchType = MsgSearchType.valueOf(searchType);
@@ -112,7 +123,7 @@ public class MessageResultService {
         Page<GetMessageRes> messageResPage = null;
         if(msgSearchType == MsgSearchType.RECEIVER){ // 수신자 번호 검색했을 때
             messageResPage = messageRepository.findByReceiveNumber(keyword, memberId, pageRequest)
-                    .map(GetMessageRes::toDto);
+                   .map(GetMessageRes::toDto);
 
         }else if(msgSearchType == MsgSearchType.SENDER){ // 발신자 번호 검색했을 때
             messageResPage = messageRepository.findBySenderNumber(keyword, memberId, pageRequest)

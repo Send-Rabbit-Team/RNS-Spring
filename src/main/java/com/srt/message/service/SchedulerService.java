@@ -9,9 +9,11 @@ import com.srt.message.service.rabbit.BrokerService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.scheduling.TaskScheduler;
 import org.springframework.scheduling.support.CronTrigger;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Map;
 import java.util.Optional;
@@ -20,6 +22,7 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
 import static com.srt.message.config.response.BaseResponseStatus.ALREADY_CANCEL_RESERVE;
+import static com.srt.message.config.response.BaseResponseStatus.NOT_RESERVE_MESSAGE;
 
 @Log4j2
 @RequiredArgsConstructor
@@ -32,7 +35,7 @@ public class SchedulerService {
 
     private final ReserveMessageRepository reserveMessageRepository;
 
-    private final RedisTemplate<String, String> redisTemplate;
+    private final RedisTemplate<String, Object> redisTemplate;
 
     // 스케쥴러 등록
     public void register(BrokerMessageDto brokerMessageDto) {
@@ -44,6 +47,14 @@ public class SchedulerService {
             if (checkSchedulerLock(taskId))
                 return;
 
+            // redis에서 예약 발송 전송 횟수 가져와서 카운팅 처리
+            String countKey = "reserve." + taskId + ".count";
+            ValueOperations<String, Object> valueOperation = redisTemplate.opsForValue();
+            String count = valueOperation.get(countKey) == null? "0" : (String) valueOperation.get(countKey);
+            int sendCount = Integer.parseInt(count);
+            valueOperation.set(countKey, String.valueOf(sendCount + 1));
+
+            reserveMessageRepository.findByMessageId(taskId);
             brokerService.sendSmsMessage(brokerMessageDto);
         }, cronTrigger);
 
@@ -60,13 +71,15 @@ public class SchedulerService {
                 throw new BaseException(ALREADY_CANCEL_RESERVE);
 
             scheduledTasks.get(messageId).cancel(true);
-            reserveMessageRepository.delete(reserveMessage);
+
+            reserveMessage.changeReserveStatusStop();
+            reserveMessageRepository.save(reserveMessage);
 
             log.info(messageId + "번 메시지 예약 발송 스케쥴러를 중지합니다.");
 
-            return messageId + "의 메시지 발송 예약이 취소되었습니다.";
+            return messageId + "번 메시지의 발송 예약이 취소되었습니다.";
         }else{
-            return "해당 메시지는 예약된 메시지가 아닙니다";
+            throw new BaseException(NOT_RESERVE_MESSAGE);
         }
     }
 
