@@ -1,15 +1,15 @@
 package com.srt.message.utils.algorithm;
 
-public class BrokerWeight<Broker> {
-    private Broker broker;
+public class BrokerWeight<T> {
+    private T broker;
     private int weight;
 
-    public BrokerWeight(Broker broker, int weight) {
+    public BrokerWeight(T broker, int weight) {
         this.broker = broker;
         this.weight = weight;
     }
 
-    public Broker getBroker() {
+    public T getBroker() {
         return broker;
     }
 
