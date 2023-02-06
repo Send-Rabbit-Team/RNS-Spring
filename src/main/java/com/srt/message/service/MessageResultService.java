@@ -88,46 +88,46 @@ public class MessageResultService {
     }
 
     // 메시지 유형별 필터 조회
-    public List<GetMessageRes> getMessagesByType(String type, long memberId, int page){
+    public PageResult<GetMessageRes> getMessagesByType(String type, long memberId, int page){
         MessageType messageType = MessageType.valueOf(type);
         PageRequest pageRequest = PageRequest.of(page-1, 10, Sort.by("id").descending());
 
-        return messageRepository.findMessagesByMessageType(messageType, memberId, pageRequest)
-                .map(GetMessageRes::toDto).toList();
+        return new PageResult<>(messageRepository.findMessagesByMessageType(messageType, memberId, pageRequest)
+                .map(GetMessageRes::toDto));
     }
 
     // 예약된 메시지 필터 조회
-    public List<GetMessageRes> getReserveMessages(long memberId, int page){
+    public PageResult<GetMessageRes> getReserveMessages(long memberId, int page){
         PageRequest pageRequest = PageRequest.of(page-1, 10, Sort.by("id").descending());
 
-        return messageRepository.findReserveMessage(memberId, pageRequest)
-                .map(GetMessageRes::toDto).toList();
+        return new PageResult<>(messageRepository.findReserveMessage(memberId, pageRequest)
+                .map(GetMessageRes::toDto));
     }
 
     // 검색 조회 (메모, 수신, 발신 번호)
-    public List<GetMessageRes> getMessageBySearching(String searchType, String keyword, long memberId, int page){
+    public PageResult<GetMessageRes> getMessageBySearching(String searchType, String keyword, long memberId, int page){
         MsgSearchType msgSearchType = MsgSearchType.valueOf(searchType);
         PageRequest pageRequest = PageRequest.of(page-1, 10, Sort.by("id").descending());
 
-        List<GetMessageRes> getMessageResList = null;
+        Page<GetMessageRes> messageResPage = null;
         if(msgSearchType == MsgSearchType.RECEIVER){ // 수신자 번호 검색했을 때
-            getMessageResList = messageRepository.findByReceiveNumber(keyword, memberId, pageRequest)
-                   .map(GetMessageRes::toDto).toList();
+            messageResPage = messageRepository.findByReceiveNumber(keyword, memberId, pageRequest)
+                    .map(GetMessageRes::toDto);
 
         }else if(msgSearchType == MsgSearchType.SENDER){ // 발신자 번호 검색했을 때
-            getMessageResList = messageRepository.findBySenderNumber(keyword, memberId, pageRequest)
-                    .map(GetMessageRes::toDto).toList();
+            messageResPage = messageRepository.findBySenderNumber(keyword, memberId, pageRequest)
+                    .map(GetMessageRes::toDto);
 
         }else if(msgSearchType == MsgSearchType.MEMO) { // 메모 키워드로 검색했을 때
-            getMessageResList = messageRepository.findByMemo(keyword, memberId, pageRequest)
-                    .map(GetMessageRes::toDto).toList();
+            messageResPage = messageRepository.findByMemo(keyword, memberId, pageRequest)
+                    .map(GetMessageRes::toDto);
 
         }else if(msgSearchType == MsgSearchType.MESSAGE) { // 메시지 내용으로 검색했을 때
-            getMessageResList = messageRepository.findByMessageContent(keyword, memberId, pageRequest)
-                    .map(GetMessageRes::toDto).toList();
+            messageResPage = messageRepository.findByMessageContent(keyword, memberId, pageRequest)
+                    .map(GetMessageRes::toDto);
         }
 
-        return getMessageResList;
+        return new PageResult<>(messageResPage);
     }
 
     /**
