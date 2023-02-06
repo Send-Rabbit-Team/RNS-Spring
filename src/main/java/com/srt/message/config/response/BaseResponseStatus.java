@@ -61,6 +61,7 @@ public enum BaseResponseStatus {
      */
     VALIDATED_ERROR(false, 3000, "VALIDATED_ERROR"), // @Valid 예외 처리
     SEND_MESSAGE_ERROR(false, 3001, "메시지를 발송하는 과정 중 오류가 발생했습니다."),
+    NOT_RESERVE_MESSAGE(false, 3002, "해당 메시지는 예약된 메시지가 아닙니다."),
 
     /**
      * 4000 : Database, Server 오류

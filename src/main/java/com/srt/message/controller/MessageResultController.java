@@ -5,8 +5,8 @@ import com.srt.message.config.page.PageResult;
 import com.srt.message.config.response.BaseResponse;
 import com.srt.message.dto.jwt.JwtInfo;
 import com.srt.message.dto.message.get.GetMessageRes;
+import com.srt.message.dto.message.get.GetReserveMessageRes;
 import com.srt.message.dto.message_result.get.GetListMessageResultRes;
-import com.srt.message.dto.message_result.get.GetMessageResultRes;
 import com.srt.message.service.MessageResultService;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
@@ -16,7 +16,6 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.List;
 
 @Log4j2
 @RestController
@@ -38,6 +37,21 @@ public class MessageResultController {
         log.info("발송된 메시지 조회 - memberId: {}, postSendMessageReq: {}", JwtInfo.getMemberId(request), page);
 
         return new BaseResponse<>(messageRes);
+    }
+
+    @ApiOperation(
+            value = "예약된 메시지 조회",
+            notes = "예약된 메시지들을 페이징으로 조회하는 기능이다."
+    )
+    @ApiResponses({
+            @ApiResponse(code = 1000, message = "요청에 성공하였습니다.")
+    })
+    @GetMapping("/reserve/{page}")
+    public BaseResponse<PageResult<GetReserveMessageRes>> getReserveMessages(@PathVariable("page") int page, HttpServletRequest request) {
+        PageResult<GetReserveMessageRes> reserveMessages = messageResultService.getReserveMessages(JwtInfo.getMemberId(request), page);
+        log.info("예약된 메시지 필터 조회 - memberId: {}, page: {}", JwtInfo.getMemberId(request), page);
+
+        return new BaseResponse<>(reserveMessages);
     }
 
     @ApiOperation(
@@ -66,23 +80,8 @@ public class MessageResultController {
     })
     @GetMapping("/filter/type/{page}")
     public BaseResponse<PageResult<GetMessageRes>> getMessagesByType(@PathVariable("page") int page, @RequestParam("type") String type, HttpServletRequest request) {
-        final PageResult<GetMessageRes> messageResList = messageResultService.getMessagesByType(type, JwtInfo.getMemberId(request), page);
+        PageResult<GetMessageRes> messageResList = messageResultService.getMessagesByType(type, JwtInfo.getMemberId(request), page);
         log.info("메시지 유형별 필터 조회 - memberId: {}, type: {}", JwtInfo.getMemberId(request), type);
-
-        return new BaseResponse<>(messageResList);
-    }
-
-    @ApiOperation(
-            value = "예약된 메시지 필터 조회",
-            notes = "예약된 메시지들을 필터 조회하는 기능이다."
-    )
-    @ApiResponses({
-            @ApiResponse(code = 1000, message = "요청에 성공하였습니다.")
-    })
-    @GetMapping("/filter/reserve/{page}")
-    public BaseResponse<PageResult<GetMessageRes>> getReserveMessages(@PathVariable("page") int page, HttpServletRequest request) {
-        PageResult<GetMessageRes> messageResList = messageResultService.getReserveMessages(JwtInfo.getMemberId(request), page);
-        log.info("예약된 메시지 필터 조회 - memberId: {}, page: {}", JwtInfo.getMemberId(request), page);
 
         return new BaseResponse<>(messageResList);
     }

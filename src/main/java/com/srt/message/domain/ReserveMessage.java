@@ -1,6 +1,7 @@
 package com.srt.message.domain;
 
 import com.srt.message.config.domain.BaseEntity;
+import com.srt.message.config.status.ReserveStatus;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -25,4 +26,12 @@ public class ReserveMessage extends BaseEntity {
     private String cronExpression;
 
     private String cronText;
+
+    @Enumerated(EnumType.STRING)
+    private ReserveStatus reserveStatus;
+
+    // 편의 메서드
+    public void changeReserveStatusStop(){
+        this.reserveStatus = ReserveStatus.STOP;
+    }
 }

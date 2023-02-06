@@ -25,27 +25,9 @@ import static com.srt.message.config.response.BaseResponseStatus.FILE_UPLOAD_SUC
 @RequestMapping("/message")
 @RequiredArgsConstructor
 public class MessageController {
-    private final ObjectStorageService objectStorageService;
-
     private final MessageService messageService;
 
     private final KakaoMessageService kakaoMessageService;
-
-    // MMS 이미지 전송 테스트
-    @ApiOperation(
-            value = "MMS 이미지 전송 테스트",
-            notes = "Object Storage에 이미지가 잘 저장되는지 테스트"
-    )
-    @ApiResponses({
-            @ApiResponse(code = 1000, message = "요청에 성공하였습니다.")
-    })
-    @PostMapping("/upload/test")
-    @NoIntercept
-    public BaseResponse<String> imageUploadTest(@RequestParam("image") MultipartFile multipartFile) {
-        objectStorageService.uploadImageTest(multipartFile);
-
-        return new BaseResponse<>(FILE_UPLOAD_SUCCESS);
-    }
 
     // 중계사에 문자 전송
     @ApiOperation(
@@ -80,24 +62,5 @@ public class MessageController {
         log.info("중계사 알림톡 전송 - memberId: {}, postSendMessageReq: {}", JwtInfo.getMemberId(request), postKakaoMessageReq);
 
         return new BaseResponse<>("메시지 갯수: " + postKakaoMessageReq.getCount() + ", 메시지 발송 걸린 시간: " + Double.parseDouble(processTime) / 1000 + "초");
-    }
-
-    // 예약 취소
-    @ApiOperation(
-            value = "예약된 메시지 취소",
-            notes = "예약된 메시지를 취소하는 기능이다."
-    )
-    @ApiResponses({
-            @ApiResponse(code = 1000, message = "요청에 성공하였습니다."),
-            @ApiResponse(code = 2016, message = "해당 사용자의 데이터가 아닙니다."),
-            @ApiResponse(code = 2023, message = "존재하는 메시지가 아닙니다.")
-    })
-    @GetMapping("/reserve/cancel/{messageId}")
-    public BaseResponse<String> cancelReserveMessage(@PathVariable("messageId") long messageId, HttpServletRequest request) {
-        String response = messageService.cancelReserveMessage(messageId, JwtInfo.getMemberId(request));
-
-        log.info("예약된 메시지 취소 - memberId: {}, postSendMessageReq: {}", JwtInfo.getMemberId(request), messageId);
-
-        return new BaseResponse<>(response);
     }
 }

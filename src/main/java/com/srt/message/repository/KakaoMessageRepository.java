@@ -12,7 +12,7 @@ import org.springframework.data.jpa.repository.Query;
 import java.util.Optional;
 
 public interface KakaoMessageRepository extends JpaRepository<KakaoMessage, Long> {
-    @EntityGraph(value = "KakaoMessage.with.Member.SenderNumber.RepeatRule")
+    @EntityGraph(value = "KakaoMessage.with.Member.SenderNumber")
     Optional<KakaoMessage> findKakaoMessageById(long messageId);
 
     @Query(value = "select km from KakaoMessage km where km.member.id = :memberId",
