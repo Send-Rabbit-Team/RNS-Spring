@@ -9,10 +9,9 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 
-@NamedEntityGraph(name = "Message.with.Member.SenderNumber.RepeatRule", attributeNodes = {
+@NamedEntityGraph(name = "Message.with.Member.SenderNumber", attributeNodes = {
         @NamedAttributeNode(value = "member", subgraph = "member_company"),
         @NamedAttributeNode("senderNumber"),
-        @NamedAttributeNode("repeatRule"),
 },
         subgraphs = @NamedSubgraph(name = "member_company", attributeNodes = {
                 @NamedAttributeNode("company")
@@ -37,13 +36,11 @@ public class Message extends BaseEntity {
     @JoinColumn(name = "sender_number_id")
     private SenderNumber senderNumber;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "repeat_rule_id")
-    private RepeatRule repeatRule;
-
     private String subject;
 
     private String content;
+
+    private boolean reserveYN;
 
     @Enumerated(EnumType.STRING)
     private MessageType messageType;

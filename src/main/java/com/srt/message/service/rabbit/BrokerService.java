@@ -3,6 +3,7 @@ package com.srt.message.service.rabbit;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.srt.message.config.status.MessageStatus;
+import com.srt.message.config.status.ReserveStatus;
 import com.srt.message.domain.*;
 import com.srt.message.domain.redis.RMessageResult;
 import com.srt.message.dto.message.BrokerSendMessageDto;
@@ -163,7 +164,9 @@ public class BrokerService {
                 .message(brokerMessageDto.getMessage())
                 .cronExpression(messageDto.getCronExpression())
                 .cronText(messageDto.getCronText())
+                .reserveStatus(ReserveStatus.PROCESSING)
                 .build();
+
         reserveMessageRepository.save(reserveMessage);
 
         schedulerService.register(brokerMessageDto);

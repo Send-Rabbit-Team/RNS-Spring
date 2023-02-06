@@ -2,6 +2,7 @@ package com.srt.message.repository;
 
 import com.srt.message.config.type.MessageType;
 import com.srt.message.domain.Message;
+import com.srt.message.domain.ReserveMessage;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.EntityGraph;
@@ -14,25 +15,23 @@ import java.util.Optional;
 @Repository
 public interface MessageRepository extends JpaRepository<Message, Long> {
     // 캐시용
-    @EntityGraph(value = "Message.with.Member.SenderNumber.RepeatRule")
+    @EntityGraph(value = "Message.with.Member.SenderNumber")
     Optional<Message> findMessageById(long messageId);
 
-    // 사용자 보낸 메시지 페이징 조회
-    @Query(value = "select m from Message m where m.member.id = :memberId",
-            countQuery = "select count(m) from Message m where m.member.id = :memberId")
+    // 사용자 보낸 메시지 페이징 조회 (예약 메시지는 제외)
+    @Query(value = "select m from Message m where m.member.id = :memberId and m.reserveYN = false",
+            countQuery = "select count(m) from Message m where m.member.id = :memberId and m.reserveYN = false")
     Page<Message> findAllMessage(long memberId, Pageable pageable);
+
+    // 예약 메시지 페이징 조회
+    @Query(value = "select rm from ReserveMessage rm left join fetch rm.message m where m.member.id = :memberId and m.reserveYN = true",
+            countQuery = "select count(m) from Message m where m.member.id = :memberId and m.reserveYN = true")
+    Page<ReserveMessage> findAllReserveMessage(long memberId, Pageable pageable);
 
     // 유형별 메시지 필터 페이징 조회
     @Query(value = "select m from Message m where m.member.id = :memberId and m.messageType = :messageType",
             countQuery = "select count(m) from Message m where m.member.id = :memberId and m.messageType = :messageType")
     Page<Message> findMessagesByMessageType(MessageType messageType, long memberId, Pageable pageable);
-
-    // 예약된 메시지 필터 페이징 조회
-    @Query(value = "select m from Message m join ReserveMessage rm where m.member.id = :memberId and m.id = rm.message.id " +
-            "and rm.status = 'ACTIVE'",
-            countQuery = "select count(m) from Message m where m.member.id = :memberId and m.messageType = :messageType")
-    Page<Message> findReserveMessage(long memberId, Pageable pageable);
-
 
     // 수신자 검색 페이징 조회
     @Query(value = "select mr.message from MessageResult mr left join mr.message where mr.message.member.id = :memberId " +

@@ -47,7 +47,7 @@ public class AuthController {
     @NoIntercept
     public BaseResponse<PostRegisterRes> defaultSignUp(@RequestBody @Validated PostRegisterReq postRegisterReq){
         PostRegisterRes postRegisterRes = authService.defaultSignUp(postRegisterReq);
-        log.info("Default Sign-Up - email: {}" + postRegisterRes.getEmail());
+        log.info("일반 회원가입 - email: {}" + postRegisterRes.getEmail());
 
         return new BaseResponse<>(postRegisterRes);
     }

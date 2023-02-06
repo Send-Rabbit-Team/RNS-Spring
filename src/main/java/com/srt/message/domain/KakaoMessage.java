@@ -10,10 +10,8 @@ import org.hibernate.annotations.Comment;
 
 import javax.persistence.*;
 
-@NamedEntityGraph(name = "KakaoMessage.with.Member.SenderNumber.RepeatRule", attributeNodes = {
-        @NamedAttributeNode(value = "member", subgraph = "member_company"),
-        @NamedAttributeNode("repeatRule")
-},
+@NamedEntityGraph(name = "KakaoMessage.with.Member.SenderNumber", attributeNodes = {
+        @NamedAttributeNode(value = "member", subgraph = "member_company")},
         subgraphs = @NamedSubgraph(name = "member_company", attributeNodes = {
                 @NamedAttributeNode("company")
         })
@@ -34,10 +32,6 @@ public class KakaoMessage extends BaseEntity {
     private Member member;
 
     private String sender;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "repeat_rule_id")
-    private RepeatRule repeatRule;
 
     private String title;
 

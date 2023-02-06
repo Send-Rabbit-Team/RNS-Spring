@@ -55,12 +55,17 @@ public class MessageService {
         if (senderNumber.getMember().getId() != member.getId())
             throw new BaseException(NOT_MATCH_SENDER_NUMBER);
 
+        boolean reserveYN = false;
+        if (messageReq.getMessage().getCronExpression() != null)
+            reserveYN = true;
+
         Message message = Message.builder()
                 .member(member)
                 .senderNumber(senderNumber)
                 .subject(messageReq.getMessage().getSubject())
                 .content(messageReq.getMessage().getContent())
                 .messageType(messageReq.getMessage().getMessageType())
+                .reserveYN(reserveYN)
                 .build();
 
         messageRepository.save(message);
