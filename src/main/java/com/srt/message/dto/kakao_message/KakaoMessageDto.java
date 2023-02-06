@@ -1,12 +1,10 @@
-package com.srt.message.dto.message.kakao;
+package com.srt.message.dto.kakao_message;
 
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.srt.message.config.status.MessageStatus;
 import com.srt.message.config.type.ButtonType;
 import lombok.*;
-
-import java.util.List;
 
 @Builder
 @AllArgsConstructor
@@ -31,15 +29,13 @@ public class KakaoMessageDto {
 
     private MessageStatus messageStatus;
 
-    @JsonIgnore
-    private String reserveTime;
-
-    @JsonIgnore
-    private String scheduleCode;
-
     private String buttonTitle;
 
     private String buttonUrl;
 
     private ButtonType buttonType;
+
+    private String cronExpression;
+
+    private String cronText;
 }

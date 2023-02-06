@@ -4,8 +4,10 @@ import com.srt.message.config.exception.BaseException;
 import com.srt.message.config.status.BaseStatus;
 import com.srt.message.domain.ReserveMessage;
 import com.srt.message.dto.message.BrokerMessageDto;
+import com.srt.message.dto.kakao_message.BrokerKakaoMessageDto;
 import com.srt.message.repository.ReserveMessageRepository;
 import com.srt.message.service.rabbit.BrokerService;
+import com.srt.message.service.rabbit.KakaoBrokerService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -28,6 +30,7 @@ public class SchedulerService {
     private Map<Long, ScheduledFuture<?>> scheduledTasks = new ConcurrentHashMap<>();
 
     private final BrokerService brokerService;
+    private final KakaoBrokerService kakaoBrokerService;
     private final TaskScheduler taskScheduler;
 
     private final ReserveMessageRepository reserveMessageRepository;
@@ -45,6 +48,21 @@ public class SchedulerService {
                 return;
 
             brokerService.sendSmsMessage(brokerMessageDto);
+        }, cronTrigger);
+
+        scheduledTasks.put(taskId, task);
+    }
+
+    public void registerKakao(BrokerKakaoMessageDto brokerKakaoMessageDto) {
+        long taskId = brokerKakaoMessageDto.getKakaoMessage().getId();
+        String cronExpression = brokerKakaoMessageDto.getKakaoMessageDto().getCronExpression();
+        CronTrigger cronTrigger = new CronTrigger(cronExpression);
+
+        ScheduledFuture<?> task = taskScheduler.schedule(() -> {
+            if (checkSchedulerLock(taskId))
+                return;
+
+            kakaoBrokerService.sendKakaoMessage(brokerKakaoMessageDto);
         }, cronTrigger);
 
         scheduledTasks.put(taskId, task);
