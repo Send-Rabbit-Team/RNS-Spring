@@ -22,6 +22,7 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
 import static com.srt.message.config.response.BaseResponseStatus.ALREADY_CANCEL_RESERVE;
+import static com.srt.message.config.response.BaseResponseStatus.NOT_RESERVE_MESSAGE;
 
 @Log4j2
 @RequiredArgsConstructor
@@ -76,9 +77,9 @@ public class SchedulerService {
 
             log.info(messageId + "번 메시지 예약 발송 스케쥴러를 중지합니다.");
 
-            return messageId + "의 메시지 발송 예약이 취소되었습니다.";
+            return messageId + "번 메시지의 발송 예약이 취소되었습니다.";
         }else{
-            return "해당 메시지는 예약된 메시지가 아닙니다";
+            throw new BaseException(NOT_RESERVE_MESSAGE);
         }
     }
 

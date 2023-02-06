@@ -4,6 +4,8 @@ import com.srt.message.domain.Member;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.AuditorAware;
 import org.springframework.stereotype.Component;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.Optional;
@@ -16,9 +18,9 @@ public class LoginMemberAuditorAware implements AuditorAware<Long> {
 
     @Override
     public Optional<Long> getCurrentAuditor() {
-        if(request == null) // RabbitMQ로 consume 받는 상황일 때
-            return Optional.empty();
+        if (RequestContextHolder.getRequestAttributes() instanceof ServletRequestAttributes)
+            return Optional.ofNullable(loginMember.getId());
 
-        return Optional.ofNullable(loginMember.getId());
+        return Optional.empty(); // RabbitMQ로 consume 받는 상황일 때
     }
 }
