@@ -65,8 +65,8 @@ public class MessageResultController {
             @ApiResponse(code = 1000, message = "요청에 성공하였습니다.")
     })
     @GetMapping("/filter/type/{page}")
-    public BaseResponse<List<GetMessageRes>> getMessagesByType(@PathVariable("page") int page, @RequestParam("type") String type, HttpServletRequest request) {
-        List<GetMessageRes> messageResList = messageResultService.getMessagesByType(type, JwtInfo.getMemberId(request), page);
+    public BaseResponse<PageResult<GetMessageRes>> getMessagesByType(@PathVariable("page") int page, @RequestParam("type") String type, HttpServletRequest request) {
+        final PageResult<GetMessageRes> messageResList = messageResultService.getMessagesByType(type, JwtInfo.getMemberId(request), page);
         log.info("메시지 유형별 필터 조회 - memberId: {}, type: {}", JwtInfo.getMemberId(request), type);
 
         return new BaseResponse<>(messageResList);
@@ -80,8 +80,8 @@ public class MessageResultController {
             @ApiResponse(code = 1000, message = "요청에 성공하였습니다.")
     })
     @GetMapping("/filter/reserve/{page}")
-    public BaseResponse<List<GetMessageRes>> getReserveMessages(@PathVariable("page") int page, HttpServletRequest request) {
-        List<GetMessageRes> messageResList = messageResultService.getReserveMessages(JwtInfo.getMemberId(request), page);
+    public BaseResponse<PageResult<GetMessageRes>> getReserveMessages(@PathVariable("page") int page, HttpServletRequest request) {
+        PageResult<GetMessageRes> messageResList = messageResultService.getReserveMessages(JwtInfo.getMemberId(request), page);
         log.info("예약된 메시지 필터 조회 - memberId: {}, page: {}", JwtInfo.getMemberId(request), page);
 
         return new BaseResponse<>(messageResList);
@@ -95,9 +95,9 @@ public class MessageResultController {
             @ApiResponse(code = 1000, message = "요청에 성공하였습니다.")
     })
     @GetMapping("/search/{page}")
-    public BaseResponse<List<GetMessageRes>> getMessagesBySearching(@PathVariable("page") int page, @RequestParam(value = "type") String searchType
+    public BaseResponse<PageResult<GetMessageRes>> getMessagesBySearching(@PathVariable("page") int page, @RequestParam(value = "type") String searchType
             , @RequestParam("keyword") String keyword, HttpServletRequest request) {
-        List<GetMessageRes> messageResList = messageResultService.getMessageBySearching(searchType, keyword, JwtInfo.getMemberId(request), page);
+        PageResult<GetMessageRes> messageResList = messageResultService.getMessageBySearching(searchType, keyword, JwtInfo.getMemberId(request), page);
         log.info("메시지 검색 조회 - memberId: {}, type: {}, keyword: {}", JwtInfo.getMemberId(request), searchType, keyword);
 
         return new BaseResponse<>(messageResList);
