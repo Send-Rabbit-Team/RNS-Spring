@@ -1,13 +1,9 @@
 package com.srt.message.controller;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.srt.message.config.page.PageResult;
 import com.srt.message.config.response.BaseResponse;
-import com.srt.message.dto.message.get.GetMessageRes;
-import com.srt.message.dto.message_result.get.GetMessageResultRes;
 import com.srt.message.service.KakaoMessageService;
 import com.srt.message.dto.jwt.JwtInfo;
-import com.srt.message.dto.message.kakao.post.PostSendKakaoMessageReq;
+import com.srt.message.dto.kakao_message.post.PostKakaoMessageReq;
 import com.srt.message.dto.message.post.PostSendMessageReq;
 import com.srt.message.jwt.NoIntercept;
 import com.srt.message.service.MessageService;
@@ -21,8 +17,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
-
-import java.util.List;
 
 import static com.srt.message.config.response.BaseResponseStatus.FILE_UPLOAD_SUCCESS;
 
@@ -80,12 +74,12 @@ public class MessageController {
             @ApiResponse(code = 1000, message = "요청에 성공하였습니다.")
     })
     @PostMapping("/send/kakao")
-    public BaseResponse<String> sendKakaoMessage(@RequestBody PostSendKakaoMessageReq postSendKakaoMessageReq, HttpServletRequest request) {
-        String processTime = kakaoMessageService.sendKakaoMessageToBroker(postSendKakaoMessageReq, JwtInfo.getMemberId(request));
+    public BaseResponse<String> sendKakaoMessage(@RequestBody PostKakaoMessageReq postKakaoMessageReq, HttpServletRequest request) {
+        String processTime = kakaoMessageService.sendKakaoMessageToBroker(postKakaoMessageReq, JwtInfo.getMemberId(request));
 
-        log.info("중계사 알림톡 전송 - memberId: {}, postSendMessageReq: {}", JwtInfo.getMemberId(request), postSendKakaoMessageReq);
+        log.info("중계사 알림톡 전송 - memberId: {}, postSendMessageReq: {}", JwtInfo.getMemberId(request), postKakaoMessageReq);
 
-        return new BaseResponse<>("메시지 갯수: " + postSendKakaoMessageReq.getCount() + ", 메시지 발송 걸린 시간: " + Double.parseDouble(processTime) / 1000 + "초");
+        return new BaseResponse<>("메시지 갯수: " + postKakaoMessageReq.getCount() + ", 메시지 발송 걸린 시간: " + Double.parseDouble(processTime) / 1000 + "초");
     }
 
     // 예약 취소

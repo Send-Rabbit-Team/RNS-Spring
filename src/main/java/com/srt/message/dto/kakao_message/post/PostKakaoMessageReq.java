@@ -1,6 +1,6 @@
-package com.srt.message.dto.message.kakao.post;
+package com.srt.message.dto.kakao_message.post;
 
-import com.srt.message.dto.message.kakao.KakaoMessageDto;
+import com.srt.message.dto.kakao_message.KakaoMessageDto;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.*;
 
@@ -11,7 +11,7 @@ import java.util.List;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class PostSendKakaoMessageReq {
+public class PostKakaoMessageReq {
     private KakaoMessageDto kakaoMessageDto;
 
     private List<String> receivers;

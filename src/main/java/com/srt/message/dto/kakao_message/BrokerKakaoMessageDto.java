@@ -1,4 +1,4 @@
-package com.srt.message.dto.message.kakao;
+package com.srt.message.dto.kakao_message;
 
 import com.srt.message.domain.Contact;
 import com.srt.message.domain.KakaoMessage;
