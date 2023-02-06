@@ -156,24 +156,6 @@ public class BrokerService {
         return processTime;
     }
 
-    // 메시지 예약발송
-    public String reserveSmsMessage(BrokerMessageDto brokerMessageDto){
-        SMSMessageDto messageDto = brokerMessageDto.getSmsMessageDto();
-
-        ReserveMessage reserveMessage = ReserveMessage.builder()
-                .message(brokerMessageDto.getMessage())
-                .cronExpression(messageDto.getCronExpression())
-                .cronText(messageDto.getCronText())
-                .reserveStatus(ReserveStatus.PROCESSING)
-                .build();
-
-        reserveMessageRepository.save(reserveMessage);
-
-        schedulerService.register(brokerMessageDto);
-
-        return "예약성공";
-    }
-
     // Json 형태로 반환
     public String convertToJson(Object object) {
         String sendMessageJson = null;

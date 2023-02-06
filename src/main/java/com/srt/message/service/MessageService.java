@@ -32,6 +32,7 @@ public class MessageService {
     private final MessageImageRepository messageImageRepository;
 
     private final BrokerService brokerService;
+    private final ReserveMessageService reserveMessageService;
 
     private final SchedulerService schedulerService;
 
@@ -93,19 +94,8 @@ public class MessageService {
 
         // 크론 표현식 있으면 예약 발송으로 이동
         if (messageReq.getMessage().getCronExpression() != null)
-            return brokerService.reserveSmsMessage(brokerMessageDto);
+            return reserveMessageService.reserveSmsMessage(brokerMessageDto);
 
         return brokerService.sendSmsMessage(brokerMessageDto);
-    }
-
-    // 예약 취소
-    public String cancelReserveMessage(long messageId, long memberId) {
-        Message message = messageRepository.findById(memberId)
-                .orElseThrow(() -> new BaseException(NOT_EXIST_MESSAGE));
-
-        if (message.getMember().getId() != memberId)
-            throw new BaseException(NOT_MATCH_MEMBER);
-
-        return schedulerService.remove(messageId);
     }
 }

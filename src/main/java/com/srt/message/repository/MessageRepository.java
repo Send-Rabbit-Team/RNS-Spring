@@ -1,6 +1,7 @@
 package com.srt.message.repository;
 
 import com.srt.message.config.type.MessageType;
+import com.srt.message.domain.Contact;
 import com.srt.message.domain.Message;
 import com.srt.message.domain.ReserveMessage;
 import org.springframework.data.domain.Page;
@@ -10,6 +11,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository
