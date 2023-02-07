@@ -24,6 +24,10 @@ public class ReserveMessageContact extends BaseEntity {
     private ReserveMessage reserveMessage;
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "reserve_kakao_message_id")
+    private ReserveKakaoMessage reserveKakaoMessage;
+
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "contact_id")
     private Contact contact;
 }

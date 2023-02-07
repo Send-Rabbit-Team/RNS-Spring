@@ -9,8 +9,10 @@ import com.srt.message.domain.ReserveMessageContact;
 import com.srt.message.dto.message.BrokerMessageDto;
 import com.srt.message.dto.message.SMSMessageDto;
 import com.srt.message.repository.ReserveMessageContactRepository;
+import com.srt.message.dto.kakao_message.BrokerKakaoMessageDto;
 import com.srt.message.repository.ReserveMessageRepository;
 import com.srt.message.service.rabbit.BrokerService;
+import com.srt.message.service.rabbit.KakaoBrokerService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.context.annotation.Bean;
@@ -18,9 +20,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.scheduling.TaskScheduler;
 import org.springframework.scheduling.support.CronTrigger;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Map;
@@ -40,6 +40,7 @@ public class SchedulerService {
     private Map<Long, ScheduledFuture<?>> scheduledTasks = new ConcurrentHashMap<>();
 
     private final BrokerService brokerService;
+    private final KakaoBrokerService kakaoBrokerService;
     private final TaskScheduler taskScheduler;
 
     private final ReserveMessageRepository reserveMessageRepository;
@@ -94,6 +95,21 @@ public class SchedulerService {
         scheduledTasks.put(taskId, task);
     }
 
+    public void registerKakao(BrokerKakaoMessageDto brokerKakaoMessageDto) {
+        long taskId = brokerKakaoMessageDto.getKakaoMessage().getId();
+        String cronExpression = brokerKakaoMessageDto.getKakaoMessageDto().getCronExpression();
+        CronTrigger cronTrigger = new CronTrigger(cronExpression);
+
+        ScheduledFuture<?> task = taskScheduler.schedule(() -> {
+            if (checkSchedulerLock(taskId))
+                return;
+
+            kakaoBrokerService.sendKakaoMessage(brokerKakaoMessageDto);
+        }, cronTrigger);
+
+        scheduledTasks.put(taskId, task);
+    }
+
     // 스케쥴러 취소
     public String remove(long messageId) {
         Optional<ReserveMessage> reserveMessageOptional = reserveMessageRepository.findByMessageId(messageId);
@@ -114,6 +130,13 @@ public class SchedulerService {
         }else{
             throw new BaseException(NOT_RESERVE_MESSAGE);
         }
+    }
+
+    public void removeKakao(long messageId) {
+        if (scheduledTasks.get(messageId) != null )
+            scheduledTasks.get(messageId).cancel(true);
+        else
+            throw new BaseException(NOT_RESERVE_MESSAGE);
     }
 
     // 스케쥴러 락
