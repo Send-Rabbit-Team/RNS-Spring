@@ -1,6 +1,7 @@
 package com.srt.message.service;
 
 import com.srt.message.config.exception.BaseException;
+import com.srt.message.config.status.ReserveStatus;
 import com.srt.message.domain.*;
 import com.srt.message.repository.*;
 import com.srt.message.dto.kakao_message.BrokerKakaoMessageDto;
@@ -18,6 +19,7 @@ import static com.srt.message.config.response.BaseResponseStatus.*;
 @Service
 @RequiredArgsConstructor
 public class KakaoMessageService {
+    private final ReserveMessageContactRepository reserveMessageContactRepository;
     private final MemberRepository memberRepository;
     private final ContactRepository contactRepository;
     private final KakaoMessageRepository kakaoMessageRepository;
@@ -73,9 +75,19 @@ public class KakaoMessageService {
                     .kakaoMessage(kakaoMessage)
                     .cronExpression(messageReq.getKakaoMessageDto().getCronExpression())
                     .cronText(messageReq.getKakaoMessageDto().getCronText())
+                    .reserveStatus(ReserveStatus.PROCESSING)
                     .build();
             reserveKakaoMessageRepository.save(reserveKakaoMessage);
             log.info("reserveKakaoMessage : " + reserveKakaoMessage);
+
+            for (Contact contact : contacts) {
+                ReserveMessageContact reserveMessageContact = ReserveMessageContact.builder()
+                        .reserveKakaoMessage(reserveKakaoMessage)
+                        .contact(contact)
+                        .build();
+                reserveMessageContactRepository.save(reserveMessageContact);
+            }
+
 
             schedulerService.registerKakao(brokerMessageDto);
         }

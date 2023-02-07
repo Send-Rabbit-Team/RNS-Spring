@@ -15,7 +15,6 @@ import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.scheduling.TaskScheduler;
 import org.springframework.scheduling.support.CronTrigger;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Map;
 import java.util.Optional;
@@ -99,6 +98,13 @@ public class SchedulerService {
         }else{
             throw new BaseException(NOT_RESERVE_MESSAGE);
         }
+    }
+
+    public void removeKakao(long messageId) {
+        if (scheduledTasks.get(messageId) != null )
+            scheduledTasks.get(messageId).cancel(true);
+        else
+            throw new BaseException(NOT_RESERVE_MESSAGE);
     }
 
     // 스케쥴러 락

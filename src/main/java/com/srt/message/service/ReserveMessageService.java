@@ -73,7 +73,7 @@ public class ReserveMessageService {
 
     // 예약 취소
     public String cancelReserveMessage(long messageId, long memberId) {
-        Message message = messageRepository.findById(memberId)
+        Message message = messageRepository.findById(messageId)
                 .orElseThrow(() -> new BaseException(NOT_EXIST_MESSAGE));
 
         if (message.getMember().getId() != memberId)

@@ -1,5 +1,5 @@
 package com.srt.message.config.type;
 
 public enum KmsgSearchType {
-    NUMBER, MEMO, CONTENT
+    NUMBER, MEMO, TITLE, CONTENT
 }
