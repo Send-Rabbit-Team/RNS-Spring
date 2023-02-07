@@ -3,6 +3,8 @@ package com.srt.message.dto.message;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.srt.message.config.status.MessageStatus;
 import com.srt.message.config.type.MessageType;
+import com.srt.message.domain.Message;
+import com.srt.message.domain.ReserveMessage;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.*;
 
@@ -59,4 +61,16 @@ public class SMSMessageDto {
             example = "매일 오전 3시"
     )
     private String cronText;
+
+    public static SMSMessageDto toDto(Message message, ReserveMessage reserveMessage){
+        return SMSMessageDto.builder()
+                .subject(message.getSubject())
+                .content(message.getContent())
+                .from(message.getSenderNumber().getPhoneNumber())
+                .messageType(message.getMessageType())
+                .messageStatus(MessageStatus.PENDING)
+                .cronExpression(reserveMessage.getCronExpression())
+                .cronText(reserveMessage.getCronText())
+                .build();
+    }
 }

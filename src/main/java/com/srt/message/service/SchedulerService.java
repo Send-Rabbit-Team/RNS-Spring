@@ -2,24 +2,33 @@ package com.srt.message.service;
 
 import com.srt.message.config.exception.BaseException;
 import com.srt.message.config.status.BaseStatus;
+import com.srt.message.config.status.ReserveStatus;
+import com.srt.message.domain.Contact;
 import com.srt.message.domain.ReserveMessage;
+import com.srt.message.domain.ReserveMessageContact;
 import com.srt.message.dto.message.BrokerMessageDto;
+import com.srt.message.dto.message.SMSMessageDto;
+import com.srt.message.repository.ReserveMessageContactRepository;
 import com.srt.message.repository.ReserveMessageRepository;
 import com.srt.message.service.rabbit.BrokerService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.context.annotation.Bean;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.scheduling.TaskScheduler;
 import org.springframework.scheduling.support.CronTrigger;
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 import static com.srt.message.config.response.BaseResponseStatus.ALREADY_CANCEL_RESERVE;
 import static com.srt.message.config.response.BaseResponseStatus.NOT_RESERVE_MESSAGE;
@@ -34,12 +43,36 @@ public class SchedulerService {
     private final TaskScheduler taskScheduler;
 
     private final ReserveMessageRepository reserveMessageRepository;
+    private final ReserveMessageContactRepository reserveMessageContactRepository;
 
     private final RedisTemplate<String, Object> redisTemplate;
 
+    // 어플리케이션 실행 시에 스케쥴러 자동으로 등록
+    @Bean
+    public void registerMessageReserveScheduler(){
+        List<ReserveMessage> reserveMessageList = reserveMessageRepository.findAllByReserveStatus(ReserveStatus.PROCESSING);
+
+        reserveMessageList.stream().forEach(r -> {
+            String cronExpression = r.getCronExpression();
+            long taskId = r.getMessage().getId();
+
+            // 예약된 메시지 연락처 찾기
+            List<Contact> contacts =
+                    reserveMessageContactRepository.findAllByReserveMessage(r)
+                            .stream().map(ReserveMessageContact::getContact).collect(Collectors.toList());
+
+            // 스케쥴러 등록을 위해 BrokerMessageDto 객체 생성하기
+            SMSMessageDto smsMessageDto = SMSMessageDto.toDto(r.getMessage(), r);
+            smsMessageDto.setCronExpression(cronExpression);
+            BrokerMessageDto brokerMessageDto = BrokerMessageDto.builder().smsMessageDto(smsMessageDto)
+                    .message(r.getMessage()).contacts(contacts).member(r.getMessage().getMember()).build();
+
+            register(brokerMessageDto, taskId);
+        });
+    }
+
     // 스케쥴러 등록
-    public void register(BrokerMessageDto brokerMessageDto) {
-        long taskId = brokerMessageDto.getMessage().getId();
+    public void register(BrokerMessageDto brokerMessageDto, long taskId) {
         String cronExpression = brokerMessageDto.getSmsMessageDto().getCronExpression();
         CronTrigger cronTrigger = new CronTrigger(cronExpression);
 

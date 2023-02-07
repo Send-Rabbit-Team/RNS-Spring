@@ -6,6 +6,9 @@ import lombok.*;
 import javax.persistence.*;
 
 // 예약 발송 대상자들 정보 저장 테이블
+@NamedEntityGraph(name = "ReserveMessageContact.with.Contact", attributeNodes = {
+        @NamedAttributeNode(value = "contact")
+})
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
