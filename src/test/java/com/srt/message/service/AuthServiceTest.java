@@ -1,287 +1,239 @@
 package com.srt.message.service;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.srt.message.config.auditor.LoginMember;
 import com.srt.message.config.exception.BaseException;
 import com.srt.message.config.status.AuthPhoneNumberStatus;
 import com.srt.message.config.type.LoginType;
 import com.srt.message.config.type.MemberType;
+import com.srt.message.domain.Member;
+import com.srt.message.domain.SenderNumber;
 import com.srt.message.domain.redis.AuthPhoneNumber;
-import com.srt.message.dto.auth.login.post.PostLoginReq;
-import com.srt.message.dto.auth.login.post.PostLoginRes;
 import com.srt.message.dto.auth.register.google.GoogleRegisterReq;
 import com.srt.message.dto.auth.register.google.GoogleRegisterRes;
 import com.srt.message.dto.auth.register.post.PostRegisterReq;
 import com.srt.message.dto.auth.register.post.PostRegisterRes;
-import com.srt.message.dto.jwt.JwtInfo;
-import com.srt.message.jwt.JwtService;
+import com.srt.message.repository.CompanyRepository;
 import com.srt.message.repository.MemberRepository;
+import com.srt.message.repository.SenderNumberRepository;
 import com.srt.message.repository.redis.AuthPhoneNumberRedisRepository;
+import com.srt.message.utils.encrypt.SHA256;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.transaction.annotation.Transactional;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.LinkedHashMap;
+import java.io.UnsupportedEncodingException;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+import java.util.List;
+import java.util.Optional;
 
 import static com.srt.message.config.response.BaseResponseStatus.ALREADY_EXIST_EMAIL;
 import static com.srt.message.config.response.BaseResponseStatus.NOT_AUTH_PHONE_NUMBER;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.BDDMockito.given;
 
-@SpringBootTest
-@Transactional
+@ExtendWith(MockitoExtension.class)
 class AuthServiceTest {
-    @Autowired
+    @InjectMocks
     private AuthService authService;
+    @Mock
+    private SmsService smsService;
 
-    @Autowired
+    @Mock
     private MemberRepository memberRepository;
-
-    @Autowired
+    @Mock
+    private CompanyRepository companyRepository;
+    @Mock
     private AuthPhoneNumberRedisRepository authPhoneNumberRedisRepository;
+    @Mock
+    private LoginMember loginMember;
+    @Mock
+    private SenderNumberRepository senderNumberRepository;
+    private Member member;
 
-    @Autowired
-    private ObjectMapper objectMapper;
+    @BeforeEach
+    public void setUpMember(){
+        member = Member.builder().email("kakao@gmail.com").build();
+    }
 
-    // 회원 가입 테스트 (개인)
+    @DisplayName("일반 회원가입 (개인)")
     @Test
-    public void defaultSignUp_SavePersonMember_True(){
+    void defaultSignUp_Person_Success() throws UnsupportedEncodingException, NoSuchAlgorithmException, InvalidKeyException {
         // given
-        PostRegisterReq req = PostRegisterReq.builder()
-                .email("qeasd123asd@gmail.com")
+        PostRegisterReq request = defaultSignUpRequest_person();
+        String encryptPassword = SHA256.encrypt(request.getPassword());
+
+        // when
+        PostRegisterRes response = authService.defaultSignUp(request);
+
+        // then
+        assertThat(response.getEmail()).isEqualTo(request.getEmail());
+        assertThat(encryptPassword).isEqualTo(request.getPassword());
+        assertThat(response.getName()).isEqualTo(request.getName());
+        assertThat(response.getMemberType()).isEqualTo(MemberType.PERSON);
+        assertThat(response.getLoginType()).isEqualTo(LoginType.DEFAULT);
+    }
+
+    @DisplayName("일반 회원가입 (기업)")
+    @Test
+    void defaultSignUp_Company_Success() {
+        // given
+        PostRegisterReq request = defaultSignUpRequest_company();
+        String encryptPassword = SHA256.encrypt(request.getPassword());
+
+        // when
+        PostRegisterRes response = authService.defaultSignUp(request);
+
+        // then
+        assertThat(response.getEmail()).isEqualTo(request.getEmail());
+        assertThat(encryptPassword).isEqualTo(request.getPassword());
+        assertThat(response.getName()).isEqualTo(request.getName());
+        assertThat(response.getCompanyName()).isEqualTo(request.getCompanyName());
+        assertThat(response.getBsNum()).isEqualTo(request.getBsNum());
+        assertThat(response.getKakaoBizId()).isEqualTo(request.getKakaoBizId());
+        assertThat(response.getMemberType()).isEqualTo(MemberType.COMPANY);
+        assertThat(response.getLoginType()).isEqualTo(LoginType.DEFAULT);
+    }
+
+    @DisplayName("구글 회원가입 (개인)")
+    @Test
+    void googleSignUp_Person_Success() {
+        // given
+        GoogleRegisterReq request = googleSignUpRequest_person();
+
+        // when
+        GoogleRegisterRes response = authService.googleSignUp(request);
+
+        // then
+        assertThat(response.getEmail()).isEqualTo(request.getEmail());
+        assertThat(response.getName()).isEqualTo(request.getName());
+        assertThat(response.getMemberType()).isEqualTo(MemberType.PERSON);
+        assertThat(response.getLoginType()).isEqualTo(LoginType.GOOGLE);
+    }
+
+    @DisplayName("구글 회원가입 (기업)")
+    @Test
+    void googleSignUp_Company_Success() {
+        // given
+        GoogleRegisterReq request = googleSignUpRequest_person();
+
+        // when
+        GoogleRegisterRes response = authService.googleSignUp(request);
+
+        // then
+        assertThat(response.getEmail()).isEqualTo(request.getEmail());
+        assertThat(response.getName()).isEqualTo(request.getName());
+        assertThat(response.getCompanyName()).isEqualTo(request.getCompanyName());
+        assertThat(response.getBsNum()).isEqualTo(request.getBsNum());
+        assertThat(response.getKakaoBizId()).isEqualTo(request.getKakaoBizId());
+        assertThat(response.getMemberType()).isEqualTo(MemberType.PERSON);
+        assertThat(response.getLoginType()).isEqualTo(LoginType.GOOGLE);
+    }
+
+    @DisplayName("회원가입 시 이메일 중복 처리")
+    @Test
+    void signUp_EmailDuplicated() {
+        // given
+        PostRegisterReq request = PostRegisterReq.builder().email("kakao@gmail.com").build();
+
+        given(memberRepository.findByEmailIgnoreCase(any())).willReturn(Optional.ofNullable(member));
+
+        // when
+        BaseException exception = assertThrows(BaseException.class, () ->
+                authService.defaultSignUp(request));
+
+        assertEquals(exception.getStatus(), ALREADY_EXIST_EMAIL);
+    }
+
+    @DisplayName("일반 회원가입 시 휴대폰 인증 처리")
+    @Test
+    void defaultSignUp_authPhoneNumber(){
+        // given
+        PostRegisterReq request = PostRegisterReq.builder()
+                .email("kakao@gmail.com").password("1q2w3e4r!").checkPassword("1q2w3e4r!").build();
+
+        // when
+        BaseException exception = assertThrows(BaseException.class, () ->
+                authService.defaultSignUp(request));
+
+        assertEquals(exception.getStatus(), NOT_AUTH_PHONE_NUMBER);
+    }
+
+    public PostRegisterReq defaultSignUpRequest_person() {
+        PostRegisterReq postRegisterReq = PostRegisterReq.builder()
+                .email("kakao@gmail.com")
                 .password("1q2w3e4r!")
                 .checkPassword("1q2w3e4r!")
-                .name("김형준")
+                .name("카카오")
                 .phoneNumber("01012341234")
                 .memberType(MemberType.PERSON)
                 .loginType(LoginType.DEFAULT)
                 .build();
 
-        saveAuthPhoneNumber("01012341234");
+        given(authPhoneNumberRedisRepository.findById(any())).willReturn(Optional.ofNullable(AuthPhoneNumber.builder()
+                .phoneNumber(postRegisterReq.getPhoneNumber()).authPhoneNumberStatus(AuthPhoneNumberStatus.CONFIRM).build()));
 
-        // when
-        PostRegisterRes res = authService.defaultSignUp(req);
-        long memberId = memberRepository.findByEmailIgnoreCase(req.getEmail()).get().getId();
-
-        // then
-        assertThat(memberId).isEqualTo(res.getMemberId());
+        return postRegisterReq;
     }
 
-    // 회원 가입 테스트 (기업)
-    @Test
-    public void defaultSignUp_SaveCompanyMember_True(){
-        // given
-        PostRegisterReq req = PostRegisterReq.builder()
-                .email("qeasd123asd@gmail.com")
+    public PostRegisterReq defaultSignUpRequest_company() {
+        PostRegisterReq postRegisterReq = PostRegisterReq.builder()
+                .email("kakao@gmail.com")
                 .password("1q2w3e4r!")
                 .checkPassword("1q2w3e4r!")
-                .name("김형준")
-                .companyName("카카오 엔터프라이즈")
-                .bsNum("1234512345")
+                .name("카카오")
                 .phoneNumber("01012341234")
+                .bsNum("12345678901")
+                .companyName("카엔프")
+                .kakaoBizId("das123")
                 .memberType(MemberType.COMPANY)
                 .loginType(LoginType.DEFAULT)
                 .build();
 
-        saveAuthPhoneNumber("01012341234");
+        given(authPhoneNumberRedisRepository.findById(any())).willReturn(Optional.ofNullable(AuthPhoneNumber.builder()
+                .phoneNumber(postRegisterReq.getPhoneNumber()).authPhoneNumberStatus(AuthPhoneNumberStatus.CONFIRM).build()));
 
-        // when
-        PostRegisterRes res = authService.defaultSignUp(req);
-        long memberId = memberRepository.findByEmailIgnoreCase(req.getEmail()).get().getId();
-
-        // then
-        assertThat(memberId).isEqualTo(res.getMemberId());
+        return postRegisterReq;
     }
 
-    // 이메일 중복 방지 테스트
-    @Test
-    public void Should_ThrowBaseException_When_AlreadyExistEmail(){
-        // given
-        PostRegisterReq req1 = PostRegisterReq.builder()
-                .email("qeasd123asd@gmail.com")
-                .password("1q2w3e4r!")
-                .checkPassword("1q2w3e4r!")
-                .name("김형준")
-                .companyName("카카오 엔터프라이즈")
-                .bsNum("1234512345")
+    public GoogleRegisterReq googleSignUpRequest_person() {
+        GoogleRegisterReq googleRegisterReq = GoogleRegisterReq.builder()
+                .email("kakao@gmail.com")
+                .name("카카오")
                 .phoneNumber("01012341234")
-                .memberType(MemberType.COMPANY)
-                .loginType(LoginType.DEFAULT)
-                .build();
-
-        saveAuthPhoneNumber("01012341234");
-
-        authService.defaultSignUp(req1);
-
-        PostRegisterReq req2 = PostRegisterReq.builder()
-                .email("qeasd123asd@gmail.com")
-                .password("1q2w3e4r!")
-                .checkPassword("1q2w3e4r!")
-                .name("김형준")
-                .companyName("카카오 엔터프라이즈")
-                .bsNum("1234512345")
-                .phoneNumber("01012341235")
-                .memberType(MemberType.COMPANY)
-                .loginType(LoginType.DEFAULT)
-                .build();
-
-        saveAuthPhoneNumber("01012341235");
-
-        // when
-        BaseException exception = assertThrows(BaseException.class,
-                () -> authService.defaultSignUp(req2));
-
-        // then
-        assertThat(exception.getStatus()).isEqualTo(ALREADY_EXIST_EMAIL);
-    }
-
-    // 휴대폰 미 인증시 예외 테스트
-    @Test
-    public void Should_ThrowBaseException_When_NotAuthPhoneNumber(){
-        // given
-        PostRegisterReq req = PostRegisterReq.builder()
-                .email("qeasd123asd@gmail.com")
-                .password("1q2w3e4r!")
-                .checkPassword("1q2w3e4r!")
-                .name("김형준")
-                .companyName("카카오 엔터프라이즈")
-                .bsNum("1234512345")
-                .phoneNumber("01012341234")
-                .memberType(MemberType.COMPANY)
-                .loginType(LoginType.DEFAULT)
-                .build();
-
-        // when
-        BaseException exception = assertThrows(BaseException.class,
-                () -> authService.defaultSignUp(req));
-
-        // then
-        assertThat(exception.getStatus()).isEqualTo(NOT_AUTH_PHONE_NUMBER);
-    }
-
-    // 일반 로그인 테스트
-    @Test
-    public void defaultSignIn_getJwtAndParseMemberId_True(){
-        // given
-        initDefaultMember();
-
-        PostLoginReq req = PostLoginReq.builder()
-                .email("qeasd123asd@gmail.com")
-                .password("1q2w3e4r!")
-                .build();
-
-        // when
-        PostLoginRes res = authService.defaultSignIn(req);
-        String accessToken = res.getJwt();
-
-        JwtService jwtService = new JwtService();
-        LinkedHashMap jwtInfo = jwtService.getJwtInfo(accessToken);
-        JwtInfo convertJwtInfo = objectMapper.convertValue(jwtInfo, JwtInfo.class);
-
-        // then
-        assertThat(res.getMemberId()).isEqualTo(convertJwtInfo.getMemberId());
-    }
-
-    // 구글 회원가입 테스트 (개인)
-    @Test
-    public void googleSignUp_SavePersonMember_True(){
-        // given
-        GoogleRegisterReq req = GoogleRegisterReq.builder()
-                .email("t123e23st123")
-                .name("오영주")
-                .phoneNumber("01012341234")
-                .memberType(MemberType.COMPANY)
                 .loginType(LoginType.GOOGLE)
-                .build();
-
-        // when
-        GoogleRegisterRes res = authService.googleSignUp(req);
-        long memberId = memberRepository.findByEmailIgnoreCase(req.getEmail()).get().getId();
-
-        // then
-        assertThat(memberId).isEqualTo(res.getMemberId());
-    }
-
-    // 구글 회원가입 테스트 (기업)
-    @Test
-    public void googleSignUp_SaveCompanyMember_True(){
-        // given
-        GoogleRegisterReq req = GoogleRegisterReq.builder()
-                .email("t123e23st123")
-                .name("오영주")
-                .phoneNumber("01012341234")
-                .companyName("네이버")
-                .bsNum("0123401234")
-                .memberType(MemberType.COMPANY)
-                .loginType(LoginType.GOOGLE)
-                .build();
-
-        // when
-        GoogleRegisterRes res = authService.googleSignUp(req);
-        long memberId = memberRepository.findByEmailIgnoreCase(req.getEmail()).get().getId();
-
-        // then
-        assertThat(memberId).isEqualTo(res.getMemberId());
-    }
-
-    // 구글 로그인 테스트
-    @Test
-    public void googleSignIn_getJwtAndParseMemberId_True(){
-        // given
-        initGoogleMember();
-
-        String email = "t123e23st123@gmail.com";
-
-        // when
-        PostLoginRes res = authService.googleSignIn(email);
-        String accessToken = res.getJwt();
-
-        JwtService jwtService = new JwtService();
-        LinkedHashMap jwtInfo = jwtService.getJwtInfo(accessToken);
-        JwtInfo convertJwtInfo = objectMapper.convertValue(jwtInfo, JwtInfo.class);
-
-        // then
-        assertThat(res.getMemberId()).isEqualTo(convertJwtInfo.getMemberId());
-    }
-
-    // 일반 멤버 초기호출
-    public void initDefaultMember(){
-        PostRegisterReq req = PostRegisterReq.builder()
-                .email("qeasd123asd@gmail.com")
-                .password("1q2w3e4r!")
-                .checkPassword("1q2w3e4r!")
-                .name("김형준")
-                .phoneNumber("01012341234")
                 .memberType(MemberType.PERSON)
-                .loginType(LoginType.DEFAULT)
                 .build();
 
-        saveAuthPhoneNumber("01012341234");
-
-        authService.defaultSignUp(req);
+        return googleRegisterReq;
     }
 
-    // 구글 멤버 초기호출
-    public void initGoogleMember(){
-        GoogleRegisterReq req = GoogleRegisterReq.builder()
-                .email("t123e23st123@gmail.com")
-                .name("오영주")
+    public GoogleRegisterReq googleSignUpRequest_company() {
+        GoogleRegisterReq googleRegisterReq = GoogleRegisterReq.builder()
+                .email("kakao@gmail.com")
+                .name("카카오")
                 .phoneNumber("01012341234")
-                .companyName("네이버")
-                .bsNum("0123401234")
-                .memberType(MemberType.COMPANY)
+                .companyName("카엔프")
+                .bsNum("12345678901")
+                .kakaoBizId("das123")
                 .loginType(LoginType.GOOGLE)
+                .memberType(MemberType.COMPANY)
                 .build();
 
-        authService.googleSignUp(req);
+        return googleRegisterReq;
     }
-
-    // 레디스 휴대전화 정보 저장
-    public void saveAuthPhoneNumber(String phoneNumber){
-        AuthPhoneNumber authPhoneNumber = AuthPhoneNumber.builder()
-                .phoneNumber("01012341234")
-                .authPhoneNumberStatus(AuthPhoneNumberStatus.CONFIRM)
+    public SenderNumber getSenderNumber(PostRegisterReq request){
+        return SenderNumber.builder()
+                .member(member)
+                .memo(request.getName())
+                .phoneNumber(request.getPhoneNumber())
                 .build();
-        authPhoneNumberRedisRepository.save(authPhoneNumber);
     }
 }

@@ -27,6 +27,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Optional;
+
 import static com.srt.message.config.response.BaseResponseStatus.*;
 
 
@@ -47,7 +49,6 @@ public class AuthService {
     // 회원가입
     @Transactional(readOnly = false)
     public PostRegisterRes defaultSignUp(PostRegisterReq postRegisterReq){
-        // 중복된 회원 확인
         if(memberRepository.findByEmailIgnoreCase(postRegisterReq.getEmail()).isPresent())
             throw new BaseException(ALREADY_EXIST_EMAIL);
 

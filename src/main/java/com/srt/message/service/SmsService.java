@@ -130,7 +130,7 @@ public class SmsService {
         // 6자리 인증번호 생성
         authPhoneNumber.createAuthToken();
 
-        authPhoneNumberRedisRepository.save(authPhoneNumber);
+        authPhoneNumber = authPhoneNumberRedisRepository.save(authPhoneNumber);
 
         return authPhoneNumber.getAuthToken();
     }
