@@ -7,6 +7,7 @@ import com.srt.message.config.type.ButtonType;
 import com.srt.message.config.type.KmsgSearchType;
 import com.srt.message.domain.Member;
 import com.srt.message.dto.kakao_message.get.GetKakaoMessageRes;
+import com.srt.message.dto.kakao_message_result.get.GetKakaoMessageResultListRes;
 import com.srt.message.dto.kakao_message_result.get.GetKakaoMessageResultRes;
 import com.srt.message.repository.KakaoMessageRepository;
 import com.srt.message.repository.KakaoMessageResultRepository;
@@ -17,9 +18,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
-import java.util.stream.Collectors;
 
 import static com.srt.message.config.response.BaseResponseStatus.NOT_EXIST_MEMBER;
 
@@ -61,10 +59,15 @@ public class KakaoMessageResultService {
         return null;
     }
 
-    public List<GetKakaoMessageResultRes> getKakaoMessageResult(Long memberId, Long messageId) {
+    public GetKakaoMessageResultListRes getKakaoMessageResult(Long memberId, Long messageId) {
         getExistMember(memberId);
-        return kakaoMessageResultRepository.findKakaoMessageResultByKakaoMessageId(messageId)
-                .stream().map(kakaoMessageResult -> GetKakaoMessageResultRes.toDto(kakaoMessageResult)).collect(Collectors.toList());
+        GetKakaoMessageResultListRes getKakaoMessageResultListRes = new GetKakaoMessageResultListRes();
+        kakaoMessageResultRepository.findKakaoMessageResultByKakaoMessageId(messageId).forEach(kakaoMessageResult -> {
+            getKakaoMessageResultListRes.addKakaoMessageResultResList(GetKakaoMessageResultRes.toDto(kakaoMessageResult));
+            getKakaoMessageResultListRes.addKakaoBrokerCount(kakaoMessageResult.getKakaoBroker().getName());
+            getKakaoMessageResultListRes.addMessageStatusCount(kakaoMessageResult.getMessageStatus());
+        });
+        return getKakaoMessageResultListRes;
     }
 
     private Member getExistMember(long memberId) {

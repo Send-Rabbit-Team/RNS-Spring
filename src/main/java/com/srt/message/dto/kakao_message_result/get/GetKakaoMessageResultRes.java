@@ -16,7 +16,7 @@ public class GetKakaoMessageResultRes {
     private String contactGroup;
     private String kakaoBrokerName;
     private MessageStatus messageStatus;
-    private String createAt;
+    private String createdAt;
 
     public static GetKakaoMessageResultRes toDto(KakaoMessageResult kakaoMessageResult) {
         return GetKakaoMessageResultRes.builder()
@@ -26,7 +26,7 @@ public class GetKakaoMessageResultRes {
                 .contactGroup(kakaoMessageResult.getContact().getContactGroup().getName())
                 .kakaoBrokerName(kakaoMessageResult.getKakaoBroker().getName())
                 .messageStatus(kakaoMessageResult.getMessageStatus())
-                .createAt(kakaoMessageResult.getCreatedAt().toString())
+                .createdAt(kakaoMessageResult.getCreatedAt().toString())
                 .build();
     }
 }

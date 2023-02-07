@@ -6,14 +6,13 @@ import com.srt.message.config.type.ButtonType;
 import com.srt.message.config.type.KmsgSearchType;
 import com.srt.message.dto.jwt.JwtInfo;
 import com.srt.message.dto.kakao_message.get.GetKakaoMessageRes;
-import com.srt.message.dto.kakao_message_result.get.GetKakaoMessageResultRes;
+import com.srt.message.dto.kakao_message_result.get.GetKakaoMessageResultListRes;
 import com.srt.message.service.KakaoMessageResultService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.List;
 
 @Log4j2
 @RestController
@@ -47,7 +46,7 @@ public class KakaoMessageResultController {
     }
 
     @GetMapping("/info/{messageId}")
-    public BaseResponse<List<GetKakaoMessageResultRes>> getKakaoMessageResult(
+    public BaseResponse<GetKakaoMessageResultListRes> getKakaoMessageResult(
             @PathVariable Long messageId,
             HttpServletRequest request) {
         return new BaseResponse<>(kakaoMessageResultService.getKakaoMessageResult(JwtInfo.getMemberId(request), messageId));

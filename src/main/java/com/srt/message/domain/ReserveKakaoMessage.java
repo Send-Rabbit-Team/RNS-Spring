@@ -15,7 +15,7 @@ import javax.persistence.*;
 @Getter
 public class ReserveKakaoMessage extends BaseEntity {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
     @OneToOne(fetch = FetchType.LAZY)
