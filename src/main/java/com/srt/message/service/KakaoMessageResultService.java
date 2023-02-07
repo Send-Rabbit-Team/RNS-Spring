@@ -49,15 +49,16 @@ public class KakaoMessageResultService {
         getExistMember(memberId);
         PageRequest pageRequest = PageRequest.of(page-1, 10, Sort.by("id").descending());
 
-        Page<GetKakaoMessageRes> kakaoMessagePage = null;
         if (searchType == KmsgSearchType.NUMBER) {
-            kakaoMessagePage = kakaoMessageRepository.findKakaoMessageByContactNumber(pageRequest, memberId, keyword).map(GetKakaoMessageRes::toDto);
+            return new PageResult<>(kakaoMessageRepository.findKakaoMessageByContactNumber(pageRequest, memberId, keyword).map(GetKakaoMessageRes::toDto));
         } else if (searchType == KmsgSearchType.MEMO) {
-            kakaoMessagePage = kakaoMessageRepository.findKakaoMessageByContactMemo(pageRequest, memberId, keyword).map(GetKakaoMessageRes::toDto);
+            return new PageResult<>(kakaoMessageRepository.findKakaoMessageByContactMemo(pageRequest, memberId, keyword).map(GetKakaoMessageRes::toDto));
+        } else if (searchType == KmsgSearchType.TITLE) {
+            return new PageResult<>(kakaoMessageRepository.findKakaoMessageByMessageTitle(pageRequest, memberId, keyword).map(GetKakaoMessageRes::toDto));
         } else if (searchType == KmsgSearchType.CONTENT) {
-            kakaoMessagePage = kakaoMessageRepository.findKakaoMessageByMessageContent(pageRequest, memberId, keyword).map(GetKakaoMessageRes::toDto);
+            return new PageResult<>(kakaoMessageRepository.findKakaoMessageByMessageContent(pageRequest, memberId, keyword).map(GetKakaoMessageRes::toDto));
         }
-        return new PageResult<>(kakaoMessagePage);
+        return null;
     }
 
     public List<GetKakaoMessageResultRes> getKakaoMessageResult(Long memberId, Long messageId) {

@@ -23,17 +23,19 @@ public interface KakaoMessageRepository extends JpaRepository<KakaoMessage, Long
             countQuery = "select count(km) from KakaoMessage km where km.member.id = :memberId and km.buttonType = :buttonType")
     Page<KakaoMessage> findKakaoMessageByButtonType(Pageable pageable, Long memberId, ButtonType buttonType);
 
-    @Query(value = "select kmr from KakaoMessageResult kmr where kmr.kakaoMessage.member.id = :memberId and kmr.contact.phoneNumber = :contactNumber",
-            countQuery = "select count(kmr) from KakaoMessageResult kmr where kmr.kakaoMessage.member.id = :memberId and kmr.contact.phoneNumber = :contactNumber")
+    @Query(value = "select km from KakaoMessage km inner join KakaoMessageResult kmr on km = kmr.kakaoMessage where km.member.id = :memberId and kmr.contact.phoneNumber = :contactNumber",
+            countQuery = "select count(km) from KakaoMessage km join KakaoMessageResult kmr on km.id = kmr.kakaoMessage.id where km.member.id = :memberId and kmr.contact.phoneNumber = :contactNumber")
     Page<KakaoMessage> findKakaoMessageByContactNumber(Pageable pageable, Long memberId, String contactNumber);
 
-    @Query(value = "select kmr from KakaoMessageResult kmr where kmr.kakaoMessage.member.id = :memberId and kmr.contact.memo = :contactMemo",
-            countQuery = "select count(kmr) from KakaoMessageResult kmr where kmr.kakaoMessage.member.id = :memberId and kmr.contact.memo = :contactMemo")
+    @Query(value = "select distinct km from KakaoMessage km join KakaoMessageResult kmr on km = kmr.kakaoMessage where kmr.kakaoMessage.member.id = :memberId and kmr.contact.memo like %:contactMemo%",
+            countQuery = "select distinct count(km) from KakaoMessage km join KakaoMessageResult kmr on km = kmr.kakaoMessage where kmr.kakaoMessage.member.id = :memberId and kmr.contact.memo like %:contactMemo%")
     Page<KakaoMessage> findKakaoMessageByContactMemo(Pageable pageable, Long memberId, String contactMemo);
 
-    @Query(value = "select km from KakaoMessage km where km.member.id = :memberId and km.title like %:messageContent% or km.subTitle like %:messageContent% or " +
-            "km.content like %:messageContent% or km.description like %:messageContent%",
-            countQuery = "select count(km) from KakaoMessage km where km.member.id = :memberId and km.title like %:messageContent% or km.subTitle like %:messageContent% or " +
-            "km.content like %:messageContent% or km.description like %:messageContent%")
+    @Query(value = "select distinct km from KakaoMessage km where km.member.id = :memberId and (km.title like %:messageContent% or km.subTitle like %:messageContent%)",
+            countQuery = "select distinct count(km) from KakaoMessage km where km.member.id = :memberId and (km.title like %:messageContent% or km.subTitle like %:messageContent%)")
+    Page<KakaoMessage> findKakaoMessageByMessageTitle(Pageable pageable, Long memberId, String messageContent);
+
+    @Query(value = "select distinct km from KakaoMessage km where km.member.id = :memberId and (km.content like %:messageContent% or km.description like %:messageContent%)",
+    countQuery = "select distinct count(km) from KakaoMessage km where km.member.id = :memberId and (km.content like %:messageContent% or km.description like %:messageContent%)")
     Page<KakaoMessage> findKakaoMessageByMessageContent(Pageable pageable, Long memberId, String messageContent);
 }
