@@ -11,5 +11,7 @@ import java.util.List;
 public interface ReserveMessageContactRepository extends JpaRepository<ReserveMessageContact, Long> {
     @EntityGraph(value = "ReserveMessageContact.with.Contact")
     List<ReserveMessageContact> findAllByReserveMessage(ReserveMessage reserveMessage);
+
+    @EntityGraph(value = "ReserveMessageContact.with.Contact")
     List<ReserveMessageContact> findAllByReserveKakaoMessage(ReserveKakaoMessage reserveKakaoMessage);
 }
