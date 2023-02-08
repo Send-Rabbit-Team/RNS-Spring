@@ -1,16 +1,11 @@
 package com.srt.message.service;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.srt.message.config.status.BaseStatus;
 import com.srt.message.config.type.MessageType;
 import com.srt.message.domain.*;
-import com.srt.message.dto.message.BrokerMessageDto;
 import com.srt.message.dto.message.SMSMessageDto;
 import com.srt.message.dto.message.post.PostSendMessageReq;
 import com.srt.message.repository.*;
-import com.srt.message.repository.redis.RedisHashRepository;
-import com.srt.message.repository.redis.RedisListRepository;
 import com.srt.message.service.rabbit.BrokerService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -20,16 +15,12 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.amqp.core.MessageBuilder;
-import org.springframework.amqp.core.MessageProperties;
-import org.springframework.amqp.rabbit.core.RabbitTemplate;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
 import static com.srt.message.config.status.BaseStatus.ACTIVE;
-import static com.srt.message.utils.rabbitmq.RabbitSMSUtil.SMS_EXCHANGE_NAME;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
