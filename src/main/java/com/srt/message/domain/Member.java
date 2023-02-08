@@ -1,14 +1,15 @@
 package com.srt.message.domain;
 
-import com.srt.message.config.domain.BaseEntity;
 import com.srt.message.config.domain.BaseTimeEntity;
-import com.srt.message.config.type.BsType;
 import com.srt.message.config.type.LoginType;
 import com.srt.message.config.type.MemberType;
 import lombok.*;
 
 import javax.persistence.*;
 
+@NamedEntityGraph(name = "Member.with.Company", attributeNodes = {
+        @NamedAttributeNode(value = "company")
+})
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
