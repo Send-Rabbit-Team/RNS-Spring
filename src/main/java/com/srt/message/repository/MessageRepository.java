@@ -21,14 +21,9 @@ public interface MessageRepository extends JpaRepository<Message, Long> {
     Optional<Message> findMessageById(long messageId);
 
     // 사용자 보낸 메시지 페이징 조회 (예약 메시지는 제외)
-    @Query(value = "select m from Message m where m.member.id = :memberId and m.reserveYN = false",
-            countQuery = "select count(m) from Message m where m.member.id = :memberId and m.reserveYN = false")
+    @Query(value = "select m from Message m where m.member.id = :memberId",
+            countQuery = "select count(m) from Message m where m.member.id = :memberId")
     Page<Message> findAllMessage(long memberId, Pageable pageable);
-
-    // 예약 메시지 페이징 조회
-    @Query(value = "select rm from ReserveMessage rm left join fetch rm.message m where m.member.id = :memberId and m.reserveYN = true",
-            countQuery = "select count(m) from Message m where m.member.id = :memberId and m.reserveYN = true")
-    Page<ReserveMessage> findAllReserveMessage(long memberId, Pageable pageable);
 
     // 유형별 메시지 필터 페이징 조회
     @Query(value = "select m from Message m where m.member.id = :memberId and m.messageType = :messageType",
@@ -36,22 +31,22 @@ public interface MessageRepository extends JpaRepository<Message, Long> {
     Page<Message> findMessagesByMessageType(MessageType messageType, long memberId, Pageable pageable);
 
     // 수신자 검색 페이징 조회
-    @Query(value = "select mr.message from MessageResult mr left join mr.message where mr.message.member.id = :memberId " +
+    @Query(value = "select distinct mr.message from MessageResult mr left join mr.message where mr.message.member.id = :memberId " +
             "and mr.contact.phoneNumber = :receiveNumber")
     Page<Message> findByReceiveNumber(String receiveNumber, long memberId, Pageable pageable);
 
     // 발신자 검색 페이징 조회
-    @Query(value = "select mr.message from MessageResult mr left join mr.message m where mr.message.member.id = :memberId " +
+    @Query(value = "select distinct mr.message from MessageResult mr left join mr.message m where mr.message.member.id = :memberId " +
             "and m.senderNumber.phoneNumber = :senderNumber")
     Page<Message> findBySenderNumber(String senderNumber, long memberId, Pageable pageable);
 
     // 메모 키워드 검색 페이징 조회
-    @Query(value = "select mr.message from MessageResult mr left join mr.message where mr.message.member.id = :memberId " +
+    @Query(value = "select distinct mr.message from MessageResult mr left join mr.message where mr.message.member.id = :memberId " +
             "and mr.contact.memo like %:keyword%")
     Page<Message> findByMemo(String keyword, long memberId, Pageable pageable);
 
     // 메시지 내용 키워드 검색 페이징 조회
-    @Query(value = "select mr.message from MessageResult mr join mr.message where mr.message.member.id = :memberId " +
+    @Query(value = "select distinct mr.message from MessageResult mr join mr.message where mr.message.member.id = :memberId " +
             "and mr.message.content like %:keyword%")
     Page<Message> findByMessageContent(String keyword, long memberId, Pageable pageable);
 }

@@ -7,7 +7,7 @@ public class RabbitKakaoUtil {
 
         // KAKAO EXCHANGE
         public static final String KAKAO_WORK_EXCHANGE_NAME = "dx.kakao.work";
-        public static final String KAKAO_DLX_EXCHANGE_NAME = "dx.kakao.wait";
+        public static final String KAKAO_WAIT_EXCHANGE_NAME = "dx.kakao.wait";
         public static final String KAKAO_RECEIVE_EXCHANGE_NAME = "dx.kakao.receive";
         public static final String KAKAO_DEAD_EXCHANGE_NAME = "dx.kakao.dead";
 

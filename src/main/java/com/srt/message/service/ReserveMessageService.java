@@ -43,7 +43,7 @@ public class ReserveMessageService {
                 .reserveStatus(ReserveStatus.PROCESSING)
                 .build();
 
-        reserveMessageRepository.save(reserveMessage);
+        reserveMessage = reserveMessageRepository.save(reserveMessage);
 
         // 예약 대상자 정보 추가
         for(Contact contact: brokerMessageDto.getContacts()){
@@ -51,11 +51,11 @@ public class ReserveMessageService {
                     .reserveMessage(reserveMessage)
                     .contact(contact)
                     .build();
-
             reserveMessageContactRepository.save(reserveMessageContact);
-        }
 
-        schedulerService.register(brokerMessageDto);
+            brokerMessageDto.getSmsMessageDto().setTo(contact.getPhoneNumber());
+            schedulerService.register(brokerMessageDto, reserveMessage.getId());
+        }
 
         return "예약성공";
     }

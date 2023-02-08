@@ -37,4 +37,8 @@ public class RMessageResult {
     public void changeMessageStatus(MessageStatus messageStatus){
         this.messageStatus = messageStatus;
     }
+
+    public void changeId(String id){
+        this.id = id;
+    }
 }

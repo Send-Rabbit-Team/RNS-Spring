@@ -11,7 +11,6 @@ import com.srt.message.domain.Message;
 import com.srt.message.domain.MessageResult;
 import com.srt.message.domain.redis.RMessageResult;
 import com.srt.message.dto.message.get.GetMessageRes;
-import com.srt.message.dto.message.get.GetReserveMessageRes;
 import com.srt.message.dto.message_result.get.GetListMessageResultRes;
 import com.srt.message.dto.message_result.get.GetMessageResultRes;
 import com.srt.message.repository.*;
@@ -24,7 +23,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -56,20 +54,6 @@ public class MessageResultService {
                 .map(GetMessageRes::toDto);
 
         return new PageResult<>(messagePage);
-    }
-
-    // 예약 메시지 페이징 조회
-    public PageResult<GetReserveMessageRes> getReserveMessages(long memberId, int page) {
-        PageRequest pageRequest = PageRequest.of(page-1, 10, Sort.by("id").descending());
-        Page<GetReserveMessageRes> reserveMessagePage = messageRepository.findAllReserveMessage(memberId, pageRequest)
-                .map(rm -> {
-                    String countKey = "reserve." + rm.getMessage().getId() + ".count";
-                    String sendCount = redisTemplate.opsForValue().get(countKey) == null? "0": (String) redisTemplate.opsForValue().get(countKey);
-
-                    return GetReserveMessageRes.toDto(rm, sendCount);
-                });
-
-        return new PageResult<>(reserveMessagePage);
     }
 
     // 메시지 처리 결과 모두 조회

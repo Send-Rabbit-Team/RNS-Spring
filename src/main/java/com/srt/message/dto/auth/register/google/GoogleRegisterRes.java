@@ -69,6 +69,7 @@ public class GoogleRegisterRes {
                 .name(member.getName())
                 .phoneNumber(member.getPhoneNumber())
                 .profileImgUrl(member.getProfileImageURL())
+                .memberType(member.getMemberType())
                 .loginType(member.getLoginType())
                 .build();
 

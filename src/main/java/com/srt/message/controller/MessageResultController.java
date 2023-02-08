@@ -40,21 +40,6 @@ public class MessageResultController {
     }
 
     @ApiOperation(
-            value = "예약된 메시지 조회",
-            notes = "예약된 메시지들을 페이징으로 조회하는 기능이다."
-    )
-    @ApiResponses({
-            @ApiResponse(code = 1000, message = "요청에 성공하였습니다.")
-    })
-    @GetMapping("/reserve/{page}")
-    public BaseResponse<PageResult<GetReserveMessageRes>> getReserveMessages(@PathVariable("page") int page, HttpServletRequest request) {
-        PageResult<GetReserveMessageRes> reserveMessages = messageResultService.getReserveMessages(JwtInfo.getMemberId(request), page);
-        log.info("예약된 메시지 필터 조회 - memberId: {}, page: {}", JwtInfo.getMemberId(request), page);
-
-        return new BaseResponse<>(reserveMessages);
-    }
-
-    @ApiOperation(
             value = "메시지 처리 결과 조회",
             notes = "메시지 처리 결과들을 조회한다. 만약에, 상태 DB에 저장되있을 경우 레디스에서 불러오고, 아니면" +
                     "RDBMS에서 조회한다."

@@ -2,7 +2,9 @@ package com.srt.message.listener;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.rabbitmq.client.Channel;
 import com.srt.message.config.status.MessageStatus;
+import com.srt.message.dlx.DlxProcessingErrorHandler;
 import com.srt.message.domain.Broker;
 import com.srt.message.domain.Contact;
 import com.srt.message.domain.Message;
@@ -27,6 +29,8 @@ import java.util.ArrayList;
 @Transactional
 @RequiredArgsConstructor
 public class SmsBrokerListener {
+    private final DlxProcessingErrorHandler dlxProcessingErrorHandler;
+
     private final RedisHashRepository redisHashRepository;
 
     private final ObjectMapper objectMapper;
@@ -63,6 +67,27 @@ public class SmsBrokerListener {
     public void receiveLGMessage(final MessageResultDto messageResultDto) {
         updateRMessageResult(messageResultDto, LG_BROKER_NAME);
         saveMessageResult(messageResultDto, LG_BROKER_NAME);
+    }
+
+    /**
+     * Sender Consumer
+     */
+    // KT
+    @RabbitListener(queues = "q.sms.kt.sender", concurrency = "3", ackMode = "MANUAL")
+    public void receiveSenderKTMessage(org.springframework.amqp.core.Message message, Channel channel){
+        dlxProcessingErrorHandler.handleErrorProcessingMessage(message, channel);
+    }
+
+    // SKT
+    @RabbitListener(queues = "q.sms.skt.sender", concurrency = "3", ackMode = "MANUAL")
+    public void receiveSenderSKTMessage(org.springframework.amqp.core.Message message, Channel channel){
+        dlxProcessingErrorHandler.handleErrorProcessingMessage(message, channel);
+    }
+
+    // LG
+    @RabbitListener(queues = "q.sms.lg.sender", concurrency = "3", ackMode = "MANUAL")
+    public void receiveSenderLGMessage(org.springframework.amqp.core.Message message, Channel channel){
+        dlxProcessingErrorHandler.handleErrorProcessingMessage(message, channel);
     }
 
     /**

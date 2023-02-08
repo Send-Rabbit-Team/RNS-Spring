@@ -40,8 +40,6 @@ public class Message extends BaseEntity {
 
     private String content;
 
-    private boolean reserveYN;
-
     @Enumerated(EnumType.STRING)
     private MessageType messageType;
 

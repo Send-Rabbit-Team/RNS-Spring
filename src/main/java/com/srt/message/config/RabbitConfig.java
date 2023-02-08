@@ -59,24 +59,27 @@ public class RabbitConfig {
     @Bean
     public Queue smsKTQueue(){
         Map<String, Object> args = new HashMap<>();
-        args.put("x-dead-letter-exchange", DLX_EXCHANGE_NAME);
-        args.put("x-dead-letter-routing-key", KT_WAIT_ROUTING_KEY);
+        args.put("x-dead-letter-exchange", SENDER_EXCHANGE_NAME);
+        args.put("x-dead-letter-routing-key", KT_SENDER_ROUTING_KEY);
+        args.put("x-message-ttl", WORK_TTL);
         return new Queue(KT_WORK_QUEUE_NAME, true, false, false, args);
     }
 
     @Bean
     public Queue smsSKTQueue(){
         Map<String, Object> args = new HashMap<>();
-        args.put("x-dead-letter-exchange", DLX_EXCHANGE_NAME);
-        args.put("x-dead-letter-routing-key", SKT_WAIT_ROUTING_KEY);
+        args.put("x-dead-letter-exchange", SENDER_EXCHANGE_NAME);
+        args.put("x-dead-letter-routing-key", SKT_SENDER_ROUTING_KEY);
+        args.put("x-message-ttl", WORK_TTL);
         return new Queue(SKT_WORK_QUEUE_NAME, true, false, false, args);
     }
 
     @Bean
     public Queue smsLGQueue(){
         Map<String, Object> args = new HashMap<>();
-        args.put("x-dead-letter-exchange", DLX_EXCHANGE_NAME);
-        args.put("x-dead-letter-routing-key", LG_WAIT_ROUTING_KEY);
+        args.put("x-dead-letter-exchange", SENDER_EXCHANGE_NAME);
+        args.put("x-dead-letter-routing-key", LG_SENDER_ROUTING_KEY);
+        args.put("x-message-ttl", WORK_TTL);
         return new Queue(LG_WORK_QUEUE_NAME, true, false, false, args);
     }
 
@@ -186,7 +189,7 @@ public class RabbitConfig {
 //    // DLX Exchange
 //    @Bean
 //    public DirectExchange dlxSMSExchange(){
-//        return new DirectExchange(DLX_EXCHANGE_NAME);
+//        return new DirectExchange(WAIT_EXCHANGE_NAME);
 //    }
 //
 //    // DLX Binding
@@ -212,6 +215,57 @@ public class RabbitConfig {
 //    }
 
     /**
+     * Sender 설정 (Wait로 가기 전의 큐)
+     */
+    // Sender Queue
+    @Bean
+    public Queue smsSenderKTQueue(){
+        Map<String, Object> args = new HashMap<>();
+        args.put("x-dead-letter-exchange", WAIT_EXCHANGE_NAME);
+        args.put("x-dead-letter-routing-key", KT_WAIT_ROUTING_KEY);
+        return new Queue(KT_SENDER_QUEUE_NAME, true, false, false, args);
+    }
+    @Bean
+    public Queue smsSenderSKTQueue(){
+        Map<String, Object> args = new HashMap<>();
+        args.put("x-dead-letter-exchange", WAIT_EXCHANGE_NAME);
+        args.put("x-dead-letter-routing-key", KT_WAIT_ROUTING_KEY);
+        return new Queue(SKT_SENDER_QUEUE_NAME, true, false, false, args);
+    }
+    @Bean
+    public Queue smsSenderLGQueue(){
+        Map<String, Object> args = new HashMap<>();
+        args.put("x-dead-letter-exchange", WAIT_EXCHANGE_NAME);
+        args.put("x-dead-letter-routing-key", KT_WAIT_ROUTING_KEY);
+        return new Queue(LG_SENDER_QUEUE_NAME, true, false, false, args);
+    }
+
+    // Sender Exchange
+    @Bean
+    public DirectExchange senderSMSExchange(){
+        return new DirectExchange(SENDER_EXCHANGE_NAME);
+    }
+    // Sender Binding
+    @Bean
+    public Binding bindingSenderSmsKT(DirectExchange senderSMSExchange, Queue smsSenderKTQueue){
+        return BindingBuilder.bind(smsSenderKTQueue)
+                .to(senderSMSExchange)
+                .with(KT_SENDER_ROUTING_KEY);
+    }
+    @Bean
+    public Binding bindingSenderSmsSKT(DirectExchange senderSMSExchange, Queue smsSenderSKTQueue){
+        return BindingBuilder.bind(smsSenderSKTQueue)
+                .to(senderSMSExchange)
+                .with(SKT_SENDER_ROUTING_KEY);
+    }
+    @Bean
+    public Binding bindingSenderSmsLG(DirectExchange senderSMSExchange, Queue smsSenderLGQueue){
+        return BindingBuilder.bind(smsSenderLGQueue)
+                .to(senderSMSExchange)
+                .with(LG_SENDER_ROUTING_KEY);
+    }
+
+    /**
      * Dead 설정
      */
     // Dead Queue
@@ -234,7 +288,7 @@ public class RabbitConfig {
         return new DirectExchange(DEAD_EXCHANGE_NAME);
     }
 
-    // Binding
+    // Dead Binding
     @Bean
     public Binding bindingDeadSmsKT(DirectExchange deadSMSExchange, Queue smsDeadKTQueue){
         return BindingBuilder.bind(smsDeadKTQueue)
@@ -265,7 +319,7 @@ public class RabbitConfig {
     @Bean
     public DirectExchange kakaoReceiveExchange(){ return new DirectExchange(KAKAO_RECEIVE_EXCHANGE_NAME); }
     @Bean
-    public DirectExchange kakaoDlxExchange(){ return new DirectExchange(KAKAO_DLX_EXCHANGE_NAME); }
+    public DirectExchange kakaoDlxExchange(){ return new DirectExchange(KAKAO_WAIT_EXCHANGE_NAME); }
     @Bean
     public DirectExchange kakaoDeadExchange(){
         return new DirectExchange(KAKAO_DEAD_EXCHANGE_NAME);
@@ -278,7 +332,7 @@ public class RabbitConfig {
     @Bean
     public Queue kakaoWorkCNSQueue(){
         Map<String, Object> args = new HashMap<>();
-        args.put("x-dead-letter-exchange",KAKAO_DLX_EXCHANGE_NAME);
+        args.put("x-dead-letter-exchange",KAKAO_WAIT_EXCHANGE_NAME);
         args.put("x-dead-letter-routing-key",CNS_WAIT_ROUTING_KEY);
         return new Queue(CNS_WORK_QUEUE_NAME,true, false, false, args);
     }
@@ -306,7 +360,7 @@ public class RabbitConfig {
     @Bean
     public Queue kakaoWorkKEQueue() {
         Map<String, Object> args = new HashMap<>();
-        args.put("x-dead-letter-exchange", KAKAO_DLX_EXCHANGE_NAME);
+        args.put("x-dead-letter-exchange", KAKAO_WAIT_EXCHANGE_NAME);
         args.put("x-dead-letter-routing-key", KE_WAIT_ROUTING_KEY);
         return new Queue(KE_WORK_QUEUE_NAME, true, false, false, args);
     }

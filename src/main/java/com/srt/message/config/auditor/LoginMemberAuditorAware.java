@@ -14,7 +14,6 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class LoginMemberAuditorAware implements AuditorAware<Long> {
     private final LoginMember loginMember;
-    private final HttpServletRequest request;
 
     @Override
     public Optional<Long> getCurrentAuditor() {

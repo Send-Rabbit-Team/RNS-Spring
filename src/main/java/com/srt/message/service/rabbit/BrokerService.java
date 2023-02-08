@@ -122,7 +122,7 @@ public class BrokerService {
             smsMessageDto.setTo(contacts.get(i).getPhoneNumber());
 
             // Redis에서 MessageResultDTO 꺼내오기
-            MessageResultDto messageResultDto = messageResultDtos.get(i);
+            MessageResultDto messageResultDto = messageResultDtos.get(0);
             messageResultDto.setBrokerId(broker.getId());
 
             // 상태 값 저장

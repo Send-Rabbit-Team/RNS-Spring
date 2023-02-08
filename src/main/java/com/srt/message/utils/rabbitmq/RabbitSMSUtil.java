@@ -1,10 +1,12 @@
 package com.srt.message.utils.rabbitmq;
 
 public class RabbitSMSUtil {
-        public static final int WAIT_TTL = 5000;
+        public static final int WORK_TTL = 10 * 1000;
+        public static final int WAIT_TTL = 5 * 1000;
 
         public static final String SMS_EXCHANGE_NAME = "dx.sms.work";
-        public static final String DLX_EXCHANGE_NAME = "dx.sms.wait";
+        public static final String SENDER_EXCHANGE_NAME = "dx.sms.sender";
+        public static final String WAIT_EXCHANGE_NAME = "dx.sms.wait";
         public static final String RECEIVE_EXCHANGE_NAME = "dx.sms.receive";
         public static final String DEAD_EXCHANGE_NAME = "dx.sms.dead";
 
@@ -14,6 +16,9 @@ public class RabbitSMSUtil {
 
         public static final String KT_RECEIVE_QUEUE_NAME = "q.sms.kt.receive";
         public static final String KT_RECEIVE_ROUTING_KEY = "sms.receive.kt";
+
+        public static final String KT_SENDER_QUEUE_NAME = "q.sms.kt.sender";
+        public static final String KT_SENDER_ROUTING_KEY = "sms.sender.kt";
 
         public static final String KT_WAIT_QUEUE_NAME = "q.sms.kt.wait";
         public static final String KT_WAIT_ROUTING_KEY = "sms.wait.kt";
@@ -28,6 +33,9 @@ public class RabbitSMSUtil {
         public static final String SKT_RECEIVE_QUEUE_NAME = "q.sms.skt.receive";
         public static final String SKT_RECEIVE_ROUTING_KEY = "sms.receive.skt";
 
+        public static final String SKT_SENDER_QUEUE_NAME = "q.sms.skt.sender";
+        public static final String SKT_SENDER_ROUTING_KEY = "sms.sender.skt";
+
         public static final String SKT_WAIT_QUEUE_NAME = "q.sms.skt.wait";
         public static final String SKT_WAIT_ROUTING_KEY = "sms.wait.skt";
 
@@ -40,6 +48,9 @@ public class RabbitSMSUtil {
 
         public static final String LG_RECEIVE_QUEUE_NAME = "q.sms.lg.receive";
         public static final String LG_RECEIVE_ROUTING_KEY = "sms.receive.lg";
+
+        public static final String LG_SENDER_QUEUE_NAME = "q.sms.lg.sender";
+        public static final String LG_SENDER_ROUTING_KEY = "sms.sender.lg";
 
         public static final String LG_WAIT_QUEUE_NAME = "q.sms.lg.wait";
         public static final String LG_WAIT_ROUTING_KEY = "sms.wait.lg";
