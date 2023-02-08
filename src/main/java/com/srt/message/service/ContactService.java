@@ -26,7 +26,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static com.srt.message.config.response.BaseResponseStatus.*;
@@ -64,17 +63,16 @@ public class ContactService {
                 .orElseThrow(() -> new BaseException(NOT_EXIST_MEMBER));
 
         ContactGroup contactGroup = null;
+
         // 그룹 존재 여부
         if(groupId != null)
             contactGroup = contactGroupRepository.findById(groupId)
-                    .orElseThrow(() -> new BaseException(NOT_EXIST_GROUP));
-
+                    .orElseThrow(() -> new BaseException(NOT_MATCH_GROUP));
 
         Contact contact = PostContactReq.toEntity(req, contactGroup, member);
         contactRepository.save(contact);
 
         return PostContactRes.toDto(contact, contactGroup);
-
     }
 
 
@@ -89,7 +87,7 @@ public class ContactService {
         ContactGroup contactGroup = null;
         Long contactGroupId = patchContactReq.getContactGroupId();
         if(patchContactReq.getContactGroupId() != null)
-            contactGroup = contactGroupRepository.findById(contactGroupId).get();
+            contactGroup = contactGroupRepository.findByIdAndStatus(contactGroupId, BaseStatus.ACTIVE).get();
 
         // 연락처 수정
         contact.editContact(patchContactReq, contactGroup);
@@ -156,6 +154,7 @@ public class ContactService {
         return new PageResult<>(contactPage);
     }
 
+    // 연락처 전체 조회
     public GetContactAllRes getMemberContactAll(long memberId){
         List<Contact> contactList = contactRepository.findByMemberIdAndStatus(memberId, BaseStatus.ACTIVE);
         GetContactAllRes getContactAllRes = GetContactAllRes.toDto(contactList);

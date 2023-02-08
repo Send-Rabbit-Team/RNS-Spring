@@ -12,7 +12,7 @@ public class RabbitSMSUtil {
 
         // KT
         public static final String KT_WORK_QUEUE_NAME = "q.sms.kt.work";
-        public static final String KT_WORK_ROUTING_KEY = "sms.send.kt";
+        public static final String KT_WORK_ROUTING_KEY = "sms.work.kt";
 
         public static final String KT_RECEIVE_QUEUE_NAME = "q.sms.kt.receive";
         public static final String KT_RECEIVE_ROUTING_KEY = "sms.receive.kt";
@@ -28,7 +28,7 @@ public class RabbitSMSUtil {
 
         // SKT
         public static final String SKT_WORK_QUEUE_NAME = "q.sms.skt.work";
-        public static final String SKT_WORK_ROUTING_KEY = "sms.send.skt";
+        public static final String SKT_WORK_ROUTING_KEY = "sms.work.skt";
 
         public static final String SKT_RECEIVE_QUEUE_NAME = "q.sms.skt.receive";
         public static final String SKT_RECEIVE_ROUTING_KEY = "sms.receive.skt";
@@ -44,7 +44,7 @@ public class RabbitSMSUtil {
 
         // LG
         public static final String LG_WORK_QUEUE_NAME = "q.sms.lg.work";
-        public static final String LG_WORK_ROUTING_KEY = "sms.send.lg";
+        public static final String LG_WORK_ROUTING_KEY = "sms.work.lg";
 
         public static final String LG_RECEIVE_QUEUE_NAME = "q.sms.lg.receive";
         public static final String LG_RECEIVE_ROUTING_KEY = "sms.receive.lg";
