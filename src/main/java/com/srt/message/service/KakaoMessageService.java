@@ -70,7 +70,7 @@ public class KakaoMessageService {
 
 
         // Save ReserveKakaoMessage
-        if (messageReq.getKakaoMessageDto().getCronExpression() != null) {
+        if (messageReq.getKakaoMessageDto().getCronExpression() != "") {
             ReserveKakaoMessage reserveKakaoMessage = ReserveKakaoMessage.builder()
                     .kakaoMessage(kakaoMessage)
                     .cronExpression(messageReq.getKakaoMessageDto().getCronExpression())

@@ -2,14 +2,13 @@ package com.srt.message.listener;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.rabbitmq.client.Channel;
 import com.srt.message.config.status.MessageStatus;
+import com.srt.message.dlx.DlxProcessingErrorHandler;
 import com.srt.message.domain.*;
 import com.srt.message.domain.redis.RKakaoMessageResult;
-import com.srt.message.domain.redis.RMessageResult;
 import com.srt.message.dto.message_result.KakaoMessageResultDto;
-import com.srt.message.dto.message_result.MessageResultDto;
 import com.srt.message.repository.KakaoMessageResultRepository;
-import com.srt.message.repository.MessageResultRepository;
 import com.srt.message.repository.cache.BrokerCacheRepository;
 import com.srt.message.repository.cache.ContactCacheRepository;
 import com.srt.message.repository.cache.MessageCacheRepository;
@@ -20,13 +19,12 @@ import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-
 @Log4j2
 @Service
 @Transactional
 @RequiredArgsConstructor
 public class KakaoBrokerListener {
+    private final DlxProcessingErrorHandler dlxProcessingErrorHandler;
     private final KakaoMessageResultRepository kakaoMessageResultRepository;
     private final RedisHashRepository redisHashRepository;
     private final ObjectMapper objectMapper;
@@ -42,34 +40,48 @@ public class KakaoBrokerListener {
 
     // CNS RESPONSE
     @RabbitListener(queues = "q.kakao.cns.receive", concurrency = "3", containerFactory = "prefetchContainerFactory")
-    public void receiveKTMessage(final KakaoMessageResultDto kakaoMessageResultDto) {
+    public void receiveCNSMessage(final KakaoMessageResultDto kakaoMessageResultDto) {
         updateRMessageResult(kakaoMessageResultDto, CNS_BROKER_NAME);
         saveMessageResult(kakaoMessageResultDto, CNS_BROKER_NAME);
     }
 
     // KE RESPONSE
     @RabbitListener(queues = "q.kakao.ke.receive", concurrency = "3", containerFactory = "prefetchContainerFactory")
-    public void receiveSKTMessage(final KakaoMessageResultDto kakaoMessageResultDto) {
+    public void receiveKEMessage(final KakaoMessageResultDto kakaoMessageResultDto) {
         updateRMessageResult(kakaoMessageResultDto, KE_BROKER_NAME);
         saveMessageResult(kakaoMessageResultDto, KE_BROKER_NAME);
     }
+
+    /**
+     * Sender Consumer
+     */
+    // CNS
+    @RabbitListener(queues = "q.kakao.cns.sender", concurrency = "3", ackMode = "MANUAL")
+    public void receiveSenderCNSMessage(org.springframework.amqp.core.Message message, Channel channel) {
+        dlxProcessingErrorHandler.handleErrorProcessingKakaoMessage(message, channel);
+    }
+    // KE
+    @RabbitListener(queues = "q.kakao.ke.sender", concurrency = "3", ackMode = "MANUAL")
+    public void receiveSenderKEMessage(org.springframework.amqp.core.Message message, Channel channel) {
+        dlxProcessingErrorHandler.handleErrorProcessingKakaoMessage(message, channel);
+    }
+
 
     /**
      * Dead Consumer
      */
     // CNS
     @RabbitListener(queues = "q.kakao.cns.dead")
-    public void receiveDeadKTMessage(final KakaoMessageResultDto kakaoMessageResultDto) {
+    public void receiveDeadCNSMessage(final KakaoMessageResultDto kakaoMessageResultDto) {
         kakaoMessageResultDto.setMessageStatus(MessageStatus.FAIL);
         updateRMessageResult(kakaoMessageResultDto, CNS_BROKER_NAME);
         saveMessageResult(kakaoMessageResultDto, CNS_BROKER_NAME);
 
         log.warn(CNS_BROKER_NAME + " broker got dead letter - {}", kakaoMessageResultDto);
     }
-
     // KE
     @RabbitListener(queues = "q.kakao.ke.dead")
-    public void receiveDeadSKTMessage(final KakaoMessageResultDto kakaoMessageResultDto) {
+    public void receiveDeadKEMessage(final KakaoMessageResultDto kakaoMessageResultDto) {
         kakaoMessageResultDto.setMessageStatus(MessageStatus.FAIL);
         updateRMessageResult(kakaoMessageResultDto, KE_BROKER_NAME);
         saveMessageResult(kakaoMessageResultDto, KE_BROKER_NAME);
