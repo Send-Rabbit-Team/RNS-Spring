@@ -170,7 +170,7 @@ class ContactServiceTest {
 
     @DisplayName("연락처 전체 조회")
     @Test
-    void getMemberContactAll(){
+    void getMemberContactAll_Success(){
         // when
         doReturn(Arrays.asList(contact, contact, contact)).when(contactRepository).findByMemberIdAndStatus(member.getId(), BaseStatus.ACTIVE);
 
