@@ -13,11 +13,14 @@ import lombok.NoArgsConstructor;
 public class RegisterSenderNumberRes {
     private String phoneNumber;
 
+    private String blockNumber;
+
     private String memo;
 
     public static RegisterSenderNumberRes toDto(SenderNumber senderNumber){
         return RegisterSenderNumberRes.builder()
                 .phoneNumber(senderNumber.getPhoneNumber())
+                .blockNumber(senderNumber.getBlockNumber())
                 .memo(senderNumber.getMemo())
                 .build();
     }

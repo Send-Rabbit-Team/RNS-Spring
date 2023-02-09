@@ -178,6 +178,7 @@ class AuthServiceTest {
         BaseException exception = assertThrows(BaseException.class, () ->
                 authService.defaultSignUp(request));
 
+        // then
         assertEquals(exception.getStatus(), ALREADY_EXIST_EMAIL);
     }
 
