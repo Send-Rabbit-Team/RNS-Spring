@@ -1,6 +1,7 @@
 package com.srt.message.service;
 
 import com.srt.message.config.exception.BaseException;
+import com.srt.message.config.status.BaseStatus;
 import com.srt.message.config.status.ReserveStatus;
 import com.srt.message.domain.Contact;
 import com.srt.message.domain.Message;
@@ -79,6 +80,18 @@ public class ReserveMessageService {
         if (message.getMember().getId() != memberId)
             throw new BaseException(NOT_MATCH_MEMBER);
 
-        return schedulerService.remove(messageId);
+        ReserveMessage reserveMessage = reserveMessageRepository.findByMessageId(messageId)
+                .orElseThrow(() -> new BaseException(NOT_RESERVE_MESSAGE));
+
+        if(reserveMessage.getStatus() == BaseStatus.INACTIVE)
+            throw new BaseException(ALREADY_CANCEL_RESERVE);
+
+        schedulerService.remove(messageId);
+
+        reserveMessage.changeReserveStatusStop();
+        reserveMessageRepository.save(reserveMessage);
+
+
+        return messageId + "번 메시지의 발송 예약이 취소되었습니다.";
     }
 }

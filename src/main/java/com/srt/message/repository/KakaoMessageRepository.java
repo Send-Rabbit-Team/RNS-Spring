@@ -1,7 +1,6 @@
 package com.srt.message.repository;
 
 import com.srt.message.config.type.ButtonType;
-import com.srt.message.config.type.MessageType;
 import com.srt.message.domain.KakaoMessage;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -12,8 +11,8 @@ import org.springframework.data.jpa.repository.Query;
 import java.util.Optional;
 
 public interface KakaoMessageRepository extends JpaRepository<KakaoMessage, Long> {
-    @EntityGraph(value = "KakaoMessage.with.Member.SenderNumber")
-    Optional<KakaoMessage> findKakaoMessageById(long messageId);
+    @EntityGraph("KakaoMessage.with.Member")
+    Optional<KakaoMessage> findKakaoMessageById(Long messageId);
 
     @Query(value = "select km from KakaoMessage km where km.member.id = :memberId",
             countQuery = "select count(km) from KakaoMessage km where km.member.id = :memberId")

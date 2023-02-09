@@ -10,7 +10,7 @@ import org.hibernate.annotations.Comment;
 
 import javax.persistence.*;
 
-@NamedEntityGraph(name = "KakaoMessage.with.Member.SenderNumber", attributeNodes = {
+@NamedEntityGraph(name = "KakaoMessage.with.Member", attributeNodes = {
         @NamedAttributeNode(value = "member", subgraph = "member_company")},
         subgraphs = @NamedSubgraph(name = "member_company", attributeNodes = {
                 @NamedAttributeNode("company")
