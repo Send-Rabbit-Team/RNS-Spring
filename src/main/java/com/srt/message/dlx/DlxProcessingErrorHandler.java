@@ -2,7 +2,9 @@ package com.srt.message.dlx;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rabbitmq.client.Channel;
+import com.srt.message.dto.dlx.ReceiveKakaoMessageDto;
 import com.srt.message.dto.dlx.ReceiveMessageDto;
+import com.srt.message.dto.message_result.KakaoMessageResultDto;
 import com.srt.message.dto.message_result.MessageResultDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -18,6 +20,7 @@ import java.util.Map;
 import java.util.Optional;
 
 import static com.srt.message.utils.rabbitmq.RabbitSMSUtil.*;
+import static com.srt.message.utils.rabbitmq.RabbitKakaoUtil.*;
 
 @Log4j2
 @Component
@@ -111,5 +114,52 @@ public class DlxProcessingErrorHandler {
         }
 
         return null;
+    }
+
+    public boolean handleErrorProcessingKakaoMessage(Message message, Channel channel) {
+        RabbitmqHeader rabbitmqHeader = new RabbitmqHeader(message.getMessageProperties().getHeaders());
+
+        try {
+            ReceiveKakaoMessageDto receiveMessageDto = objectMapper.readValue(new String(message.getBody()), ReceiveKakaoMessageDto.class);
+            long brokerId = receiveMessageDto.getKakaoMessageResultDto().getBrokerId();
+
+            // 모든 중계사를 다 돌았을 경우, 해당 브로커의 Dead Queue로 보내기
+            if (rabbitmqHeader.getFailedRetryCount() >= maxRetryCount) {
+                String brokerName = (brokerId == 1) ? "cns" : "ke";
+                log.warn("[DEAD] Error at " + new Date() + "on retry " + rabbitmqHeader.getFailedRetryCount()
+                        + " for message " + message);
+
+                KakaoMessageResultDto kakaoMessageResultDto = receiveMessageDto.getKakaoMessageResultDto();
+                channel.basicAck(message.getMessageProperties().getDeliveryTag(), false);
+                rabbitTemplate.convertAndSend(KAKAO_DEAD_EXCHANGE_NAME, "kakao.dead." + brokerName, kakaoMessageResultDto);
+
+                // 다른 중계사를 다 돌지 않았을 경우, CNS 중계사 WAIT로 보내기
+            } else if (rabbitmqHeader.getFailedRetryCount() >= maxBrokerRetryCount) {
+                log.warn("[RE-SEND OTHER BROKER] Error at " + new Date() + "on retry " + rabbitmqHeader.getFailedRetryCount()
+                        + " for message " + message);
+
+                channel.basicAck(message.getMessageProperties().getDeliveryTag(), false);
+                if (brokerId == 1) {
+                    rabbitTemplate.convertAndSend(KAKAO_WAIT_EXCHANGE_NAME, KE_WAIT_ROUTING_KEY, message);
+                } else {
+                    rabbitTemplate.convertAndSend(KAKAO_WAIT_EXCHANGE_NAME, CNS_WAIT_ROUTING_KEY, message);
+                }
+
+            }
+
+            // 자신의 WAIT QUEUE로 넣기
+            else {
+                log.info("[RE-QUEUE] Error at " + new Date() + " on retry " + rabbitmqHeader.getFailedRetryCount()
+                        + " for message " + message);
+
+                channel.basicReject(message.getMessageProperties().getDeliveryTag(), false);
+            }
+            return true;
+
+        } catch (IOException e) {
+            log.warn("[HANDLER-FAILED] Error at " + new Date() + " on retry " + rabbitmqHeader.getFailedRetryCount()
+                    + " for message " + message);
+        }
+        return false;
     }
 }

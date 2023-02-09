@@ -3,6 +3,7 @@ package com.srt.message.service;
 import com.srt.message.config.exception.BaseException;
 import com.srt.message.config.status.ReserveStatus;
 import com.srt.message.domain.*;
+import com.srt.message.dto.kakao_message.KakaoMessageDto;
 import com.srt.message.repository.*;
 import com.srt.message.dto.kakao_message.BrokerKakaoMessageDto;
 import com.srt.message.dto.kakao_message.post.PostKakaoMessageReq;
@@ -43,18 +44,7 @@ public class KakaoMessageService {
 
 
         // Save KakaoMessage
-        KakaoMessage kakaoMessage = KakaoMessage.builder()
-                .member(member)
-                .sender(messageReq.getKakaoMessageDto().getFrom())
-                .title(messageReq.getKakaoMessageDto().getTitle())
-                .subTitle(messageReq.getKakaoMessageDto().getSubtitle())
-                .content(messageReq.getKakaoMessageDto().getContent())
-                .image(messageReq.getKakaoMessageDto().getImage())
-                .description(messageReq.getKakaoMessageDto().getDescription())
-                .buttonTitle(messageReq.getKakaoMessageDto().getButtonTitle())
-                .buttonUrl(messageReq.getKakaoMessageDto().getButtonUrl())
-                .buttonType(messageReq.getKakaoMessageDto().getButtonType())
-                .build();
+        KakaoMessage kakaoMessage = KakaoMessageDto.toEntity(messageReq.getKakaoMessageDto(), member);
         kakaoMessageRepository.save(kakaoMessage);
         log.info("kakaoMessage : " + kakaoMessage);
 
@@ -70,7 +60,7 @@ public class KakaoMessageService {
 
 
         // Save ReserveKakaoMessage
-        if (messageReq.getKakaoMessageDto().getCronExpression() != null) {
+        if (messageReq.getKakaoMessageDto().getCronExpression() != "") {
             ReserveKakaoMessage reserveKakaoMessage = ReserveKakaoMessage.builder()
                     .kakaoMessage(kakaoMessage)
                     .cronExpression(messageReq.getKakaoMessageDto().getCronExpression())
@@ -89,7 +79,7 @@ public class KakaoMessageService {
             }
 
 
-            schedulerService.registerKakao(brokerMessageDto);
+            schedulerService.registerKakao(brokerMessageDto, reserveKakaoMessage.getId());
         }
 
 

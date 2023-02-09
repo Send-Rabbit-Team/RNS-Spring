@@ -10,7 +10,7 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 public class GetKakaoMessageResultRes {
-    private long resultId;
+    private long kakaoMessageId;
     private String contactNumber;
     private String contactMemo;
     private String contactGroup;
@@ -20,7 +20,7 @@ public class GetKakaoMessageResultRes {
 
     public static GetKakaoMessageResultRes toDto(KakaoMessageResult kakaoMessageResult) {
         return GetKakaoMessageResultRes.builder()
-                .resultId(kakaoMessageResult.getId())
+                .kakaoMessageId(kakaoMessageResult.getKakaoMessage().getId())
                 .contactNumber(kakaoMessageResult.getContact().getPhoneNumber())
                 .contactMemo(kakaoMessageResult.getContact().getMemo())
                 .contactGroup(kakaoMessageResult.getContact().getContactGroup().getName())

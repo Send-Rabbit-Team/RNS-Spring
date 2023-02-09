@@ -26,6 +26,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -151,6 +152,7 @@ public class MessageResultService {
                 .brokerId(broker.getId())
                 .brokerName(broker.getName())
                 .messageStatus(rMessageResult.getMessageStatus())
+                .createdAt(LocalDateTime.now().toString())
                 .build();
     }
 }

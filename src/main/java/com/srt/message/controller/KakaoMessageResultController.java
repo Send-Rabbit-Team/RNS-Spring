@@ -1,5 +1,6 @@
 package com.srt.message.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.srt.message.config.page.PageResult;
 import com.srt.message.config.response.BaseResponse;
 import com.srt.message.config.type.ButtonType;
@@ -48,7 +49,7 @@ public class KakaoMessageResultController {
     @GetMapping("/info/{messageId}")
     public BaseResponse<GetKakaoMessageResultListRes> getKakaoMessageResult(
             @PathVariable Long messageId,
-            HttpServletRequest request) {
+            HttpServletRequest request) throws JsonProcessingException {
         return new BaseResponse<>(kakaoMessageResultService.getKakaoMessageResult(JwtInfo.getMemberId(request), messageId));
     }
 

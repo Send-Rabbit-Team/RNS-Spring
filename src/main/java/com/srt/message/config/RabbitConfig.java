@@ -319,7 +319,9 @@ public class RabbitConfig {
     @Bean
     public DirectExchange kakaoReceiveExchange(){ return new DirectExchange(KAKAO_RECEIVE_EXCHANGE_NAME); }
     @Bean
-    public DirectExchange kakaoDlxExchange(){ return new DirectExchange(KAKAO_WAIT_EXCHANGE_NAME); }
+    public DirectExchange kakaoSenderExchange(){ return new DirectExchange(KAKAO_SENDER_EXCHANGE_NAME); }
+    @Bean
+    public DirectExchange kakaoWaitExchange(){ return new DirectExchange(KAKAO_WAIT_EXCHANGE_NAME); }
     @Bean
     public DirectExchange kakaoDeadExchange(){
         return new DirectExchange(KAKAO_DEAD_EXCHANGE_NAME);
@@ -332,13 +334,21 @@ public class RabbitConfig {
     @Bean
     public Queue kakaoWorkCNSQueue(){
         Map<String, Object> args = new HashMap<>();
-        args.put("x-dead-letter-exchange",KAKAO_WAIT_EXCHANGE_NAME);
-        args.put("x-dead-letter-routing-key",CNS_WAIT_ROUTING_KEY);
+        args.put("x-dead-letter-exchange",KAKAO_SENDER_EXCHANGE_NAME);
+        args.put("x-dead-letter-routing-key",CNS_SENDER_ROUTING_KEY);
+        args.put("x-message-ttl", KAKAO_WORK_TTL);
         return new Queue(CNS_WORK_QUEUE_NAME,true, false, false, args);
     }
     @Bean
     public Queue kakaoReceiveCNSQueue(){
         return new Queue(CNS_RECEIVE_QUEUE_NAME, true);
+    }
+    @Bean
+    public Queue kakaoSenderCNSQueue() {
+        Map<String, Object> args = new HashMap<>();
+        args.put("x-dead-letter-exchange", KAKAO_WAIT_EXCHANGE_NAME);
+        args.put("x-dead-letter-routing-key", CNS_WAIT_ROUTING_KEY);
+        return new Queue(CNS_SENDER_QUEUE_NAME, true, false, false, args);
     }
     @Bean
     public Queue kakaoWaitCNSQueue(){
@@ -360,13 +370,21 @@ public class RabbitConfig {
     @Bean
     public Queue kakaoWorkKEQueue() {
         Map<String, Object> args = new HashMap<>();
-        args.put("x-dead-letter-exchange", KAKAO_WAIT_EXCHANGE_NAME);
-        args.put("x-dead-letter-routing-key", KE_WAIT_ROUTING_KEY);
+        args.put("x-dead-letter-exchange",KAKAO_SENDER_EXCHANGE_NAME);
+        args.put("x-dead-letter-routing-key",KE_SENDER_ROUTING_KEY);
+        args.put("x-message-ttl", KAKAO_WORK_TTL);
         return new Queue(KE_WORK_QUEUE_NAME, true, false, false, args);
     }
     @Bean
     public Queue kakaoReceiveKEQueue() {
         return new Queue(KE_RECEIVE_QUEUE_NAME, true);
+    }
+    @Bean
+    public Queue kakaoSenderKEQueue() {
+        Map<String, Object> args = new HashMap<>();
+        args.put("x-dead-letter-exchange", KAKAO_WAIT_EXCHANGE_NAME);
+        args.put("x-dead-letter-routing-key", KE_WAIT_ROUTING_KEY);
+        return new Queue(KE_SENDER_QUEUE_NAME, true, false, false, args);
     }
     @Bean
     public Queue kakaoWaitKEQueue() {
@@ -386,7 +404,7 @@ public class RabbitConfig {
      * KAKAO: CNS BINDING [WORK, RECEIVE, DLX, DEAD]
      */
     @Bean
-    public Binding bindingKakaoCNS(DirectExchange kakaoWorkExchange, Queue kakaoWorkCNSQueue){
+    public Binding bindingKakaoWorkCNS(DirectExchange kakaoWorkExchange, Queue kakaoWorkCNSQueue){
         return BindingBuilder.bind(kakaoWorkCNSQueue)
                 .to(kakaoWorkExchange)
                 .with(CNS_WORK_ROUTING_KEY);
@@ -398,9 +416,15 @@ public class RabbitConfig {
                 .with(CNS_RECEIVE_ROUTING_KEY);
     }
     @Bean
-    public Binding bindingKakaoDlxCNS(DirectExchange kakaoDlxExchange, Queue kakaoWaitCNSQueue){
+    public Binding bindingKakaoSenderCNS(DirectExchange kakaoSenderExchange, Queue kakaoSenderCNSQueue){
+        return BindingBuilder.bind(kakaoSenderCNSQueue)
+                .to(kakaoSenderExchange)
+                .with(CNS_SENDER_ROUTING_KEY);
+    }
+    @Bean
+    public Binding bindingKakaoWaitCNS(DirectExchange kakaoWaitExchange, Queue kakaoWaitCNSQueue){
         return BindingBuilder.bind(kakaoWaitCNSQueue)
-                .to(kakaoDlxExchange)
+                .to(kakaoWaitExchange)
                 .with(CNS_WAIT_ROUTING_KEY);
     }
     @Bean
@@ -414,7 +438,7 @@ public class RabbitConfig {
      * KAKAO: KE BINDING [WORK, RECEIVE, DLX, DEAD]
      */
     @Bean
-    public Binding bindingKakaoKE(DirectExchange kakaoWorkExchange, Queue kakaoWorkKEQueue){
+    public Binding bindingKakaoWorkKE(DirectExchange kakaoWorkExchange, Queue kakaoWorkKEQueue){
         return BindingBuilder.bind(kakaoWorkKEQueue)
                 .to(kakaoWorkExchange)
                 .with(KE_WORK_ROUTING_KEY);
@@ -426,9 +450,15 @@ public class RabbitConfig {
                 .with(KE_RECEIVE_ROUTING_KEY);
     }
     @Bean
-    public Binding bindingKakaoDlxKE(DirectExchange kakaoDlxExchange, Queue kakaoWaitKEQueue){
+    public Binding bindingKakaoSenderKE(DirectExchange kakaoSenderExchange, Queue kakaoSenderKEQueue){
+        return BindingBuilder.bind(kakaoSenderKEQueue)
+                .to(kakaoSenderExchange)
+                .with(KE_SENDER_ROUTING_KEY);
+    }
+    @Bean
+    public Binding bindingKakaoWaitKE(DirectExchange kakaoWaitExchange, Queue kakaoWaitKEQueue){
         return BindingBuilder.bind(kakaoWaitKEQueue)
-                .to(kakaoDlxExchange)
+                .to(kakaoWaitExchange)
                 .with(KE_WAIT_ROUTING_KEY);
     }
     @Bean

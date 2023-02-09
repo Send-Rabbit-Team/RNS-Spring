@@ -98,7 +98,7 @@ public class KakaoBrokerService {
 
             // 수신할 브로커(라우팅키)와 수신자 번호 지정
             KakaoBroker kakaoBroker = (KakaoBroker) brokerPool.getNext().getBroker();
-            String routingKey = "kakao.send." + kakaoBroker.getName().toLowerCase();
+            String routingKey = "kakao.work." + kakaoBroker.getName().toLowerCase();
             kakaoMessageDto.setTo(contacts.get(i).getPhoneNumber());
 
             KakaoMessageResultDto kakaoMessageResultDto = kakaoMessageResultDtoList.get(i);

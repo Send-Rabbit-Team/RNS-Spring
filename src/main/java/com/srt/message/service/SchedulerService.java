@@ -4,13 +4,14 @@ import com.srt.message.config.exception.BaseException;
 import com.srt.message.config.status.BaseStatus;
 import com.srt.message.config.status.ReserveStatus;
 import com.srt.message.domain.Contact;
+import com.srt.message.domain.ReserveKakaoMessage;
 import com.srt.message.domain.ReserveMessage;
 import com.srt.message.domain.ReserveMessageContact;
+import com.srt.message.dto.kakao_message.KakaoMessageDto;
 import com.srt.message.dto.message.BrokerMessageDto;
 import com.srt.message.dto.message.SMSMessageDto;
-import com.srt.message.repository.ReserveMessageContactRepository;
+import com.srt.message.repository.*;
 import com.srt.message.dto.kakao_message.BrokerKakaoMessageDto;
-import com.srt.message.repository.ReserveMessageRepository;
 import com.srt.message.service.rabbit.BrokerService;
 import com.srt.message.service.rabbit.KakaoBrokerService;
 import lombok.RequiredArgsConstructor;
@@ -30,13 +31,14 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
-import static com.srt.message.config.response.BaseResponseStatus.ALREADY_CANCEL_RESERVE;
-import static com.srt.message.config.response.BaseResponseStatus.NOT_RESERVE_MESSAGE;
+import static com.srt.message.config.response.BaseResponseStatus.*;
 
 @Log4j2
 @RequiredArgsConstructor
 @Service
 public class SchedulerService {
+    private final MemberRepository memberRepository;
+    private final ReserveKakaoMessageRepository reserveKakaoMessageRepository;
     private Map<Long, ScheduledFuture<?>> scheduledTasks = new ConcurrentHashMap<>();
 
     private final BrokerService brokerService;
@@ -72,6 +74,41 @@ public class SchedulerService {
         });
     }
 
+    @Bean
+    public void registerKakaoMessageReserveScheduler(){
+        List<ReserveKakaoMessage> reserveMessageList = reserveKakaoMessageRepository.findAllByReserveStatus(ReserveStatus.PROCESSING);
+
+        reserveMessageList.stream().forEach(reserveKakaoMessage -> {
+            String cronExpression = reserveKakaoMessage.getCronExpression();
+            long taskId = reserveKakaoMessage.getKakaoMessage().getId();
+
+            // 예약된 메시지 연락처 찾기
+            List<Contact> contacts =
+                    reserveMessageContactRepository.findAllByReserveKakaoMessage(reserveKakaoMessage)
+                            .stream().map(ReserveMessageContact::getContact).collect(Collectors.toList());
+
+            // 카카오 비즈 아이디 찾기
+            String kakaoBizId = memberRepository.findByIdAndStatus(reserveKakaoMessage.getKakaoMessage().getMember().getId(), BaseStatus.ACTIVE)
+                    .orElseThrow(() -> new BaseException(NOT_EXIST_MEMBER)).getCompany().getKakaoBizId();
+
+
+            // KakaoMessageDto 객체 생성하기
+            KakaoMessageDto kakaoMessageDto = KakaoMessageDto.toDto(reserveKakaoMessage.getKakaoMessage());
+            kakaoMessageDto.setCronExpression(cronExpression);
+            kakaoMessageDto.setFrom(kakaoBizId);
+
+            // 스케쥴러 등록을 위해 BrokerMessageDto 객체 생성하기
+            BrokerKakaoMessageDto brokerKakaoMessageDto = BrokerKakaoMessageDto.builder()
+                    .kakaoMessageDto(kakaoMessageDto)
+                    .kakaoMessage(reserveKakaoMessage.getKakaoMessage())
+                    .contacts(contacts)
+                    .member(reserveKakaoMessage.getKakaoMessage().getMember())
+                    .build();
+
+            registerKakao(brokerKakaoMessageDto, taskId);
+        });
+    }
+
     // 스케쥴러 등록
     public void register(BrokerMessageDto brokerMessageDto, long taskId) {
         String cronExpression = brokerMessageDto.getSmsMessageDto().getCronExpression();
@@ -95,14 +132,22 @@ public class SchedulerService {
         scheduledTasks.put(taskId, task);
     }
 
-    public void registerKakao(BrokerKakaoMessageDto brokerKakaoMessageDto) {
-        long taskId = brokerKakaoMessageDto.getKakaoMessage().getId();
+    public void registerKakao(BrokerKakaoMessageDto brokerKakaoMessageDto, long taskId) {
         String cronExpression = brokerKakaoMessageDto.getKakaoMessageDto().getCronExpression();
         CronTrigger cronTrigger = new CronTrigger(cronExpression);
 
         ScheduledFuture<?> task = taskScheduler.schedule(() -> {
             if (checkSchedulerLock(taskId))
                 return;
+
+            // redis에서 예약 발송 전송 횟수 가져와서 카운팅 처리
+            String countKey = "reserve." + taskId + ".count";
+            ValueOperations<String, Object> valueOperation = redisTemplate.opsForValue();
+            String count = valueOperation.get(countKey) == null? "0" : (String) valueOperation.get(countKey);
+            int sendCount = Integer.parseInt(count);
+            valueOperation.set(countKey, String.valueOf(sendCount + 1));
+
+            reserveKakaoMessageRepository.findByKakaoMessageId(taskId);
 
             kakaoBrokerService.sendKakaoMessage(brokerKakaoMessageDto);
         }, cronTrigger);
@@ -111,30 +156,11 @@ public class SchedulerService {
     }
 
     // 스케쥴러 취소
-    public String remove(long messageId) {
-        Optional<ReserveMessage> reserveMessageOptional = reserveMessageRepository.findByMessageId(messageId);
-
-        if (scheduledTasks.get(messageId) != null && reserveMessageOptional.isPresent()){
-            ReserveMessage reserveMessage = reserveMessageOptional.get();
-            if(reserveMessage.getStatus() == BaseStatus.INACTIVE)
-                throw new BaseException(ALREADY_CANCEL_RESERVE);
-
+    public void remove(long messageId) {
+        if (scheduledTasks.get(messageId) != null ) {
             scheduledTasks.get(messageId).cancel(true);
-
-            reserveMessage.changeReserveStatusStop();
-            reserveMessageRepository.save(reserveMessage);
-
             log.info(messageId + "번 메시지 예약 발송 스케쥴러를 중지합니다.");
-
-            return messageId + "번 메시지의 발송 예약이 취소되었습니다.";
-        }else{
-            throw new BaseException(NOT_RESERVE_MESSAGE);
         }
-    }
-
-    public void removeKakao(long messageId) {
-        if (scheduledTasks.get(messageId) != null )
-            scheduledTasks.get(messageId).cancel(true);
         else
             throw new BaseException(NOT_RESERVE_MESSAGE);
     }
