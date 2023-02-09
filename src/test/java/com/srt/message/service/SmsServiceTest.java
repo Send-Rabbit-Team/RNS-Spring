@@ -17,7 +17,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.Optional;
 
 import static com.srt.message.config.response.BaseResponseStatus.INVALID_AUTH_TOKEN;
-import static com.srt.message.config.response.BaseResponseStatus.NOT_AUTH_PHONE_NUMBER;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
