@@ -48,7 +48,7 @@ public class MessageResultService {
     private final RedisHashRepository redisHashRepository;
 
 
-    // 발송한 메시지 페이징 조회 (예약 메시지는 포함 안됨)
+    // 발송한 메시지 페이징 조회
     public PageResult<GetMessageRes> getAllMessages(long memberId, int page){
         PageRequest pageRequest = PageRequest.of(page-1, 10, Sort.by("id").descending());
         Page<GetMessageRes> messagePage = messageRepository.findAllMessage(memberId, pageRequest)

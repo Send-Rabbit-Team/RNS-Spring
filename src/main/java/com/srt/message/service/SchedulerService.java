@@ -156,10 +156,13 @@ public class SchedulerService {
     }
 
     // 스케쥴러 취소
-    public void remove(long messageId) {
-        if (scheduledTasks.get(messageId) != null ) {
-            scheduledTasks.get(messageId).cancel(true);
-            log.info(messageId + "번 메시지 예약 발송 스케쥴러를 중지합니다.");
+    public void remove(long reserveMessageId) {
+        if (scheduledTasks.get(reserveMessageId) != null ) {
+            scheduledTasks.get(reserveMessageId).cancel(true);
+            log.info(reserveMessageId + "번 메시지 예약 발송 스케쥴러를 중지합니다.");
+
+            // 예약 발송 카운트 제거
+            redisTemplate.delete("reserve." + reserveMessageId + ".count");
         }
         else
             throw new BaseException(NOT_RESERVE_MESSAGE);

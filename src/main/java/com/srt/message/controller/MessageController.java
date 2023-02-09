@@ -5,20 +5,15 @@ import com.srt.message.service.KakaoMessageService;
 import com.srt.message.dto.jwt.JwtInfo;
 import com.srt.message.dto.kakao_message.post.PostKakaoMessageReq;
 import com.srt.message.dto.message.post.PostSendMessageReq;
-import com.srt.message.jwt.NoIntercept;
 import com.srt.message.service.MessageService;
-import com.srt.message.service.ObjectStorageService;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
-
-import static com.srt.message.config.response.BaseResponseStatus.FILE_UPLOAD_SUCCESS;
 
 @Log4j2
 @RestController
