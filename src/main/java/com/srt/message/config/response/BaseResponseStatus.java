@@ -45,6 +45,8 @@ public enum BaseResponseStatus {
     NOT_EXIST_TEMPLATE(true, 2025, "존재하지 않는 탬플릿입니다."),
     NOT_EXIST_MESSAGE_RULE(false, 2026, "존재하지 않는 발송 규칙입니다."),
     ALREADY_CANCEL_RESERVE(false, 2027, "이미 취소된 예약 메시지입니다."),
+    NOT_EXIST_POINT(false, 2028, "존재하지 않는 포인트입니다."),
+    INSUFFICIENT_POINT(false, 2029, "포인트가 부족합니다."),
 
 
 
