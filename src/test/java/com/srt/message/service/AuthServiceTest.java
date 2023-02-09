@@ -91,7 +91,7 @@ class AuthServiceTest {
         assertThat(response.getMemberType()).isEqualTo(MemberType.PERSON);
         assertThat(response.getLoginType()).isEqualTo(LoginType.DEFAULT);
 
-        // verity
+        // verify
         verify(memberRepository, times(1)).save(any(Member.class));
     }
 

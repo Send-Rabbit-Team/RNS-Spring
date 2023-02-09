@@ -32,7 +32,7 @@ public class MessageRuleService {
     
     private final BrokerRepository brokerRepository;
 
-    // 중계사 비율 설정
+    // 메시지 중계사 비율 생성
     public PostSMSRuleRes createSMSRule(PostSMSRuleReq msgRuleReq, long memberId){
         List<MessageRuleVO> messageRuleVOs = msgRuleReq.getMessageRules();
 
@@ -56,8 +56,8 @@ public class MessageRuleService {
         return PostSMSRuleRes.toDto(messageRules);
     }
 
-    // 중계사 규칙 반환
-    public GetSMSRuleRes getAll(long memberId){
+    // 메시지 중계사 규칙 조회
+    public GetSMSRuleRes getAllSmsRules(long memberId){
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(()-> new BaseException(NOT_EXIST_MEMBER));
 
@@ -67,11 +67,10 @@ public class MessageRuleService {
     }
 
 
-    // 중계사 규칙 수정
+    // 메시지 중계사 규칙 수정
     @Transactional(readOnly = false)
-    public PatchSMSRuleRes edit(PatchSMSRuleReq patchSMSRuleReq, long memberId){
+    public PatchSMSRuleRes editSmsRule(PatchSMSRuleReq patchSMSRuleReq, long memberId){
         Member member = memberRepository.findById(memberId).orElseThrow(()->new BaseException(NOT_EXIST_MEMBER));
-
 
         List<MessageRule> modMessageRuleList = patchSMSRuleReq.getMessageRules().stream().map(
                 m -> {
