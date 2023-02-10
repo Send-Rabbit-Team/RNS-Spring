@@ -5,13 +5,18 @@ import com.srt.message.config.exception.BaseException;
 import com.srt.message.config.status.AuthPhoneNumberStatus;
 import com.srt.message.config.type.LoginType;
 import com.srt.message.config.type.MemberType;
+import com.srt.message.domain.Contact;
 import com.srt.message.domain.Member;
 import com.srt.message.domain.SenderNumber;
 import com.srt.message.domain.redis.AuthPhoneNumber;
+import com.srt.message.dto.auth.login.post.PostLoginReq;
+import com.srt.message.dto.auth.login.post.PostLoginRes;
 import com.srt.message.dto.auth.register.google.GoogleRegisterReq;
 import com.srt.message.dto.auth.register.google.GoogleRegisterRes;
 import com.srt.message.dto.auth.register.post.PostRegisterReq;
 import com.srt.message.dto.auth.register.post.PostRegisterRes;
+import com.srt.message.dto.jwt.JwtInfo;
+import com.srt.message.jwt.JwtService;
 import com.srt.message.repository.CompanyRepository;
 import com.srt.message.repository.MemberRepository;
 import com.srt.message.repository.SenderNumberRepository;
@@ -28,6 +33,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.io.UnsupportedEncodingException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Optional;
 
@@ -37,7 +43,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class AuthServiceTest {
@@ -60,7 +68,8 @@ class AuthServiceTest {
 
     @BeforeEach
     public void setUpMember(){
-        member = Member.builder().email("kakao@gmail.com").build();
+        member = Member.builder().id(1).email("forceTlight@gmail.com").
+                password("1q2w3e4r!").build();
     }
 
     @DisplayName("일반 회원가입 (개인)")
@@ -69,6 +78,8 @@ class AuthServiceTest {
         // given
         PostRegisterReq request = defaultSignUpRequest_person();
         String encryptPassword = SHA256.encrypt(request.getPassword());
+
+        doReturn(member).when(memberRepository).save(any(Member.class));
 
         // when
         PostRegisterRes response = authService.defaultSignUp(request);
@@ -79,6 +90,9 @@ class AuthServiceTest {
         assertThat(response.getName()).isEqualTo(request.getName());
         assertThat(response.getMemberType()).isEqualTo(MemberType.PERSON);
         assertThat(response.getLoginType()).isEqualTo(LoginType.DEFAULT);
+
+        // verify
+        verify(memberRepository, times(1)).save(any(Member.class));
     }
 
     @DisplayName("일반 회원가입 (기업)")
@@ -87,6 +101,8 @@ class AuthServiceTest {
         // given
         PostRegisterReq request = defaultSignUpRequest_company();
         String encryptPassword = SHA256.encrypt(request.getPassword());
+
+        doReturn(member).when(memberRepository).save(any(Member.class));
 
         // when
         PostRegisterRes response = authService.defaultSignUp(request);
@@ -100,6 +116,9 @@ class AuthServiceTest {
         assertThat(response.getKakaoBizId()).isEqualTo(request.getKakaoBizId());
         assertThat(response.getMemberType()).isEqualTo(MemberType.COMPANY);
         assertThat(response.getLoginType()).isEqualTo(LoginType.DEFAULT);
+
+        // verity
+        verify(memberRepository, times(1)).save(any(Member.class));
     }
 
     @DisplayName("구글 회원가입 (개인)")
@@ -107,6 +126,8 @@ class AuthServiceTest {
     void googleSignUp_Person_Success() {
         // given
         GoogleRegisterReq request = googleSignUpRequest_person();
+
+        doReturn(member).when(memberRepository).save(any(Member.class));
 
         // when
         GoogleRegisterRes response = authService.googleSignUp(request);
@@ -116,6 +137,9 @@ class AuthServiceTest {
         assertThat(response.getName()).isEqualTo(request.getName());
         assertThat(response.getMemberType()).isEqualTo(MemberType.PERSON);
         assertThat(response.getLoginType()).isEqualTo(LoginType.GOOGLE);
+
+        // verity
+        verify(memberRepository, times(1)).save(any(Member.class));
     }
 
     @DisplayName("구글 회원가입 (기업)")
@@ -123,6 +147,8 @@ class AuthServiceTest {
     void googleSignUp_Company_Success() {
         // given
         GoogleRegisterReq request = googleSignUpRequest_person();
+
+        doReturn(member).when(memberRepository).save(any(Member.class));
 
         // when
         GoogleRegisterRes response = authService.googleSignUp(request);
@@ -135,6 +161,9 @@ class AuthServiceTest {
         assertThat(response.getKakaoBizId()).isEqualTo(request.getKakaoBizId());
         assertThat(response.getMemberType()).isEqualTo(MemberType.PERSON);
         assertThat(response.getLoginType()).isEqualTo(LoginType.GOOGLE);
+
+        // verity
+        verify(memberRepository, times(1)).save(any(Member.class));
     }
 
     @DisplayName("회원가입 시 이메일 중복 처리")
@@ -149,6 +178,7 @@ class AuthServiceTest {
         BaseException exception = assertThrows(BaseException.class, () ->
                 authService.defaultSignUp(request));
 
+        // then
         assertEquals(exception.getStatus(), ALREADY_EXIST_EMAIL);
     }
 
@@ -164,6 +194,46 @@ class AuthServiceTest {
                 authService.defaultSignUp(request));
 
         assertEquals(exception.getStatus(), NOT_AUTH_PHONE_NUMBER);
+    }
+
+    @DisplayName("일반 로그인")
+    @Test
+    void defaultLogin_Success(){
+        // given
+        String encryptPassword = SHA256.encrypt(member.getPassword());
+        member = Member.builder().id(1).email("forceTlight@gmail.com").
+                password(encryptPassword).build();
+
+        PostLoginReq request = PostLoginReq.builder().email("forceTlight@gmail.com").password("1q2w3e4r!").build();
+        given(memberRepository.findByEmailIgnoreCase(any())).willReturn(Optional.ofNullable(member));
+
+        JwtInfo jwtInfo = new JwtInfo(member.getId());
+        JwtService jwtService = new JwtService();
+
+        // when
+        PostLoginRes response = authService.defaultSignIn(request);
+        int jwtParseMemberId = (int) jwtService.getJwtInfo(response.getJwt()).get("memberId");
+
+        // then
+        assertThat(jwtParseMemberId).isEqualTo(member.getId());
+    }
+
+    @DisplayName("구글 로그인")
+    @Test
+    void googleLogin_Success(){
+        // given
+        String email = "forceTlight@gmail.com";
+        given(memberRepository.findByEmailIgnoreCaseAndLoginType(any(), eq(LoginType.GOOGLE))).willReturn(Optional.ofNullable(member));
+
+        JwtInfo jwtInfo = new JwtInfo(member.getId());
+        JwtService jwtService = new JwtService();
+
+        // when
+        PostLoginRes response = authService.googleSignIn(email);
+        int jwtParseMemberId = (int) jwtService.getJwtInfo(response.getJwt()).get("memberId");
+
+        // then
+        assertThat(jwtParseMemberId).isEqualTo(member.getId());
     }
 
     public PostRegisterReq defaultSignUpRequest_person() {

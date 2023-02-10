@@ -39,6 +39,7 @@ public class ContactGroupService {
 
     private final ContactRepository contactRepository;
 
+    // 모든 그룹 가져오기
     @Transactional(readOnly = false)
     public List<ContactGroupDTO>  getAllContactGroup(long memberId){
         Member member = getExistMember(memberId);
@@ -56,6 +57,7 @@ public class ContactGroupService {
     public ContactGroupDTO findContactGroupById(long contactGroupId){
         ContactGroup contactGroup = contactGroupRepository.findByIdAndStatus(contactGroupId, BaseStatus.ACTIVE)
                 .orElseThrow(()-> new BaseException(NOT_EXIST_GROUP));
+
         Member member = contactGroup.getMember();
         return ContactGroupDTO.toDTO(contactGroup,member);
     }
@@ -113,9 +115,6 @@ public class ContactGroupService {
                 contactRepository.save(contact);
             }
         }
-
-
-
     }
 
     // 편의 메서드

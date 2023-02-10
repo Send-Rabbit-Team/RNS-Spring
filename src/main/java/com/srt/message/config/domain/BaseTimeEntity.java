@@ -43,4 +43,11 @@ public class BaseTimeEntity {
     public void changeStatusInActive(){
         setStatus(BaseStatus.INACTIVE);
     }
+
+    // 단위 테스트용
+    // 단위 테스트용 set
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
 }
