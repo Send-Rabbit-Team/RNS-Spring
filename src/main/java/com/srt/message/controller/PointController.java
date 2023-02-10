@@ -22,13 +22,16 @@ public class PointController {
     private final KakaoPayService kakaoPayService;
     private final PointService pointService;
 
-    @GetMapping("/kakaopay/ready")
-    public BaseResponse<String> kakaoPaymentReady(HttpServletRequest request, @RequestParam("plusPoint") int plusPoint) {
-        return new BaseResponse<>(kakaoPayService.paymentReady(JwtInfo.getMemberId(request), plusPoint));
+    @GetMapping("/charge")
+    public BaseResponse<String> chargePoint(
+            HttpServletRequest request,
+            @RequestParam("smsPoint") int smsPoint,
+            @RequestParam("kakaoPoint") int kakaoPoint) {
+        return new BaseResponse<>(kakaoPayService.paymentReady(JwtInfo.getMemberId(request), smsPoint, kakaoPoint));
     }
 
     @NoIntercept
-    @GetMapping("/kakaopay/approve")
+    @GetMapping("/redirect")
     public void kakaoPaymentApprove(@RequestParam("pg_token") String pgToken, HttpServletResponse response) throws IOException {
         if (pgToken != null)
             kakaoPayService.paymentApprove(pgToken);
@@ -40,8 +43,11 @@ public class PointController {
         return new BaseResponse<>(pointService.getPoint(JwtInfo.getMemberId(request)));
     }
 
-    @PatchMapping("/pay")
-    public BaseResponse<GetPointRes> payPoint(HttpServletRequest request, @RequestParam("subPoint") int subPoint) {
-        return new BaseResponse<>(pointService.payPoint(JwtInfo.getMemberId(request), subPoint));
+    @GetMapping("/valid")
+    public BaseResponse<GetPointRes> validPoint(
+            HttpServletRequest request,
+            @RequestParam("smsPoint") int smsPoint,
+            @RequestParam("kakaoPoint") int kakaoPoint) {
+        return new BaseResponse<>(pointService.validPoint(JwtInfo.getMemberId(request), smsPoint, kakaoPoint));
     }
 }
