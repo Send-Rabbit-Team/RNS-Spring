@@ -83,14 +83,13 @@ public class ReserveMessageService {
         ReserveMessage reserveMessage = reserveMessageRepository.findByMessageId(messageId)
                 .orElseThrow(() -> new BaseException(NOT_RESERVE_MESSAGE));
 
-        if(reserveMessage.getStatus() == BaseStatus.INACTIVE)
+        if(reserveMessage.getReserveStatus() == ReserveStatus.STOP)
             throw new BaseException(ALREADY_CANCEL_RESERVE);
 
-        schedulerService.remove(messageId);
+        schedulerService.remove(reserveMessage.getId());
 
         reserveMessage.changeReserveStatusStop();
         reserveMessageRepository.save(reserveMessage);
-
 
         return messageId + "번 메시지의 발송 예약이 취소되었습니다.";
     }

@@ -125,7 +125,6 @@ public class SchedulerService {
             int sendCount = Integer.parseInt(count);
             valueOperation.set(countKey, String.valueOf(sendCount + 1));
 
-            reserveMessageRepository.findByMessageId(taskId);
             brokerService.sendSmsMessage(brokerMessageDto);
         }, cronTrigger);
 
@@ -146,8 +145,6 @@ public class SchedulerService {
             String count = valueOperation.get(countKey) == null? "0" : (String) valueOperation.get(countKey);
             int sendCount = Integer.parseInt(count);
             valueOperation.set(countKey, String.valueOf(sendCount + 1));
-
-            reserveKakaoMessageRepository.findByKakaoMessageId(taskId);
 
             kakaoBrokerService.sendKakaoMessage(brokerKakaoMessageDto);
         }, cronTrigger);
