@@ -7,6 +7,7 @@ import com.srt.message.dto.kakao_pay.KakaoPayVO;
 import com.srt.message.dto.kakao_pay.PaymentApproveRes;
 import com.srt.message.dto.kakao_pay.PaymentReadyRes;
 import com.srt.message.dto.point.get.GetPointRes;
+import com.srt.message.repository.PointRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.HttpEntity;
@@ -20,7 +21,7 @@ import org.springframework.web.client.RestTemplate;
 
 import java.util.UUID;
 
-import static com.srt.message.config.response.BaseResponseStatus.NOT_ACCESS_GOOGLE;
+import static com.srt.message.config.response.BaseResponseStatus.INVALID_KAKAO_PAY;
 
 //@Scope(value = "request")
 @Log4j2
@@ -29,10 +30,12 @@ import static com.srt.message.config.response.BaseResponseStatus.NOT_ACCESS_GOOG
 public class KakaoPayService {
     private final String KAKAO_PAYMENT_READY_URL = "https://kapi.kakao.com/v1/payment/ready";
     private final String KAKAO_PAYMENT_APPROVE_URL = "https://kapi.kakao.com/v1/payment/approve";
-    private final String REDIRECT_URI = "http://localhost:8080/point/kakaopay/approve";
+    private final String REDIRECT_URI = "http://localhost:8080/point/redirect";
 
     private final String TEST_CID = "TC0ONETIME";
     private final String ADMIN_KEY = "7e6a8588cc37131e7467de9d24a7ca8a";
+    private final int SMS_PRICE = 10;
+    private final int KAKAO_PRICE = 7;
 
     private final KakaoPayVO kakaoPayVO;
 
@@ -41,8 +44,9 @@ public class KakaoPayService {
 
     private final PointService pointService;
 
-    public String paymentReady(long memberId, int chargedPoint) {
+    public String paymentReady(long memberId, int smsPoint, int kakaoPoint) {
         String orderId = String.valueOf(UUID.randomUUID());
+        int totalAmount = smsPoint * SMS_PRICE + kakaoPoint * KAKAO_PRICE;
 
         HttpHeaders headers = new HttpHeaders();
         headers.add("Authorization", "KakaoAK " + ADMIN_KEY);
@@ -55,7 +59,7 @@ public class KakaoPayService {
         params.add("partner_user_id", String.valueOf(memberId));
         params.add("item_name", "RNS 충전결제");
         params.add("quantity", "1");
-        params.add("total_amount", String.valueOf(chargedPoint));
+        params.add("total_amount", String.valueOf(totalAmount));
         params.add("tax_free_amount", "0");
         params.add("vat_amount", "0");
         params.add("approval_url", REDIRECT_URI);
@@ -70,10 +74,13 @@ public class KakaoPayService {
             kakaoPayVO.setTid(paymentReadyRes.getTid());
             kakaoPayVO.setMemberId(memberId);
             kakaoPayVO.setOrderId(orderId);
+            kakaoPayVO.setSmsPoint(smsPoint);
+            kakaoPayVO.setKakaoPoint(kakaoPoint);
+            kakaoPayVO.setTotalAmount(totalAmount);
 
             return paymentReadyRes.getNext_redirect_pc_url();
         } catch (JsonProcessingException e) {
-            throw new BaseException(NOT_ACCESS_GOOGLE);
+            throw new BaseException(INVALID_KAKAO_PAY);
         }
     }
 
@@ -96,11 +103,14 @@ public class KakaoPayService {
             PaymentApproveRes paymentApproveRes = objectMapper.readValue(response.getBody(), PaymentApproveRes.class);
 
             long memberId = Long.parseLong(paymentApproveRes.getPartner_user_id());
-            int addPoint = Integer.parseInt(paymentApproveRes.getAmount().getTotal());
+            int totalAmount = Integer.parseInt(paymentApproveRes.getAmount().getTotal());
 
-            return pointService.chargePoint(memberId, addPoint);
+            if (memberId == kakaoPayVO.getMemberId() && totalAmount == kakaoPayVO.getTotalAmount())
+                return pointService.chargePoint(memberId, kakaoPayVO.getSmsPoint(), kakaoPayVO.getKakaoPoint());
+            else
+                throw new BaseException(INVALID_KAKAO_PAY);
         } catch (JsonProcessingException e) {
-            throw new BaseException(NOT_ACCESS_GOOGLE);
+            throw new BaseException(INVALID_KAKAO_PAY);
         }
     }
 }

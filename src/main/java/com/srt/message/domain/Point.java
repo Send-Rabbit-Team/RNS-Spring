@@ -23,13 +23,19 @@ public class Point extends BaseEntity {
     @JoinColumn(name = "member_id")
     private Member member;
 
-    private int point;
+    private int smsPoint;
+    private int kakaoPoint;
 
-    public void addPoint(int addPoint) {
-        this.point += addPoint;
+    public void addSmsPoint(int addPoint) {
+        this.smsPoint += addPoint;
     }
-
-    public void subPoint(int subPoint) {
-        this.point -= subPoint;
+    public void subSmsPoint(int subPoint) {
+        this.smsPoint -= subPoint;
+    }
+    public void addKakaoPoint(int addPoint) {
+        this.kakaoPoint += addPoint;
+    }
+    public void subKakaoPoint(int subPoint) {
+        this.kakaoPoint -= subPoint;
     }
 }

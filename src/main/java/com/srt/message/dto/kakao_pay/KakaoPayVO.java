@@ -11,4 +11,7 @@ public class KakaoPayVO {
     private String tid;
     private String orderId;
     private Long memberId;
+    private int smsPoint;
+    private int kakaoPoint;
+    private int totalAmount;
 }
