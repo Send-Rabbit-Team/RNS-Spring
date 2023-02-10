@@ -3,9 +3,11 @@ package com.srt.message.dto.sender_number.post;
 import com.srt.message.domain.Member;
 import com.srt.message.domain.SenderNumber;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+@Builder
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter

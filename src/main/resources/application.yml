@@ -58,8 +58,8 @@ logging:
 ## Naver, Kakao i Cloud Secret ##
 cloud:
   kakao:
-    access_key: ENC(6gFOH9ncPgSZbI1dwSeFNPHegC/kfC9YP6tKEQ1JKih+0DRL9TghCGPk3xirNcII)
-    secret_key: ENC(lD8m1TPVEfrXOwZZSh81u8khM3MIg6W136YRmbUfAqfQP0qGD8s//9WJVx45FpkG0hPpg0j/F4CW0JA6c7fyDPojXuZq+oFjCnXCVantysjfyvBpyrbqZiG02ZTO0ga4)
+
+
   naver:
     access_key: ENC(t602Ydz+VBw2v27a5hwKPLLDC6sHsO4s95xtiTQOz+Q=)
     secret_key: ENC(BIJAGR/HVKxbRfuKgEi0ag6QVE8u9DMumGERpG7Ly68ua0fXftBObvig56cDVjR8HuMxSB9SotA=)

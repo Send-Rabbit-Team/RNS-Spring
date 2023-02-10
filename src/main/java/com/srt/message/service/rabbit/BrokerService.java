@@ -3,7 +3,6 @@ package com.srt.message.service.rabbit;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.srt.message.config.status.MessageStatus;
-import com.srt.message.config.status.ReserveStatus;
 import com.srt.message.domain.*;
 import com.srt.message.domain.redis.RMessageResult;
 import com.srt.message.dto.message.BrokerSendMessageDto;
@@ -32,7 +31,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import static com.srt.message.config.response.BaseResponseStatus.JSON_PROCESSING_ERROR;
 import static com.srt.message.utils.rabbitmq.RabbitSMSUtil.SMS_EXCHANGE_NAME;
 
 
@@ -51,10 +49,6 @@ public class BrokerService {
 
     private final BrokerRepository brokerRepository;
     private final MessageRuleRepository messageRuleRepository;
-
-    private final ReserveMessageRepository reserveMessageRepository;
-
-    private final SchedulerService schedulerService;
 
     private final ObjectMapper objectMapper;
 
