@@ -2,26 +2,19 @@ package com.srt.message.dlx;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rabbitmq.client.Channel;
-import com.rabbitmq.client.MessageProperties;
 import com.srt.message.dto.dlx.ReceiveKakaoMessageDto;
 import com.srt.message.dto.dlx.ReceiveMessageDto;
 import com.srt.message.dto.message_result.KakaoMessageResultDto;
-import com.srt.message.dto.message_result.MessageResultDto;
-import com.srt.message.listener.SmsBrokerListener;
 import com.srt.message.service.rabbit.BrokerService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.amqp.core.Message;
-import org.springframework.amqp.core.MessageDeliveryMode;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
 
 import static com.srt.message.utils.rabbitmq.RabbitSMSUtil.*;
 import static com.srt.message.utils.rabbitmq.RabbitKakaoUtil.*;
@@ -58,7 +51,7 @@ public class DlxProcessingErrorHandler {
                 // DL이 다른 중계사를 다 돌지 않았을 경우, 다른 중계사의 Work Queue로 보내기
             } else if (rabbitmqHeader.getFailedRetryCount() >= maxBrokerRetryCount) {
                 channel.basicAck(message.getMessageProperties().getDeliveryTag(), false);
-                rabbitTemplate.convertAndSend(SMS_EXCHANGE_NAME, "sms.work." + getReplaceBrokerName(brokerName), message);
+                rabbitTemplate.convertAndSend(SMS_EXCHANGE_NAME, "sms.work." + getReplaceBrokerName(consumeBrokerName), message);
                 printResendLog(brokerName ,consumeBrokerName, message, rabbitmqHeader.getFailedRetryCount());
             }
 

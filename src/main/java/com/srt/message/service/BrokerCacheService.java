@@ -34,7 +34,6 @@ public class BrokerCacheService {
 
 
     public void updateRMessageResult(final MessageResultDto messageResultDto, String brokerName) {
-        Broker broker = brokerCacheRepository.findBrokerById(messageResultDto.getBrokerId());
         String rMessageResultId = messageResultDto.getRMessageResultId();
 
         // Redis에서 상태 가져오기
@@ -48,7 +47,23 @@ public class BrokerCacheService {
 
         // 상태 업데이트 및 저장
         RMessageResult rMessageResult = convertToRMessageResult(jsonRMessageResult);
+
         rMessageResult.changeMessageStatus(MessageStatus.SUCCESS);
+
+        // 재전송 여부인지 확인
+        // TODO 추후에 알고리즘 작성해서 코드 간략화하기
+        long retryCount = messageResultDto.getRetryCount();
+        if(retryCount >= 1) {
+            rMessageResult.changeMessageStatus(MessageStatus.RESEND);
+
+            if (retryCount == 1) {
+                rMessageResult.requeueDescription(brokerName);
+            } else if (retryCount == 2) {
+                rMessageResult.resendOneDescription(brokerName);
+            } else {
+                rMessageResult.resendTwoDescription(brokerName);
+            }
+        }
 
         redisHashRepository.update(statusKey, rMessageResultId, rMessageResult);
     }
@@ -65,7 +80,21 @@ public class BrokerCacheService {
                 .messageStatus(messageResultDto.getMessageStatus())
                 .build();
 
-//        addMessageResultList(messageResult);
+        // 재전송 여부인지 확인
+        // TODO 추후에 알고리즘 작성해서 코드 간략화하기
+        long retryCount = messageResultDto.getRetryCount();
+        if(retryCount >= 1){
+            messageResult.changeMessageStatus(MessageStatus.RESEND);
+
+            if(retryCount == 1){
+                messageResult.requeueDescription(brokerName);
+            }else if(retryCount == 2){
+                messageResult.resendOneDescription(brokerName);
+            }else{
+                messageResult.resendTwoDescription(brokerName);
+            }
+        }
+
         messageResultRepository.save(messageResult);
 
         log.info("MessageResult 객체가 저장되었습니다. id : {}", messageResult.getId());
