@@ -1,6 +1,6 @@
 package com.srt.message.domain;
 
-import com.srt.message.config.domain.BaseEntity;
+import com.srt.message.config.domain.BaseTimeEntity;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -13,7 +13,7 @@ import javax.persistence.*;
 @Entity
 @Getter
 @Builder
-public class Company extends BaseEntity {
+public class Company extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "company_id")
@@ -22,4 +22,6 @@ public class Company extends BaseEntity {
     private String companyName;
 
     private String bsNum;
+
+    private String kakaoBizId;
 }

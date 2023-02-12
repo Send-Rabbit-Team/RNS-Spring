@@ -1,11 +1,9 @@
 package com.srt.message.dto.auth.register.google;
 
-import com.srt.message.config.type.BsType;
 import com.srt.message.config.type.LoginType;
 import com.srt.message.config.type.MemberType;
 import com.srt.message.domain.Company;
 import com.srt.message.domain.Member;
-import com.srt.message.dto.auth.register.post.PostRegisterReq;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.*;
 
@@ -54,6 +52,8 @@ public class GoogleRegisterReq {
     )
     private LoginType loginType;
 
+    private String kakaoBizId;
+
     public static Member toMemberEntity(GoogleRegisterReq req, Company company){
         return Member.builder()
                 .email(req.getEmail())
@@ -69,6 +69,7 @@ public class GoogleRegisterReq {
         return Company.builder()
                 .companyName(req.getCompanyName())
                 .bsNum(req.getBsNum())
+                .kakaoBizId(req.getKakaoBizId())
                 .build();
     }
 }

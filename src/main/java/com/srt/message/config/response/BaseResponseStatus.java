@@ -26,6 +26,29 @@ public enum BaseResponseStatus {
     INVALID_AUTH_TOKEN(false, 2007,"유효하지 않은 인증번호입니다."),
     NOT_AUTH_PHONE_NUMBER(false, 2008,"인증이 되지 않은 전화번호입니다."),
     ALREADY_AUTH_PHONE_NUMBER(false, 2008,"이미 인증을 받은 전화번호입니다."),
+    NOT_EXIST_MEMBER(false, 2009,"존재하지 않는 사용자입니다."),
+    ALREADY_EXIST_PHONE_NUMBER(false, 2010,"이미 등록된 휴대전화 번호입니다."),
+    NOT_EXIST_GROUP(false, 2011,"존재하지 않는 그룹입니다."),
+    ALREADY_EXIST_GROUP(false, 2012,"이미 존재하는 그룹입니다."),
+    ALREADY_EXIST_CONTACT_NUMBER(false, 2013,"이미 등록된 연락처입니다."),
+    NOT_EXIST_CONTACT_NUMBER(false, 2014,"존재하지 않는 연락처입니다."),
+    NOT_ACCESS_GOOGLE(false, 2015, "구글 회원 인증에 실패했습니다."),
+    NOT_MATCH_MEMBER(false, 2016, "해당 사용자의 데이터가 아닙니다."),
+    NOT_EXIST_SENDER_NUMBER(false, 2017, "존재하지 않는 발신자 번호입니다."),
+    NOT_AUTH_MEMBER(false, 2018, "권한이 없는 사용자입니다."),
+    NOT_VALID_BROKER_RATE(false, 2019, "중계사 비율 설정이 올바르지 않습니다."),
+    NOT_EXIST_BROKER(false, 2020, "존재하지 않는 중계사입니다."),
+    NOT_MATCH_SENDER_NUMBER(false, 2021, "해당 사용자의 발신자 번호가 아닙니다."),
+    NOT_MATCH_GROUP(false, 2022, "연락처에 연결된 그룹이 아닙니다."),
+    NOT_EXIST_MESSAGE(false, 2023, "존재하는 메시지가 아닙니다."),
+    NOT_EXIST_CONTACT(false, 2024, "존재하지 않는 연락처입니다."),
+    NOT_EXIST_TEMPLATE(true, 2025, "존재하지 않는 탬플릿입니다."),
+    NOT_EXIST_MESSAGE_RULE(false, 2026, "존재하지 않는 발송 규칙입니다."),
+    ALREADY_CANCEL_RESERVE(false, 2027, "이미 취소된 예약 메시지입니다."),
+    NOT_EXIST_POINT(false, 2028, "존재하지 않는 포인트입니다."),
+    INSUFFICIENT_POINT(false, 2029, "포인트가 부족합니다."),
+    INVALID_KAKAO_PAY(false, 2030, "카카오페이 인증이 유효하지 않습니다."),
+
 
 
     /**
@@ -41,6 +64,7 @@ public enum BaseResponseStatus {
      */
     VALIDATED_ERROR(false, 3000, "VALIDATED_ERROR"), // @Valid 예외 처리
     SEND_MESSAGE_ERROR(false, 3001, "메시지를 발송하는 과정 중 오류가 발생했습니다."),
+    NOT_RESERVE_MESSAGE(false, 3002, "해당 메시지는 예약된 메시지가 아닙니다."),
 
     /**
      * 4000 : Database, Server 오류

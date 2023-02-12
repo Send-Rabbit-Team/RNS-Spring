@@ -1,11 +1,9 @@
 package com.srt.message.dto.auth.register.post;
 
-import com.srt.message.config.type.BsType;
 import com.srt.message.config.type.LoginType;
 import com.srt.message.config.type.MemberType;
 import com.srt.message.domain.Company;
 import com.srt.message.domain.Member;
-import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.*;
 
@@ -41,6 +39,11 @@ public class PostRegisterRes {
     private String phoneNumber;
 
     @ApiModelProperty(
+            example = "https://objectstorage.kr-central-1.kakaoi.io/v1/586d691a32c5421b859e89fd7a7f8dcd/message/img%2Fprofile%2FprofileImg.png"
+    )
+    private String profileImgUrl;
+
+    @ApiModelProperty(
             example = "카카오 엔터프라이즈"
     )
     private String companyName;
@@ -60,6 +63,8 @@ public class PostRegisterRes {
     )
     private LoginType loginType;
 
+    private String kakaoBizId;
+
     public static PostRegisterRes toDto(Member member){
         Company company = member.getCompany();
 
@@ -69,6 +74,7 @@ public class PostRegisterRes {
                 .password(member.getPassword())
                 .name(member.getName())
                 .phoneNumber(member.getPhoneNumber())
+                .profileImgUrl(member.getProfileImageURL())
                 .memberType(member.getMemberType())
                 .loginType(member.getLoginType())
                 .build();
@@ -76,6 +82,7 @@ public class PostRegisterRes {
         if(company != null){
             res.setCompanyName(company.getCompanyName());
             res.setBsNum(company.getBsNum());
+            res.setKakaoBizId(company.getKakaoBizId());
         }
 
         return res;

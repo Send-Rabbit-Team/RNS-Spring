@@ -52,6 +52,8 @@ public class SmsService {
 
     private final AuthPhoneNumberRedisRepository authPhoneNumberRedisRepository;
 
+    private final ObjectMapper objectMapper;
+
     private final long EXPIRATION_SECOND = 60 * 5;
 
     // 인증 키 생성
@@ -109,7 +111,6 @@ public class SmsService {
                 .messages(messages)
                 .build();
 
-        ObjectMapper objectMapper = new ObjectMapper();
         String body = objectMapper.writeValueAsString(request);
         HttpEntity<String> httpBody = new HttpEntity<>(body, headers);
 
@@ -130,7 +131,7 @@ public class SmsService {
         // 6자리 인증번호 생성
         authPhoneNumber.createAuthToken();
 
-        authPhoneNumberRedisRepository.save(authPhoneNumber);
+        authPhoneNumber = authPhoneNumberRedisRepository.save(authPhoneNumber);
 
         return authPhoneNumber.getAuthToken();
     }

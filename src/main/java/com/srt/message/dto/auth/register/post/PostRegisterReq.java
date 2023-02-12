@@ -1,6 +1,5 @@
 package com.srt.message.dto.auth.register.post;
 
-import com.srt.message.config.type.BsType;
 import com.srt.message.config.type.LoginType;
 import com.srt.message.config.type.MemberType;
 import com.srt.message.domain.Company;
@@ -30,6 +29,9 @@ public class PostRegisterReq {
             message = "비밀번호는 최소 8 자로 문자, 숫자 및 특수 문자를 최소 하나씩 포함해서 8-15자리 이내로 입력해주세요.")
     private String password;
 
+    @ApiModelProperty(
+            example = "1q2w3e4r!"
+    )
     @Pattern(regexp="^(?=.*[A-Za-z])(?=.*\\d)(?=.*[$@$!%*#?&])[A-Za-z\\d$@$!%*#?&]{8,15}$",
             message = "비밀번호는 최소 8 자로 문자, 숫자 및 특수 문자를 최소 하나씩 포함해서 8-15자리 이내로 입력해주세요.")
     private String checkPassword;
@@ -64,6 +66,8 @@ public class PostRegisterReq {
     )
     private LoginType loginType;
 
+    private String kakaoBizId;
+
     public static Member toMemberEntity(PostRegisterReq req, Company company){
         return Member.builder()
                 .email(req.getEmail())
@@ -80,6 +84,7 @@ public class PostRegisterReq {
         return Company.builder()
                 .companyName(req.getCompanyName())
                 .bsNum(req.getBsNum())
+                .kakaoBizId(req.getKakaoBizId())
                 .build();
     }
 }

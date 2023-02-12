@@ -13,7 +13,9 @@ public class JwtInfo {
     private Long memberId;
 
     static public Long getMemberId(HttpServletRequest request){
+        System.out.println("request = " + request);
         JwtInfo jwtInfo = (JwtInfo) request.getAttribute("jwtInfo");
+        System.out.println("jwtInfo = " + jwtInfo);
 
         if(jwtInfo == null)
             return null;
