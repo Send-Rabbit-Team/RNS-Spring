@@ -109,7 +109,7 @@ class ReserveMessageServiceTest {
         reserveMessageService.reserveSmsMessage(request);
 
         // verify
-        verify(schedulerService, times(contacts.size())).register(request, reserveMessage.getId());
+        verify(schedulerService, times(1)).register(request, reserveMessage.getId());
         verify(reserveMessageContactRepository, times(contacts.size())).save(any());
         verify(reserveMessageRepository, times(1)).save(any());
     }

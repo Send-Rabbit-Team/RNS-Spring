@@ -100,7 +100,7 @@ public class MessageResultService {
                 .map(GetMessageRes::toDto));
     }
 
-    // 검색 조회 (메모, 수신, 발신 번호)
+    // 검색 조회 (메모, 수신, 발신 번호, 메시지 내용)
     public PageResult<GetMessageRes> getMessageBySearching(String searchType, String keyword, long memberId, int page){
         MsgSearchType msgSearchType = MsgSearchType.valueOf(searchType);
         PageRequest pageRequest = PageRequest.of(page-1, 10, Sort.by("id").descending());
