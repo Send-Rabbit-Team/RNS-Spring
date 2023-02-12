@@ -34,7 +34,7 @@ public class MessageService {
     private final BrokerService brokerService;
     private final ReserveMessageService reserveMessageService;
 
-    private final SchedulerService schedulerService;
+    private final  PointService pointService;
 
     // 메시지 중계사에게 전송
     public String sendMessageToBroker(PostSendMessageReq messageReq, long memberId) {
@@ -45,6 +45,9 @@ public class MessageService {
         // 연락처 예외 처리
         if (contacts.contains(null) || contacts.isEmpty())
             throw new BaseException(NOT_EXIST_CONTACT_NUMBER);
+
+        // Pay Point
+        pointService.paySmsPoint(memberId, contacts.size());
 
         // 발신자 번호 예외 처리
         SenderNumber senderNumber = senderNumberRepository.findByPhoneNumberAndStatus(messageReq.getMessage().getFrom(), ACTIVE)

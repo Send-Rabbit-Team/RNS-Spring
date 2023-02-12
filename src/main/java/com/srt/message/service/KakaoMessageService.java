@@ -28,6 +28,7 @@ public class KakaoMessageService {
 
     private final KakaoBrokerService kakaoBrokerService;
     private final SchedulerService schedulerService;
+    private final PointService pointService;
 
     public String sendKakaoMessageToBroker(PostKakaoMessageReq messageReq, long memberId){
         // Find Member
@@ -35,13 +36,14 @@ public class KakaoMessageService {
                 .orElseThrow(() -> new BaseException(NOT_EXIST_MEMBER));
         log.info("member : " + member);
 
-
         // Find Contacts
         List<Contact> contacts = contactRepository.findByPhoneNumberIn(messageReq.getReceivers());
         if(contacts.contains(null) || contacts.isEmpty())
             throw new BaseException(NOT_EXIST_CONTACT_NUMBER);
         log.info("contacts : " + contacts);
 
+        // Pay Point
+        pointService.payKakaoPoint(memberId, contacts.size());
 
         // Save KakaoMessage
         KakaoMessage kakaoMessage = KakaoMessageDto.toEntity(messageReq.getKakaoMessageDto(), member);
@@ -60,7 +62,7 @@ public class KakaoMessageService {
 
 
         // Save ReserveKakaoMessage
-        if (messageReq.getKakaoMessageDto().getCronExpression() != "") {
+        if (messageReq.getKakaoMessageDto().getCronExpression() != null) {
             ReserveKakaoMessage reserveKakaoMessage = ReserveKakaoMessage.builder()
                     .kakaoMessage(kakaoMessage)
                     .cronExpression(messageReq.getKakaoMessageDto().getCronExpression())
