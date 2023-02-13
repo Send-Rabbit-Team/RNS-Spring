@@ -45,8 +45,11 @@ public enum BaseResponseStatus {
     NOT_EXIST_TEMPLATE(true, 2025, "존재하지 않는 탬플릿입니다."),
     NOT_EXIST_MESSAGE_RULE(false, 2026, "존재하지 않는 발송 규칙입니다."),
     ALREADY_CANCEL_RESERVE(false, 2027, "이미 취소된 예약 메시지입니다."),
-    NOT_EXIST_BLOCK_NUMBER(false, 2028, "존재하지 않는 수신 차단 번호입니다."),
-    ALREADY_EXIST_BLOCK(false, 2029, "이미 차단된 번호입니다."),
+    NOT_EXIST_POINT(false, 2028, "존재하지 않는 포인트입니다."),
+    INSUFFICIENT_POINT(false, 2029, "포인트가 부족합니다."),
+    INVALID_KAKAO_PAY(false, 2030, "카카오페이 인증이 유효하지 않습니다."),
+    NOT_EXIST_BLOCK_NUMBER(false, 2031, "존재하지 않는 수신 차단 번호입니다."),
+    ALREADY_EXIST_BLOCK(false, 2032, "이미 차단된 번호입니다."),
 
 
 

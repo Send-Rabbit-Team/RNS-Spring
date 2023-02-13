@@ -7,6 +7,7 @@ import com.srt.message.dto.kakao_message.KakaoMessageDto;
 import com.srt.message.repository.*;
 import com.srt.message.dto.kakao_message.BrokerKakaoMessageDto;
 import com.srt.message.dto.kakao_message.post.PostKakaoMessageReq;
+import com.srt.message.service.PointService;
 import com.srt.message.service.SchedulerService;
 import com.srt.message.service.kakao.KakaoBrokerService;
 import lombok.RequiredArgsConstructor;
@@ -29,15 +30,22 @@ public class KakaoMessageService {
 
     private final KakaoBrokerService kakaoBrokerService;
     private final KakaoMessageReserveService kakaoMessageReserveService;
+    private final SchedulerService schedulerService;
+    private final PointService pointService;
 
-    public String sendKakaoMessageToBroker(PostKakaoMessageReq messageReq, long memberId){
+    public String sendKakaoMessageToBroker(PostKakaoMessageReq messageReq, long memberId) {
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new BaseException(NOT_EXIST_MEMBER));
 
+        // Find Contacts
         List<Contact> contacts = contactRepository.findByPhoneNumberIn(messageReq.getReceivers());
-        if(contacts.contains(null) || contacts.isEmpty())
+        if (contacts.contains(null) || contacts.isEmpty())
             throw new BaseException(NOT_EXIST_CONTACT_NUMBER);
 
+        // Pay Point
+        pointService.payKakaoPoint(memberId, contacts.size());
+
+        // Save KakaoMessage
         KakaoMessage kakaoMessage = KakaoMessageDto.toEntity(messageReq.getKakaoMessageDto(), member);
         kakaoMessageRepository.save(kakaoMessage);
 
@@ -47,12 +55,12 @@ public class KakaoMessageService {
                 .contacts(contacts)
                 .member(member)
                 .build();
+        log.info("brokerMessageDto : " + brokerMessageDto);
 
         // 크론 표현식 있으면, 예약 발송으로 이동
-        if(messageReq.getKakaoMessageDto().getCronExpression() != null)
+        if (messageReq.getKakaoMessageDto().getCronExpression() != null)
             return kakaoMessageReserveService.reserveKakaoMessage(brokerMessageDto);
 
         return kakaoBrokerService.sendKakaoMessage(brokerMessageDto);
     }
-
 }
