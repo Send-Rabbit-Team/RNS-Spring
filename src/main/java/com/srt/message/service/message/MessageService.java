@@ -51,7 +51,7 @@ public class MessageService {
         pointService.paySmsPoint(memberId, contacts.size());
 
         // 발신자 번호 예외 처리
-        SenderNumber senderNumber = senderNumberRepository.findByPhoneNumberAndStatus(messageReq.getMessage().getFrom(), ACTIVE)
+        SenderNumber senderNumber = senderNumberRepository.findByMemberIdAndPhoneNumberAndStatus(memberId, messageReq.getMessage().getFrom(), ACTIVE)
                 .orElseThrow(() -> new BaseException(NOT_EXIST_SENDER_NUMBER));
 
         if (senderNumber.getMember().getId() != member.getId())

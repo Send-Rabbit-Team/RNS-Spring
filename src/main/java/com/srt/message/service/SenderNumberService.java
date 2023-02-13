@@ -41,7 +41,7 @@ public class SenderNumberService {
     public RegisterSenderNumberRes registerSenderNumber(Long memberId, RegisterSenderNumberReq registerSenderNumberReq){
         String phoneNumber = registerSenderNumberReq.getPhoneNumber();
 
-        if(senderNumberRepository.findByPhoneNumberAndStatus(phoneNumber, BaseStatus.ACTIVE).isPresent())
+        if(senderNumberRepository.findByMemberIdAndPhoneNumberAndStatus(memberId, phoneNumber, BaseStatus.ACTIVE).isPresent())
             throw new BaseException(ALREADY_EXIST_PHONE_NUMBER);
 
         // 휴대폰 인증 확인
