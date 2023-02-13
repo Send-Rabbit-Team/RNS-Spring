@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface SenderNumberRepository extends JpaRepository<SenderNumber, Long> {
-    Optional<SenderNumber> findByPhoneNumberAndStatus(String phoneNumber, BaseStatus status);
+    Optional<SenderNumber> findByMemberIdAndPhoneNumberAndStatus(Long memberId, String phoneNumber, BaseStatus status);
 
     @Query(value = "select sn from SenderNumber sn where sn.member.id = :memberId and sn.status = :status",
     countQuery = "select count(sn) from SenderNumber sn where sn.member.id = :memberId and sn.status = :status")
