@@ -10,6 +10,7 @@ import com.srt.message.domain.redis.AuthPhoneNumber;
 import com.srt.message.dto.sender_number.get.GetSenderNumberRes;
 import com.srt.message.dto.sender_number.post.RegisterSenderNumberReq;
 import com.srt.message.dto.sender_number.post.RegisterSenderNumberRes;
+import com.srt.message.repository.ContactRepository;
 import com.srt.message.repository.MemberRepository;
 import com.srt.message.repository.SenderNumberRepository;
 import com.srt.message.repository.redis.AuthPhoneNumberRedisRepository;
@@ -21,7 +22,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static com.srt.message.config.response.BaseResponseStatus.*;
@@ -34,6 +34,7 @@ public class SenderNumberService {
 
     private final AuthPhoneNumberRedisRepository authPhoneNumberRedisRepository;
     private final MemberRepository memberRepository;
+    private final ContactRepository contactRepository;
 
     // 발신자 등록
     @Transactional(readOnly = false)
@@ -96,6 +97,7 @@ public class SenderNumberService {
         senderNumber.changeStatusInActive();
         senderNumberRepository.save(senderNumber);
     }
+
 
     public String getBlockNumber(long senderNumberId, long memberId){
         SenderNumber senderNumber =  senderNumberRepository.findByIdAndStatus(senderNumberId, BaseStatus.ACTIVE)

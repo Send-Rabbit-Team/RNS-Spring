@@ -45,6 +45,8 @@ public enum BaseResponseStatus {
     NOT_EXIST_TEMPLATE(true, 2025, "존재하지 않는 탬플릿입니다."),
     NOT_EXIST_MESSAGE_RULE(false, 2026, "존재하지 않는 발송 규칙입니다."),
     ALREADY_CANCEL_RESERVE(false, 2027, "이미 취소된 예약 메시지입니다."),
+    NOT_EXIST_BLOCK_NUMBER(false, 2028, "존재하지 않는 수신 차단 번호입니다."),
+    ALREADY_EXIST_BLOCK(false, 2029, "이미 차단된 번호입니다."),
 
 
 

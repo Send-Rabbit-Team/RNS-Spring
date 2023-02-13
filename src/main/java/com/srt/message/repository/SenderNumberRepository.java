@@ -22,4 +22,6 @@ public interface SenderNumberRepository extends JpaRepository<SenderNumber, Long
 
     Optional<SenderNumber> findByIdAndStatus(Long senderNumberId, BaseStatus status);
 
+    Optional<SenderNumber> findByBlockNumberAndStatus(String blockNumber, BaseStatus status);
+
 }

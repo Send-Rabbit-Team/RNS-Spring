@@ -161,7 +161,6 @@ public class ContactService {
         return getContactAllRes;
     }
 
-
     // 편의 메서드
     public void checkMatchMember(Contact contact, long memberId){
         if(contact.getMember().getId() != memberId)
