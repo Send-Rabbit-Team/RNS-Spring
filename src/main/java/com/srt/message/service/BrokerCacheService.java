@@ -18,6 +18,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
+
 @Log4j2
 @Service
 @RequiredArgsConstructor
@@ -53,7 +55,7 @@ public class BrokerCacheService {
         // 재전송 여부인지 확인
         // TODO 추후에 알고리즘 작성해서 코드 간략화하기
         long retryCount = messageResultDto.getRetryCount();
-        if(retryCount >= 1) {
+        if (retryCount >= 1) {
             rMessageResult.changeMessageStatus(MessageStatus.RESEND);
 
             if (retryCount == 1) {
@@ -83,21 +85,22 @@ public class BrokerCacheService {
         // 재전송 여부인지 확인
         // TODO 추후에 알고리즘 작성해서 코드 간략화하기
         long retryCount = messageResultDto.getRetryCount();
-        if(retryCount >= 1){
+        if (retryCount >= 1) {
             messageResult.changeMessageStatus(MessageStatus.RESEND);
 
-            if(retryCount == 1){
+            if (retryCount == 1) {
                 messageResult.requeueDescription(brokerName);
-            }else if(retryCount == 2){
+            } else if (retryCount == 2) {
                 messageResult.resendOneDescription(brokerName);
-            }else{
+            } else {
                 messageResult.resendTwoDescription(brokerName);
             }
+        } else {
+
         }
 
         messageResultRepository.save(messageResult);
-
-        log.info("MessageResult 객체가 저장되었습니다. id : {}", messageResult.getId());
+        log.info("[" + messageResult.getMessageStatus() + "] " + "[" + brokerName + "]" + " MessageResult 객체가 저장되었습니다. id : {}", messageResult.getId());
     }
 
     public RMessageResult convertToRMessageResult(String json) {

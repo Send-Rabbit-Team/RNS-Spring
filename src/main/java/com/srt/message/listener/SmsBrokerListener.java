@@ -24,6 +24,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.Date;
 
 @Log4j2
 @Service
@@ -45,6 +46,7 @@ public class SmsBrokerListener {
     public void receiveKTMessage(final MessageResultDto messageResultDto) {
         brokerCacheService.updateRMessageResult(messageResultDto, KT_BROKER_NAME);
         brokerCacheService.saveMessageResult(messageResultDto, KT_BROKER_NAME);
+
     }
 
     // SKT
