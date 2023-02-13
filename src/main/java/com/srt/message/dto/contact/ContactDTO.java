@@ -28,11 +28,11 @@ public class ContactDTO {
                         .memberId(contact.getMember().getId())
                         .phoneNumber(contact.getPhoneNumber())
                         .memo(contact.getMemo())
-                        .groupName(contact.getContactGroup().getName())
                         .build();
 
         if (contact.getContactGroup() != null) {
             contactDTO.setGroupId(contact.getContactGroup().getId());
+            contactDTO.setGroupName(contact.getContactGroup().getName());
         }
 
         return contactDTO;
