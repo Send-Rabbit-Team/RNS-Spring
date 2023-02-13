@@ -20,5 +20,5 @@ public interface MessageRuleRepository extends JpaRepository<MessageRule, Long> 
     @EntityGraph(attributePaths = {"broker"})
     List<MessageRule> findAllByMember(Member member);
 
-    Optional<MessageRule> findByBroker(Broker broker);
+    Optional<MessageRule> findByMemberIdAndBroker(Long memberId, Broker broker);
 }
