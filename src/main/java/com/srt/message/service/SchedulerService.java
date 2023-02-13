@@ -51,28 +51,28 @@ public class SchedulerService {
     private final RedisTemplate<String, Object> redisTemplate;
 
     // 어플리케이션 실행 시에 스케쥴러 자동으로 등록
-    @Bean
-    public void registerMessageReserveScheduler(){
-        List<ReserveMessage> reserveMessageList = reserveMessageRepository.findAllByReserveStatus(ReserveStatus.PROCESSING);
-
-        reserveMessageList.stream().forEach(r -> {
-            String cronExpression = r.getCronExpression();
-            long taskId = r.getMessage().getId();
-
-            // 예약된 메시지 연락처 찾기
-            List<Contact> contacts =
-                    reserveMessageContactRepository.findAllByReserveMessage(r)
-                            .stream().map(ReserveMessageContact::getContact).collect(Collectors.toList());
-
-            // 스케쥴러 등록을 위해 BrokerMessageDto 객체 생성하기
-            SMSMessageDto smsMessageDto = SMSMessageDto.toDto(r.getMessage(), r);
-            smsMessageDto.setCronExpression(cronExpression);
-            BrokerMessageDto brokerMessageDto = BrokerMessageDto.builder().smsMessageDto(smsMessageDto)
-                    .message(r.getMessage()).contacts(contacts).member(r.getMessage().getMember()).build();
-
-            register(brokerMessageDto, taskId);
-        });
-    }
+//    @Bean
+//    public void registerMessageReserveScheduler(){
+//        List<ReserveMessage> reserveMessageList = reserveMessageRepository.findAllByReserveStatus(ReserveStatus.PROCESSING);
+//
+//        reserveMessageList.stream().forEach(r -> {
+//            String cronExpression = r.getCronExpression();
+//            long taskId = r.getMessage().getId();
+//
+//            // 예약된 메시지 연락처 찾기
+//            List<Contact> contacts =
+//                    reserveMessageContactRepository.findAllByReserveMessage(r)
+//                            .stream().map(ReserveMessageContact::getContact).collect(Collectors.toList());
+//
+//            // 스케쥴러 등록을 위해 BrokerMessageDto 객체 생성하기
+//            SMSMessageDto smsMessageDto = SMSMessageDto.toDto(r.getMessage(), r);
+//            smsMessageDto.setCronExpression(cronExpression);
+//            BrokerMessageDto brokerMessageDto = BrokerMessageDto.builder().smsMessageDto(smsMessageDto)
+//                    .message(r.getMessage()).contacts(contacts).member(r.getMessage().getMember()).build();
+//
+//            register(brokerMessageDto, taskId);
+//        });
+//    }
 
     @Bean
     public void registerKakaoMessageReserveScheduler(){

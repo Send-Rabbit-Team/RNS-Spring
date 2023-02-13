@@ -14,6 +14,7 @@ import com.srt.message.dto.message.BrokerMessageDto;
 import com.srt.message.dto.message.SMSMessageDto;
 import com.srt.message.dto.message_result.MessageResultDto;
 import com.srt.message.repository.MessageRuleRepository;
+import com.srt.message.service.BrokerCacheService;
 import com.srt.message.service.SchedulerService;
 import com.srt.message.utils.algorithm.BrokerPool;
 import com.srt.message.utils.algorithm.BrokerWeight;
@@ -21,6 +22,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.lang3.time.StopWatch;
 import org.springframework.amqp.core.MessageBuilder;
+import org.springframework.amqp.core.MessageDeliveryMode;
 import org.springframework.amqp.core.MessageProperties;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.context.annotation.Scope;
@@ -41,6 +43,8 @@ import static com.srt.message.utils.rabbitmq.RabbitSMSUtil.SMS_EXCHANGE_NAME;
 public class BrokerService {
     private final int TMP_MESSAGE_DURATION = 5 * 60;
     private final int VALUE_MESSAGE_DURATION = 10 * 60;
+
+    private final BrokerCacheService brokerCacheService;
 
     private final RedisHashRepository redisHashRepository;
     private final RedisListRepository redisListRepository;
@@ -111,12 +115,12 @@ public class BrokerService {
         // 각 중개사 비율에 맞게 보내기
         for (int i = 0; i < contacts.size(); i++) {
             Broker broker = (Broker) brokerPool.getNext().getBroker();
-            String routingKey = "sms.send." + broker.getName().toLowerCase();
+            String routingKey = "sms.work." + broker.getName().toLowerCase();
 
             smsMessageDto.setTo(contacts.get(i).getPhoneNumber());
 
             // Redis에서 MessageResultDTO 꺼내오기
-            MessageResultDto messageResultDto = messageResultDtos.get(0);
+            MessageResultDto messageResultDto = messageResultDtos.get(i);
             messageResultDto.setBrokerId(broker.getId());
 
             // 상태 값 저장
@@ -148,6 +152,16 @@ public class BrokerService {
         String processTime = String.valueOf(stopWatch.getTime());
         log.info("Process Time: {} ", processTime);
         return processTime;
+    }
+
+
+    // 메시지 발송 실패 처리
+    public void processMessageFailure(String brokerName, MessageResultDto messageResultDto){
+        messageResultDto.setMessageStatus(MessageStatus.FAIL);
+        brokerCacheService.updateRMessageResult(messageResultDto, brokerName);
+        brokerCacheService.saveMessageResult(messageResultDto, brokerName);
+
+        log.warn(brokerName + " broker got dead letter - {}", messageResultDto);
     }
 
     // Json 형태로 반환
