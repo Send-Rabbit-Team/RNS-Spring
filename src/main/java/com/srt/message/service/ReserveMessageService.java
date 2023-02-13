@@ -55,8 +55,9 @@ public class ReserveMessageService {
             reserveMessageContactRepository.save(reserveMessageContact);
 
             brokerMessageDto.getSmsMessageDto().setTo(contact.getPhoneNumber());
-            schedulerService.register(brokerMessageDto, reserveMessage.getId());
         }
+
+        schedulerService.register(brokerMessageDto, reserveMessage.getId());
 
         return "예약성공";
     }
