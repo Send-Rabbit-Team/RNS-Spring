@@ -1,4 +1,4 @@
-package com.srt.message.service;
+package com.srt.message.service.kakao;
 
 import com.srt.message.config.exception.BaseException;
 import com.srt.message.config.page.PageResult;

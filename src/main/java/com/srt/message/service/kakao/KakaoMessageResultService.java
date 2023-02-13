@@ -1,4 +1,4 @@
-package com.srt.message.service;
+package com.srt.message.service.kakao;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;

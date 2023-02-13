@@ -1,4 +1,4 @@
-package com.srt.message.service.rabbit;
+package com.srt.message.service.kakao;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -6,6 +6,7 @@ import com.srt.message.config.status.BaseStatus;
 import com.srt.message.config.status.MessageStatus;
 import com.srt.message.domain.*;
 import com.srt.message.domain.redis.RKakaoMessageResult;
+import com.srt.message.repository.KakaoBrokerRepository;
 import com.srt.message.repository.KakaoMessageRuleRepository;
 import com.srt.message.dto.kakao_message.BrokerKakaoMessageDto;
 import com.srt.message.dto.kakao_message.BrokerSendKakaoMessageDto;
@@ -36,9 +37,12 @@ public class KakaoBrokerService {
     private final int TMP_MESSAGE_DURATION = 5 * 60;
     private final int VALUE_MESSAGE_DURATION = 30 * 60;
 
+    private final KakaoBrokerCacheService kakaoBrokerCacheService;
+
     private final RabbitTemplate rabbitTemplate;
     private final ObjectMapper objectMapper;
 
+    private final KakaoBrokerRepository kakaoBrokerRepository;
     private final KakaoMessageRuleRepository kakaoMessageRuleRepository;
 
     private final RedisListRepository redisListRepository;
@@ -84,6 +88,17 @@ public class KakaoBrokerService {
 
         // Message Rule 설정
         List<KakaoMessageRule> messageRules = kakaoMessageRuleRepository.findByMemberIdAndStatus(member.getId(), BaseStatus.ACTIVE);
+
+        if (messageRules.isEmpty()) { // 발송 규칙을 설정 안했을 경우
+            List<KakaoBroker> brokers = kakaoBrokerRepository.findAll();
+            for (KakaoBroker broker : brokers) {
+                messageRules.add(KakaoMessageRule.builder()
+                        .kakaoBroker(broker)
+                        .brokerRate(30)
+                        .build());
+            }
+        }
+
         ArrayList<BrokerWeight> kakaoBrokerWeightList = new ArrayList<>();
         for (KakaoMessageRule messageRule : messageRules) {
             kakaoBrokerWeightList.add(new BrokerWeight(messageRule.getKakaoBroker(), messageRule.getBrokerRate()));
@@ -135,6 +150,15 @@ public class KakaoBrokerService {
         return processTime;
     }
 
+    // 알림톡 발송 실패 처리
+    public void processMessageFailure(String brokerName, KakaoMessageResultDto messageResultDto){
+        messageResultDto.setMessageStatus(MessageStatus.FAIL);
+        kakaoBrokerCacheService.updateRMessageResult(messageResultDto, brokerName);
+        kakaoBrokerCacheService.saveMessageResult(messageResultDto, brokerName);
+
+        log.warn(brokerName + " broker got dead letter - {}", messageResultDto);
+    }
+
     // Json 형태로 반환
     public String convertToJson(Object object){
         String sendMessageJson = null;
@@ -145,6 +169,4 @@ public class KakaoBrokerService {
         }
         return sendMessageJson;
     }
-
-
 }

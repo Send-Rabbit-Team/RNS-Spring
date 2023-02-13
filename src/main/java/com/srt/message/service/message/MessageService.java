@@ -1,4 +1,4 @@
-package com.srt.message.service;
+package com.srt.message.service.message;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.srt.message.config.exception.BaseException;
@@ -7,7 +7,7 @@ import com.srt.message.domain.*;
 import com.srt.message.dto.message.BrokerMessageDto;
 import com.srt.message.dto.message.post.PostSendMessageReq;
 import com.srt.message.repository.*;
-import com.srt.message.service.rabbit.BrokerService;
+import com.srt.message.service.SchedulerService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;

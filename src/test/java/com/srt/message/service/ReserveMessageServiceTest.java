@@ -9,6 +9,7 @@ import com.srt.message.dto.message.SMSMessageDto;
 import com.srt.message.repository.MessageRepository;
 import com.srt.message.repository.ReserveMessageContactRepository;
 import com.srt.message.repository.ReserveMessageRepository;
+import com.srt.message.service.message.ReserveMessageService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

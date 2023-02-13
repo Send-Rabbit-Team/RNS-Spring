@@ -12,6 +12,7 @@ import com.srt.message.dto.message_rule.post.PostSMSRuleRes;
 import com.srt.message.repository.BrokerRepository;
 import com.srt.message.repository.MemberRepository;
 import com.srt.message.repository.MessageRuleRepository;
+import com.srt.message.service.message.MessageRuleService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

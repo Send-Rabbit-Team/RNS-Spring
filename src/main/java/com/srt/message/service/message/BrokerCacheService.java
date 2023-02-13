@@ -1,4 +1,4 @@
-package com.srt.message.service;
+package com.srt.message.service.message;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -18,7 +18,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
 
-import java.util.Date;
 
 @Log4j2
 @Service
@@ -50,8 +49,6 @@ public class BrokerCacheService {
         // 상태 업데이트 및 저장
         RMessageResult rMessageResult = convertToRMessageResult(jsonRMessageResult);
 
-        rMessageResult.changeMessageStatus(MessageStatus.SUCCESS);
-
         // 재전송 여부인지 확인
         // TODO 추후에 알고리즘 작성해서 코드 간략화하기
         long retryCount = messageResultDto.getRetryCount();
@@ -62,9 +59,13 @@ public class BrokerCacheService {
                 rMessageResult.requeueDescription(brokerName);
             } else if (retryCount == 2) {
                 rMessageResult.resendOneDescription(brokerName);
-            } else {
+            } else { // 실패했을 경우
                 rMessageResult.resendTwoDescription(brokerName);
+                rMessageResult.changeMessageStatus(MessageStatus.FAIL);
             }
+
+        }else{
+            rMessageResult.changeMessageStatus(MessageStatus.SUCCESS);
         }
 
         redisHashRepository.update(statusKey, rMessageResultId, rMessageResult);
@@ -85,6 +86,7 @@ public class BrokerCacheService {
         // 재전송 여부인지 확인
         // TODO 추후에 알고리즘 작성해서 코드 간략화하기
         long retryCount = messageResultDto.getRetryCount();
+
         if (retryCount >= 1) {
             messageResult.changeMessageStatus(MessageStatus.RESEND);
 
@@ -94,9 +96,8 @@ public class BrokerCacheService {
                 messageResult.resendOneDescription(brokerName);
             } else {
                 messageResult.resendTwoDescription(brokerName);
+                messageResult.changeMessageStatus(MessageStatus.FAIL);
             }
-        } else {
-
         }
 
         messageResultRepository.save(messageResult);

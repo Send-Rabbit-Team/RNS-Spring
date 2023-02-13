@@ -5,7 +5,7 @@ import com.srt.message.config.response.BaseResponse;
 import com.srt.message.dto.jwt.JwtInfo;
 import com.srt.message.dto.kakao_message_reserve.get.GetKakaoMessageReserveContactRes;
 import com.srt.message.dto.kakao_message_reserve.get.GetKakaoMessageReserveRes;
-import com.srt.message.service.KakaoMessageReserveService;
+import com.srt.message.service.kakao.KakaoMessageReserveService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.web.bind.annotation.*;

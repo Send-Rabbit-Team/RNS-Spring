@@ -1,4 +1,4 @@
-package com.srt.message.service;
+package com.srt.message.service.message;
 
 import com.srt.message.config.exception.BaseException;
 import com.srt.message.config.status.BaseStatus;
@@ -13,6 +13,7 @@ import com.srt.message.dto.message.SMSMessageDto;
 import com.srt.message.repository.MessageRepository;
 import com.srt.message.repository.ReserveMessageContactRepository;
 import com.srt.message.repository.ReserveMessageRepository;
+import com.srt.message.service.SchedulerService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
