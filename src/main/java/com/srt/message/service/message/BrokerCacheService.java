@@ -59,8 +59,11 @@ public class BrokerCacheService {
                 rMessageResult.requeueDescription(brokerName);
             } else if (retryCount == 2) {
                 rMessageResult.resendOneDescription(brokerName);
-            } else { // 실패했을 경우
+            } else if (retryCount == 3) {
                 rMessageResult.resendTwoDescription(brokerName);
+            }else{ // 실패했을 경우
+                rMessageResult.resendTwoDescription(brokerName);
+                rMessageResult.addDescription("중계사 오류");
                 rMessageResult.changeMessageStatus(MessageStatus.FAIL);
             }
 
@@ -94,8 +97,11 @@ public class BrokerCacheService {
                 messageResult.requeueDescription(brokerName);
             } else if (retryCount == 2) {
                 messageResult.resendOneDescription(brokerName);
-            } else {
+            } else if (retryCount == 3){
                 messageResult.resendTwoDescription(brokerName);
+            }else{ // 실패
+                messageResult.resendTwoDescription(brokerName);
+                messageResult.addDescription("중계사 오류");
                 messageResult.changeMessageStatus(MessageStatus.FAIL);
             }
         }

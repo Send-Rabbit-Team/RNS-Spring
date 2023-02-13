@@ -34,8 +34,6 @@ public class MessageService {
     private final BrokerService brokerService;
     private final ReserveMessageService reserveMessageService;
 
-    private final SchedulerService schedulerService;
-
     // 메시지 중계사에게 전송
     public String sendMessageToBroker(PostSendMessageReq messageReq, long memberId) {
         Member member = memberRepository.findById(memberId)
@@ -49,9 +47,6 @@ public class MessageService {
         // 발신자 번호 예외 처리
         SenderNumber senderNumber = senderNumberRepository.findByPhoneNumberAndStatus(messageReq.getMessage().getFrom(), ACTIVE)
                 .orElseThrow(() -> new BaseException(NOT_EXIST_SENDER_NUMBER));
-
-        log.info("senderNumber - memberId {}", senderNumber.getMember().getId());
-        log.info("member - memberId {}", member.getId());
 
         if (senderNumber.getMember().getId() != member.getId())
             throw new BaseException(NOT_MATCH_SENDER_NUMBER);

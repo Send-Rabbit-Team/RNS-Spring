@@ -59,7 +59,7 @@ public class BlockService {
         if(senderNumber.getMember().getId() != memberId)
             throw new BaseException(NOT_MATCH_MEMBER);
 
-        List<String> senderNumberList = blockRepository.findAllBySenderNumber(senderNumber.getPhoneNumber());
+        List<String> senderNumberList = blockRepository.findAllBySenderNumberAndStatus(senderNumber.getPhoneNumber(), ACTIVE);
 
         return new GetBlockRes(senderNumberList);
     }

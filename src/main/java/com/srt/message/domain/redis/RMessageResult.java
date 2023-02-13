@@ -40,6 +40,10 @@ public class RMessageResult {
         this.messageStatus = messageStatus;
     }
 
+    public void addDescription(String description){
+        this.description += " " + description;
+    }
+
     public void requeueDescription(String brokerName) {
         this.description = brokerName;
     }
