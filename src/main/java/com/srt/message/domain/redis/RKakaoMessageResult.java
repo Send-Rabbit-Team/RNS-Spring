@@ -22,8 +22,26 @@ public class RKakaoMessageResult {
 
     private MessageStatus messageStatus = MessageStatus.PENDING;
 
+    private String description;
+
     // 편의 메서드
     public void changeMessageStatus(MessageStatus messageStatus){
         this.messageStatus = messageStatus;
+    }
+
+    public void requeueDescription(String brokerName) {
+        this.description = brokerName;
+    }
+
+    public void resendOneDescription(String brokerName) {
+        switch (brokerName) {
+            case "cns":
+                this.description = "cns -> ke";
+                break;
+
+            case "ke":
+                this.description = "ke -> cns";
+                break;
+        }
     }
 }

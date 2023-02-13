@@ -44,7 +44,23 @@ public class KakaoBrokerCacheService {
 
         // 상태 업데이트 및 저장
         RKakaoMessageResult rKakaoMessageResult = convertToRMessageResult(jsonRKakaoMessageResult);
-        rKakaoMessageResult.changeMessageStatus(MessageStatus.SUCCESS);
+
+        // 재전송 여부인지 확인
+        // TODO 추후에 알고리즘 작성해서 코드 간략화하기
+        long retryCount = kakaoMessageResultDto.getRetryCount();
+        if (retryCount >= 1) {
+            rKakaoMessageResult.changeMessageStatus(MessageStatus.RESEND);
+
+            if (retryCount == 1) {
+                rKakaoMessageResult.requeueDescription(brokerName);
+            } else if (retryCount == 2) {
+                rKakaoMessageResult.resendOneDescription(brokerName);
+            }else{ // 실패 일 경우
+                rKakaoMessageResult.changeMessageStatus(MessageStatus.FAIL);
+            }
+        }else{
+            rKakaoMessageResult.changeMessageStatus(MessageStatus.SUCCESS);
+        }
 
         redisHashRepository.update(statusKey, rKakaoMessageResultId, rKakaoMessageResult);
     }
@@ -71,6 +87,8 @@ public class KakaoBrokerCacheService {
                 kakaoMessageResult.requeueDescription(brokerName);
             } else if (retryCount == 2) {
                 kakaoMessageResult.resendOneDescription(brokerName);
+            }else{ // 실패일 경우
+                kakaoMessageResult.changeMessageStatus(MessageStatus.FAIL);
             }
         }
 

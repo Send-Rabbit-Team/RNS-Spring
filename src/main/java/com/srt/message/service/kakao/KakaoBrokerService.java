@@ -28,6 +28,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import static com.srt.message.dlx.DlxProcessingErrorHandler.KAKAO_BROKER_DEAD_COUNT;
 import static com.srt.message.utils.rabbitmq.RabbitKakaoUtil.*;
 
 @Log4j2
@@ -152,7 +153,7 @@ public class KakaoBrokerService {
 
     // 알림톡 발송 실패 처리
     public void processMessageFailure(String brokerName, KakaoMessageResultDto messageResultDto){
-        messageResultDto.setMessageStatus(MessageStatus.FAIL);
+        messageResultDto.setRetryCount(KAKAO_BROKER_DEAD_COUNT);
         kakaoBrokerCacheService.updateRMessageResult(messageResultDto, brokerName);
         kakaoBrokerCacheService.saveMessageResult(messageResultDto, brokerName);
 
