@@ -107,7 +107,7 @@ class MessageServiceTest {
         doReturn(Optional.ofNullable(member)).when(memberRepository).findById(any());
         doReturn(contacts).when(contactRepository).findByPhoneNumberIn(any());
         doReturn(Optional.ofNullable(senderNumber)).when(senderNumberRepository)
-                .findByPhoneNumberAndStatus(any(), eq(ACTIVE));
+                .findByMemberIdAndPhoneNumberAndStatus(member.getId(), any(), eq(ACTIVE));
 
         doReturn("성공").when(brokerService).sendSmsMessage(any());
 
@@ -128,7 +128,7 @@ class MessageServiceTest {
         doReturn(Optional.ofNullable(member)).when(memberRepository).findById(any());
         doReturn(contacts).when(contactRepository).findByPhoneNumberIn(any());
         doReturn(Optional.ofNullable(senderNumber)).when(senderNumberRepository)
-                .findByPhoneNumberAndStatus(any(), eq(ACTIVE));
+                .findByMemberIdAndPhoneNumberAndStatus(member.getId(), any(), eq(ACTIVE));
 
         doReturn("성공").when(reserveMessageService).reserveSmsMessage(any());
 
