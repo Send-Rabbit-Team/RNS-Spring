@@ -39,4 +39,7 @@ public interface ContactRepository extends JpaRepository<Contact, Long> {
     // 캐시용
     @EntityGraph(value = "Contact.with.Member.ContactGroup")
     Optional<Contact> findContactById(long contactId);
+
+    @Query(value = "select c from Contact c inner join fetch c.contactGroup where c.id in :contactIdList")
+    List<Contact> findAllInContactIdList(List<Long> contactIdList);
 }

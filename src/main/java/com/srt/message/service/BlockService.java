@@ -53,7 +53,7 @@ public class BlockService {
 
     // 수신 차단한사람 조회
     public GetBlockRes getBlockByNumber(String phoneNumber, long memberId){
-        SenderNumber senderNumber = senderNumberRepository.findByPhoneNumberAndStatus(phoneNumber, ACTIVE)
+        SenderNumber senderNumber = senderNumberRepository.findByMemberIdAndPhoneNumberAndStatus(memberId, phoneNumber, ACTIVE)
                 .orElseThrow(() -> new BaseException(NOT_EXIST_SENDER_NUMBER));
 
         if(senderNumber.getMember().getId() != memberId)

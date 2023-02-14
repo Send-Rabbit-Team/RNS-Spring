@@ -40,6 +40,8 @@ public class Message extends BaseEntity {
 
     private String content;
 
+    private long cost;
+
     @Enumerated(EnumType.STRING)
     private MessageType messageType;
 

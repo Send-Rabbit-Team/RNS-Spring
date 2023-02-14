@@ -15,6 +15,7 @@ import com.srt.message.dto.message.BrokerMessageDto;
 import com.srt.message.dto.message.SMSMessageDto;
 import com.srt.message.dto.message_result.MessageResultDto;
 import com.srt.message.repository.MessageRuleRepository;
+import com.srt.message.service.PointService;
 import com.srt.message.utils.algorithm.BrokerPool;
 import com.srt.message.utils.algorithm.BrokerWeight;
 import lombok.RequiredArgsConstructor;
@@ -49,6 +50,7 @@ public class BrokerService {
     private final RabbitTemplate rabbitTemplate;
 
     private final BrokerCacheService brokerCacheService;
+    private final PointService pointService;
 
     private final RedisHashRepository redisHashRepository;
     private final RedisListRepository redisListRepository;
@@ -90,7 +92,7 @@ public class BrokerService {
         String tmpKey = "message.tmp." + message.getId();
         redisListRepository.rightPushAll(tmpKey, rMessageResultDtos, TMP_MESSAGE_DURATION);
 
-        String valueKey ="message.value." + message.getId(); // tmp에서 TTL 만료됐을 경우 value값 꺼내오는 용도
+        String valueKey = "message.value." + message.getId(); // tmp에서 TTL 만료됐을 경우 value값 꺼내오는 용도
         redisListRepository.rightPushAll(valueKey, rMessageResultDtos, VALUE_MESSAGE_DURATION);
 
         Member member = brokerMessageDto.getMember();
@@ -98,7 +100,8 @@ public class BrokerService {
         // 수신 차단 처리
         String senderPhoneNumber = brokerMessageDto.getMessage().getSenderNumber().getPhoneNumber();
         List<Contact> blockContacts = blockRepository.findContactList(contacts, senderPhoneNumber, ACTIVE);
-        for(Contact blockContact: blockContacts) {
+        for (Contact blockContact : blockContacts) {
+            int blockCnt = 0;
             for (Contact contact : contacts) {
                 if (contact == blockContact) {
                     MessageResult messageResult = MessageResult.builder()
@@ -109,10 +112,13 @@ public class BrokerService {
                             .build();
 
                     messageResultRepository.save(messageResult);
+                    blockCnt++;
 
                     log.info("[" + messageResult.getMessageStatus() + "] " + "[수신 차단]" + " MessageResult 객체가 저장되었습니다. id : {}", messageResult.getId());
                 }
             }
+            // 환불
+//            pointService.chargePoint()
         }
 
         // 브로커 비율 설정
@@ -137,7 +143,7 @@ public class BrokerService {
         // 각 중개사 비율에 맞게 보내기
         HashMap<String, String> rMessageResultList = new HashMap<>();
         for (int i = 0; i < contacts.size(); i++) {
-            if(blockContacts.contains(contacts.get(i))) // 수신 차단 된 번호면 스킵
+            if (blockContacts.contains(contacts.get(i))) // 수신 차단 된 번호면 스킵
                 continue;
 
             Broker broker = (Broker) brokerPool.getNext().getBroker();
@@ -181,7 +187,7 @@ public class BrokerService {
     }
 
     // 메시지 발송 실패 처리
-    public void processMessageFailure(String brokerName, MessageResultDto messageResultDto){
+    public void processMessageFailure(String brokerName, MessageResultDto messageResultDto) {
         messageResultDto.setRetryCount(MESSAGE_BROKER_DEAD_COUNT);
         brokerCacheService.updateRMessageResult(messageResultDto, brokerName);
         brokerCacheService.saveMessageResult(messageResultDto, brokerName);

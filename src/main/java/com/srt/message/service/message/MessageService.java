@@ -8,7 +8,6 @@ import com.srt.message.dto.message.BrokerMessageDto;
 import com.srt.message.dto.message.post.PostSendMessageReq;
 import com.srt.message.repository.*;
 import com.srt.message.service.PointService;
-import com.srt.message.service.SchedulerService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
@@ -18,6 +17,8 @@ import java.util.List;
 
 import static com.srt.message.config.response.BaseResponseStatus.*;
 import static com.srt.message.config.status.BaseStatus.ACTIVE;
+import static com.srt.message.config.type.MessageType.LMS;
+import static com.srt.message.config.type.MessageType.MMS;
 
 @Log4j2
 @Service
@@ -50,6 +51,10 @@ public class MessageService {
         // Pay Point
         pointService.paySmsPoint(memberId, contacts.size());
 
+        // Cost 계산
+        MessageType messageType = messageReq.getMessage().getMessageType();
+        long cost = messageType == MMS ? contacts.size() : messageType == LMS ? 3 * contacts.size() : 6 * contacts.size();
+
         // 발신자 번호 예외 처리
         SenderNumber senderNumber = senderNumberRepository.findByMemberIdAndPhoneNumberAndStatus(memberId, messageReq.getMessage().getFrom(), ACTIVE)
                 .orElseThrow(() -> new BaseException(NOT_EXIST_SENDER_NUMBER));
@@ -62,13 +67,14 @@ public class MessageService {
                 .senderNumber(senderNumber)
                 .subject(messageReq.getMessage().getSubject())
                 .content(messageReq.getMessage().getContent())
+                .cost(cost)
                 .messageType(messageReq.getMessage().getMessageType())
                 .build();
 
         messageRepository.save(message);
 
         // MMS 타입인 경우 이미지 저장
-        if (message.getMessageType() == MessageType.MMS) {
+        if (message.getMessageType() == MMS) {
             String[] images = messageReq.getMessage().getImages();
             List<MessageImage> messageImages = new ArrayList<>();
             for (int i = 0; i < messageImages.size(); i++) {
