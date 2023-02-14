@@ -3,13 +3,13 @@ package com.srt.message.service;
 import com.srt.message.config.page.PageResult;
 import com.srt.message.config.status.BaseStatus;
 import com.srt.message.domain.Member;
-import com.srt.message.domain.SenderNumber;
 import com.srt.message.domain.Template;
 import com.srt.message.dto.template.get.GetTemplateRes;
 import com.srt.message.dto.template.patch.PatchTemplateReq;
 import com.srt.message.dto.template.post.PostTemplateReq;
 import com.srt.message.repository.MemberRepository;
 import com.srt.message.repository.TemplateRepository;
+import com.srt.message.service.message.TemplateService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -27,7 +27,6 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 

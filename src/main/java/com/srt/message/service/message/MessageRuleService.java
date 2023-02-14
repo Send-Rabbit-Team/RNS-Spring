@@ -1,4 +1,4 @@
-package com.srt.message.service;
+package com.srt.message.service.message;
 
 import com.srt.message.config.exception.BaseException;
 import com.srt.message.domain.Broker;

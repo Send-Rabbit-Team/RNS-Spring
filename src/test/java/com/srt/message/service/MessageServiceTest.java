@@ -6,7 +6,9 @@ import com.srt.message.domain.*;
 import com.srt.message.dto.message.SMSMessageDto;
 import com.srt.message.dto.message.post.PostSendMessageReq;
 import com.srt.message.repository.*;
-import com.srt.message.service.rabbit.BrokerService;
+import com.srt.message.service.message.BrokerService;
+import com.srt.message.service.message.MessageService;
+import com.srt.message.service.message.ReserveMessageService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -107,7 +109,7 @@ class MessageServiceTest {
         doReturn(Optional.ofNullable(member)).when(memberRepository).findById(any());
         doReturn(contacts).when(contactRepository).findByPhoneNumberIn(any());
         doReturn(Optional.ofNullable(senderNumber)).when(senderNumberRepository)
-                .findByPhoneNumberAndStatus(any(), eq(ACTIVE));
+                .findByMemberIdAndPhoneNumberAndStatus(member.getId(), any(), eq(ACTIVE));
 
         doReturn("성공").when(brokerService).sendSmsMessage(any());
 
@@ -128,7 +130,7 @@ class MessageServiceTest {
         doReturn(Optional.ofNullable(member)).when(memberRepository).findById(any());
         doReturn(contacts).when(contactRepository).findByPhoneNumberIn(any());
         doReturn(Optional.ofNullable(senderNumber)).when(senderNumberRepository)
-                .findByPhoneNumberAndStatus(any(), eq(ACTIVE));
+                .findByMemberIdAndPhoneNumberAndStatus(member.getId(), any(), eq(ACTIVE));
 
         doReturn("성공").when(reserveMessageService).reserveSmsMessage(any());
 

@@ -35,7 +35,7 @@ public class MessageResultDto {
                 .id(dto.getRMessageResultId())
                 .messageId(dto.messageId)
                 .brokerId(dto.brokerId)
-                .contactId(dto.brokerId)
+                .contactId(dto.contactId)
                 .messageStatus(dto.messageStatus)
                 .build();
     }

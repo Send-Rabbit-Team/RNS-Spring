@@ -1,11 +1,11 @@
 package com.srt.message.controller;
 
 import com.srt.message.config.response.BaseResponse;
-import com.srt.message.service.KakaoMessageService;
+import com.srt.message.service.kakao.KakaoMessageService;
 import com.srt.message.dto.jwt.JwtInfo;
 import com.srt.message.dto.kakao_message.post.PostKakaoMessageReq;
 import com.srt.message.dto.message.post.PostSendMessageReq;
-import com.srt.message.service.MessageService;
+import com.srt.message.service.message.MessageService;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;

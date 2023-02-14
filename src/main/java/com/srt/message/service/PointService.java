@@ -38,6 +38,9 @@ public class PointService {
         return GetPointRes.toDto(pointRepository.save(point));
     }
 
+    // SMS 포인트 환불
+//    public boolean refundPoint(long memberId, int amount, MessageType messageType)
+
     // 포인트 검증
     public GetPointRes validPoint(long memberId, int smsPoint, int kakaoPoint) {
         Member member = getExistMember(memberId);

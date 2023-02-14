@@ -61,7 +61,7 @@ public class RabbitConfig {
         Map<String, Object> args = new HashMap<>();
         args.put("x-dead-letter-exchange", WAIT_EXCHANGE_NAME);
         args.put("x-dead-letter-routing-key", KT_WAIT_ROUTING_KEY);
-        args.put("x-message-ttl", WAIT_TTL);
+        args.put("x-message-ttl", WORK_TTL);
         return new Queue(KT_WORK_QUEUE_NAME, true, false, false, args);
     }
 
@@ -70,7 +70,7 @@ public class RabbitConfig {
         Map<String, Object> args = new HashMap<>();
         args.put("x-dead-letter-exchange", WAIT_EXCHANGE_NAME);
         args.put("x-dead-letter-routing-key", SKT_WAIT_ROUTING_KEY);
-        args.put("x-message-ttl", WAIT_TTL);
+        args.put("x-message-ttl", WORK_TTL);
         return new Queue(SKT_WORK_QUEUE_NAME, true, false, false, args);
     }
 
@@ -79,7 +79,7 @@ public class RabbitConfig {
         Map<String, Object> args = new HashMap<>();
         args.put("x-dead-letter-exchange", WAIT_EXCHANGE_NAME);
         args.put("x-dead-letter-routing-key", LG_WAIT_ROUTING_KEY);
-        args.put("x-message-ttl", WAIT_TTL);
+        args.put("x-message-ttl", WORK_TTL);
         return new Queue(LG_WORK_QUEUE_NAME, true, false, false, args);
     }
 
@@ -217,101 +217,6 @@ public class RabbitConfig {
                 .with(LG_WAIT_ROUTING_KEY);
     }
 
-    /**
-     * Sender 설정 (Wait로 가기 전의 큐)
-     */
-    // Sender Queue
-//    @Bean
-//    public Queue smsSenderKTQueue(){
-//        Map<String, Object> args = new HashMap<>();
-//        args.put("x-dead-letter-exchange", WAIT_EXCHANGE_NAME);
-//        args.put("x-dead-letter-routing-key", KT_WAIT_ROUTING_KEY);
-//        return new Queue(KT_SENDER_QUEUE_NAME, true, false, false, args);
-//    }
-//    @Bean
-//    public Queue smsSenderSKTQueue(){
-//        Map<String, Object> args = new HashMap<>();
-//        args.put("x-dead-letter-exchange", WAIT_EXCHANGE_NAME);
-//        args.put("x-dead-letter-routing-key", SKT_WAIT_ROUTING_KEY);
-//        return new Queue(SKT_SENDER_QUEUE_NAME, true, false, false, args);
-//    }
-//    @Bean
-//    public Queue smsSenderLGQueue(){
-//        Map<String, Object> args = new HashMap<>();
-//        args.put("x-dead-letter-exchange", WAIT_EXCHANGE_NAME);
-//        args.put("x-dead-letter-routing-key", LG_WAIT_ROUTING_KEY);
-//        return new Queue(LG_SENDER_QUEUE_NAME, true, false, false, args);
-//    }
-//
-//    // Sender Exchange
-//    @Bean
-//    public DirectExchange senderSMSExchange(){
-//        return new DirectExchange(SENDER_EXCHANGE_NAME);
-//    }
-//    // Sender Binding
-//    @Bean
-//    public Binding bindingSenderSmsKT(DirectExchange senderSMSExchange, Queue smsSenderKTQueue){
-//        return BindingBuilder.bind(smsSenderKTQueue)
-//                .to(senderSMSExchange)
-//                .with(KT_SENDER_ROUTING_KEY);
-//    }
-//    @Bean
-//    public Binding bindingSenderSmsSKT(DirectExchange senderSMSExchange, Queue smsSenderSKTQueue){
-//        return BindingBuilder.bind(smsSenderSKTQueue)
-//                .to(senderSMSExchange)
-//                .with(SKT_SENDER_ROUTING_KEY);
-//    }
-//    @Bean
-//    public Binding bindingSenderSmsLG(DirectExchange senderSMSExchange, Queue smsSenderLGQueue){
-//        return BindingBuilder.bind(smsSenderLGQueue)
-//                .to(senderSMSExchange)
-//                .with(LG_SENDER_ROUTING_KEY);
-//    }
-
-    /**
-     * Dead 설정
-     */
-    // Dead Queue
-//    @Bean
-//    public Queue smsDeadKTQueue(){
-//        return new Queue(KT_DAED_QUEUE_NAME, true);
-//    }
-//    @Bean
-//    public Queue smsDeadSKTQueue(){
-//        return new Queue(SKT_DAED_QUEUE_NAME, true);
-//    }
-//    @Bean
-//    public Queue smsDeadLGQueue(){
-//        return new Queue(LG_DAED_QUEUE_NAME, true);
-//    }
-//
-//    // Dead Exchange
-//    @Bean
-//    public DirectExchange deadSMSExchange(){
-//        return new DirectExchange(DEAD_EXCHANGE_NAME);
-//    }
-//
-//    // Dead Binding
-//    @Bean
-//    public Binding bindingDeadSmsKT(DirectExchange deadSMSExchange, Queue smsDeadKTQueue){
-//        return BindingBuilder.bind(smsDeadKTQueue)
-//                .to(deadSMSExchange)
-//                .with(KT_DEAD_ROUTING_KEY);
-//    }
-//    @Bean
-//    public Binding bindingDeadSmsSKT(DirectExchange deadSMSExchange, Queue smsDeadSKTQueue){
-//        return BindingBuilder.bind(smsDeadSKTQueue)
-//                .to(deadSMSExchange)
-//                .with(SKT_DEAD_ROUTING_KEY);
-//    }
-//    @Bean
-//    public Binding bindingDeadSmsLG(DirectExchange deadSMSExchange, Queue smsDeadLGQueue){
-//        return BindingBuilder.bind(smsDeadLGQueue)
-//                .to(deadSMSExchange)
-//                .with(LG_DEAD_ROUTING_KEY);
-//    }
-
-
     /*
      * KAKAO: EXCAHNGE
      */
@@ -337,8 +242,8 @@ public class RabbitConfig {
     @Bean
     public Queue kakaoWorkCNSQueue(){
         Map<String, Object> args = new HashMap<>();
-        args.put("x-dead-letter-exchange",KAKAO_SENDER_EXCHANGE_NAME);
-        args.put("x-dead-letter-routing-key",CNS_SENDER_ROUTING_KEY);
+        args.put("x-dead-letter-exchange",KAKAO_WAIT_EXCHANGE_NAME);
+        args.put("x-dead-letter-routing-key",CNS_WAIT_ROUTING_KEY);
         args.put("x-message-ttl", KAKAO_WORK_TTL);
         return new Queue(CNS_WORK_QUEUE_NAME,true, false, false, args);
     }
@@ -347,24 +252,13 @@ public class RabbitConfig {
         return new Queue(CNS_RECEIVE_QUEUE_NAME, true);
     }
     @Bean
-    public Queue kakaoSenderCNSQueue() {
-        Map<String, Object> args = new HashMap<>();
-        args.put("x-dead-letter-exchange", KAKAO_WAIT_EXCHANGE_NAME);
-        args.put("x-dead-letter-routing-key", CNS_WAIT_ROUTING_KEY);
-        return new Queue(CNS_SENDER_QUEUE_NAME, true, false, false, args);
-    }
-    @Bean
     public Queue kakaoWaitCNSQueue(){
         Map<String,Object> args = new HashMap<>();
-        args.put("x-message-ttl", KAKAO_WAIT_TTL);
+//        args.put("x-message-ttl", KAKAO_WORK_TTL);
         args.put("x-dead-letter-exchange",KAKAO_WORK_EXCHANGE_NAME);
         args.put("x-dead-letter-routing-key",CNS_WORK_ROUTING_KEY);
 
         return new Queue(CNS_WAIT_QUEUE_NAME,true, false, false, args);
-    }
-    @Bean
-    public Queue kakaoDeadCNSQueue(){
-        return new Queue(CNS_DEAD_QUEUE_NAME, true);
     }
 
     /*
@@ -373,8 +267,8 @@ public class RabbitConfig {
     @Bean
     public Queue kakaoWorkKEQueue() {
         Map<String, Object> args = new HashMap<>();
-        args.put("x-dead-letter-exchange",KAKAO_SENDER_EXCHANGE_NAME);
-        args.put("x-dead-letter-routing-key",KE_SENDER_ROUTING_KEY);
+        args.put("x-dead-letter-exchange",KAKAO_WAIT_EXCHANGE_NAME);
+        args.put("x-dead-letter-routing-key",KE_WAIT_ROUTING_KEY);
         args.put("x-message-ttl", KAKAO_WORK_TTL);
         return new Queue(KE_WORK_QUEUE_NAME, true, false, false, args);
     }
@@ -383,24 +277,13 @@ public class RabbitConfig {
         return new Queue(KE_RECEIVE_QUEUE_NAME, true);
     }
     @Bean
-    public Queue kakaoSenderKEQueue() {
-        Map<String, Object> args = new HashMap<>();
-        args.put("x-dead-letter-exchange", KAKAO_WAIT_EXCHANGE_NAME);
-        args.put("x-dead-letter-routing-key", KE_WAIT_ROUTING_KEY);
-        return new Queue(KE_SENDER_QUEUE_NAME, true, false, false, args);
-    }
-    @Bean
     public Queue kakaoWaitKEQueue() {
         Map<String, Object> args = new HashMap<>();
-        args.put("x-message-ttl", KAKAO_WAIT_TTL);
+//        args.put("x-message-ttl", KAKAO_WORK_TTL);
         args.put("x-dead-letter-exchange", KAKAO_WORK_EXCHANGE_NAME);
         args.put("x-dead-letter-routing-key", KE_WORK_ROUTING_KEY);
 
         return new Queue(KE_WAIT_QUEUE_NAME, true, false,false, args);
-    }
-    @Bean
-    public Queue kakaoDeadKEQueue(){
-        return new Queue(KE_DEAD_QUEUE_NAME, true);
     }
 
     /*
@@ -419,22 +302,10 @@ public class RabbitConfig {
                 .with(CNS_RECEIVE_ROUTING_KEY);
     }
     @Bean
-    public Binding bindingKakaoSenderCNS(DirectExchange kakaoSenderExchange, Queue kakaoSenderCNSQueue){
-        return BindingBuilder.bind(kakaoSenderCNSQueue)
-                .to(kakaoSenderExchange)
-                .with(CNS_SENDER_ROUTING_KEY);
-    }
-    @Bean
     public Binding bindingKakaoWaitCNS(DirectExchange kakaoWaitExchange, Queue kakaoWaitCNSQueue){
         return BindingBuilder.bind(kakaoWaitCNSQueue)
                 .to(kakaoWaitExchange)
                 .with(CNS_WAIT_ROUTING_KEY);
-    }
-    @Bean
-    public Binding bindingKakaoDeadCNS(DirectExchange kakaoDeadExchange, Queue kakaoDeadCNSQueue){
-        return BindingBuilder.bind(kakaoDeadCNSQueue)
-                .to(kakaoDeadExchange)
-                .with(CNS_DEAD_ROUTING_KEY);
     }
 
     /*
@@ -453,23 +324,9 @@ public class RabbitConfig {
                 .with(KE_RECEIVE_ROUTING_KEY);
     }
     @Bean
-    public Binding bindingKakaoSenderKE(DirectExchange kakaoSenderExchange, Queue kakaoSenderKEQueue){
-        return BindingBuilder.bind(kakaoSenderKEQueue)
-                .to(kakaoSenderExchange)
-                .with(KE_SENDER_ROUTING_KEY);
-    }
-    @Bean
     public Binding bindingKakaoWaitKE(DirectExchange kakaoWaitExchange, Queue kakaoWaitKEQueue){
         return BindingBuilder.bind(kakaoWaitKEQueue)
                 .to(kakaoWaitExchange)
                 .with(KE_WAIT_ROUTING_KEY);
     }
-    @Bean
-    public Binding bindingKakaoDeadKE(DirectExchange kakaoDeadExchange, Queue kakaoDeadKEQueue){
-        return BindingBuilder.bind(kakaoDeadKEQueue)
-                .to(kakaoDeadExchange)
-                .with(KE_DEAD_ROUTING_KEY);
-    }
-
-
 }

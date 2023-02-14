@@ -25,6 +25,7 @@ public class GetListMessageResultRes {
 
         messageStatus.put(MessageStatus.PENDING, 0);
         messageStatus.put(MessageStatus.SUCCESS, 0);
+        messageStatus.put(MessageStatus.RESEND, 0);
         messageStatus.put(MessageStatus.FAIL, 0);
     }
 

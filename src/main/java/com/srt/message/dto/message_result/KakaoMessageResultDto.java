@@ -20,6 +20,8 @@ public class KakaoMessageResultDto {
 
     private long contactId;
 
+    private long retryCount;
+
     private MessageStatus messageStatus;
 
     private LocalDateTime createdAt;

@@ -1,4 +1,4 @@
-package com.srt.message.service;
+package com.srt.message.service.message;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -18,7 +18,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
 
-import java.util.Date;
 
 @Log4j2
 @Service
@@ -45,12 +44,10 @@ public class BrokerCacheService {
         if (!redisHashRepository.isExist(statusKey, rMessageResultId))
             return;
 
-        String jsonRMessageResult = redisHashRepository.findById(statusKey, rMessageResultId);
+        String jsonRMessageResult = redisHashRepository.findByRMessageResultId(statusKey, rMessageResultId);
 
         // 상태 업데이트 및 저장
         RMessageResult rMessageResult = convertToRMessageResult(jsonRMessageResult);
-
-        rMessageResult.changeMessageStatus(MessageStatus.SUCCESS);
 
         // 재전송 여부인지 확인
         // TODO 추후에 알고리즘 작성해서 코드 간략화하기
@@ -62,9 +59,16 @@ public class BrokerCacheService {
                 rMessageResult.requeueDescription(brokerName);
             } else if (retryCount == 2) {
                 rMessageResult.resendOneDescription(brokerName);
-            } else {
+            } else if (retryCount == 3) {
                 rMessageResult.resendTwoDescription(brokerName);
+            }else{ // 실패했을 경우
+                rMessageResult.resendTwoDescription(brokerName);
+                rMessageResult.addDescription("중계사 오류");
+                rMessageResult.changeMessageStatus(MessageStatus.FAIL);
             }
+
+        }else{
+            rMessageResult.changeMessageStatus(MessageStatus.SUCCESS);
         }
 
         redisHashRepository.update(statusKey, rMessageResultId, rMessageResult);
@@ -72,7 +76,7 @@ public class BrokerCacheService {
 
     public void saveMessageResult(final MessageResultDto messageResultDto, String brokerName) {
         Message message = messageCacheRepository.findMessageById(messageResultDto.getMessageId());
-        Contact contact = contactCacheRepository.findContactById(messageResultDto.getContactId());
+        Contact contact = contactCacheRepository.findContactByContactIdAndMessageId(messageResultDto.getContactId(), messageResultDto.getMessageId());
         Broker broker = brokerCacheRepository.findBrokerById(messageResultDto.getBrokerId());
 
         MessageResult messageResult = MessageResult.builder()
@@ -85,6 +89,7 @@ public class BrokerCacheService {
         // 재전송 여부인지 확인
         // TODO 추후에 알고리즘 작성해서 코드 간략화하기
         long retryCount = messageResultDto.getRetryCount();
+
         if (retryCount >= 1) {
             messageResult.changeMessageStatus(MessageStatus.RESEND);
 
@@ -92,11 +97,13 @@ public class BrokerCacheService {
                 messageResult.requeueDescription(brokerName);
             } else if (retryCount == 2) {
                 messageResult.resendOneDescription(brokerName);
-            } else {
+            } else if (retryCount == 3){
                 messageResult.resendTwoDescription(brokerName);
+            }else{ // 실패
+                messageResult.resendTwoDescription(brokerName);
+                messageResult.addDescription("중계사 오류");
+                messageResult.changeMessageStatus(MessageStatus.FAIL);
             }
-        } else {
-
         }
 
         messageResultRepository.save(messageResult);

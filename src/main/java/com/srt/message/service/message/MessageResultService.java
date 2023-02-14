@@ -1,4 +1,4 @@
-package com.srt.message.service;
+package com.srt.message.service.message;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -28,8 +28,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Transactional(readOnly = false)
 @RequiredArgsConstructor
@@ -40,6 +42,8 @@ public class MessageResultService {
 
     private final MessageRepository messageRepository;
     private final MessageResultRepository messageResultRepository;
+
+    private final ContactRepository contactRepository;
 
     private final MessageCacheRepository messageCacheRepository;
     private final BrokerCacheRepository brokerCacheRepository;
@@ -66,6 +70,8 @@ public class MessageResultService {
         String statusKey = "message.status." + messageId;
         Map<String,String> statusMap = redisHashRepository.findAll(statusKey);
         if(!statusMap.isEmpty()){ // 상태 정보가 들어있을 경우 REDIS로 조회
+            List<RMessageResult> rMessageResultList = new ArrayList<>();
+
             for(Map.Entry<String, String> entry: statusMap.entrySet()){
                 String rMessageResultJson = entry.getValue();
                 RMessageResult rMessageResult = objectMapper.readValue(rMessageResultJson, RMessageResult.class);
@@ -73,8 +79,17 @@ public class MessageResultService {
                 response.addBrokerCount(rMessageResult.getBrokerId());
                 response.addStatusCount(rMessageResult.getMessageStatus());
 
-                messageResultResList.add(getMessageResultRes(rMessageResult));
+                rMessageResultList.add(rMessageResult);
             }
+
+            List<Long> contactIdList = rMessageResultList.stream().map(RMessageResult::getContactId).collect(Collectors.toList());
+            List<Contact> contactList = contactRepository.findAllInContactIdList(contactIdList);
+            Map<Long, Contact> contactMap = contactList.stream().collect(Collectors.toMap(Contact::getId, c -> c));
+
+            for(RMessageResult r : rMessageResultList){
+                messageResultResList.add(getMessageResultRes(r, contactMap.get(r.getContactId())));
+            }
+
         }else{ // RDBMS에서 조회
             List<MessageResult> messageResults = messageResultRepository.findAllByMessageIdOrderByIdDesc(messageId);
             messageResults.stream()
@@ -130,29 +145,33 @@ public class MessageResultService {
      * 편의 메서드
      */
     public GetMessageResultRes getMessageResultRes(MessageResult messageResult){
-        return GetMessageResultRes.builder()
+        GetMessageResultRes getMessageResultRes = GetMessageResultRes.builder()
                 .contactPhoneNumber(messageResult.getContact().getPhoneNumber())
-                .contactGroup(messageResult.getContact().getContactGroup().getName())
                 .memo(messageResult.getContact().getMemo())
                 .brokerId(messageResult.getBroker().getId())
                 .brokerName(messageResult.getBroker().getName())
                 .messageStatus(messageResult.getMessageStatus())
                 .createdAt(messageResult.getCreatedAt() == null? null: messageResult.getCreatedAt().toString())
                 .build();
+        if (messageResult.getContact().getContactGroup() != null) {
+            getMessageResultRes.setContactGroup(messageResult.getContact().getContactGroup().getName());
+        }
+        return getMessageResultRes;
     }
-    public GetMessageResultRes getMessageResultRes(RMessageResult rMessageResult){
-        Message message = messageCacheRepository.findMessageById(rMessageResult.getMessageId());
-        Contact contact = contactCacheRepository.findContactById(rMessageResult.getContactId());
+    public GetMessageResultRes getMessageResultRes(RMessageResult rMessageResult, Contact contact){
         Broker broker = brokerCacheRepository.findBrokerById(rMessageResult.getBrokerId());
 
-        return GetMessageResultRes.builder()
+        GetMessageResultRes getMessageResultRes = GetMessageResultRes.builder()
                 .contactPhoneNumber(contact.getPhoneNumber())
-                .contactGroup(contact.getContactGroup().getName())
                 .memo(contact.getMemo())
                 .brokerId(broker.getId())
                 .brokerName(broker.getName())
                 .messageStatus(rMessageResult.getMessageStatus())
                 .createdAt(LocalDateTime.now().toString())
                 .build();
+        if (contact.getContactGroup() != null) {
+            getMessageResultRes.setContactGroup(contact.getContactGroup().getName());
+        }
+        return getMessageResultRes;
     }
 }

@@ -1,4 +1,4 @@
-package com.srt.message.service;
+package com.srt.message.service.kakao;
 
 import com.srt.message.config.exception.BaseException;
 import com.srt.message.config.page.PageResult;
@@ -59,7 +59,7 @@ public class KakaoTemplateService {
         getExistMember(memberId);
 
         // pageRequest 생성
-        PageRequest pageRequest = PageRequest.of(page-1, 2, Sort.by("id").descending());
+        PageRequest pageRequest = PageRequest.of(page-1, 2, Sort.by("updatedAt").descending());
 
         // template 조회
         Page<KakaoTemplate> kakaoTemplatePage = kakaoTemplateRepository.findAllTemplate(memberId, BaseStatus.ACTIVE, pageRequest);
@@ -76,7 +76,7 @@ public class KakaoTemplateService {
         getExistMember(memberId);
 
         // template 조회
-        List<KakaoTemplate> kakaoTemplateList = kakaoTemplateRepository.findByMemberIdAndStatusOrderByIdDesc(memberId, BaseStatus.ACTIVE);
+        List<KakaoTemplate> kakaoTemplateList = kakaoTemplateRepository.findByMemberIdAndStatusOrderByUpdatedAtDesc(memberId, BaseStatus.ACTIVE);
         if (kakaoTemplateList.isEmpty())
             throw new BaseException(NOT_EXIST_TEMPLATE);
 

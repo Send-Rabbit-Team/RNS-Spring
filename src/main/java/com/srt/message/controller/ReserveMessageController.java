@@ -3,7 +3,7 @@ package com.srt.message.controller;
 import com.srt.message.config.response.BaseResponse;
 import com.srt.message.dto.contact.get.GetContactAllRes;
 import com.srt.message.dto.jwt.JwtInfo;
-import com.srt.message.service.ReserveMessageService;
+import com.srt.message.service.message.ReserveMessageService;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;

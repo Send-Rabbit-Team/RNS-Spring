@@ -12,7 +12,9 @@ public interface RedisHashRepository<T> {
 
     Map<String, String> findAll(String key);
 
-    String findById(String key, String rMessageResultId);
+    String findByRMessageResultId(String key, String rMessageResultId);
+
+    String findByContactId(String key, String contactId);
 
     void update(String key, String rMessageResultId, T rMessageResult);
 }

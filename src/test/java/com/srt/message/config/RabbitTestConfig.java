@@ -343,7 +343,7 @@ public class RabbitTestConfig {
     @Bean
     public Queue kakaoWaitCNSQueue(){
         Map<String,Object> args = new HashMap<>();
-        args.put("x-message-ttl", KAKAO_WAIT_TTL);
+        args.put("x-message-ttl", KAKAO_WORK_TTL);
         args.put("x-dead-letter-exchange",KAKAO_WORK_EXCHANGE_NAME);
         args.put("x-dead-letter-routing-key",CNS_WORK_ROUTING_KEY);
 
@@ -371,7 +371,7 @@ public class RabbitTestConfig {
     @Bean
     public Queue kakaoWaitKEQueue() {
         Map<String, Object> args = new HashMap<>();
-        args.put("x-message-ttl", KAKAO_WAIT_TTL);
+        args.put("x-message-ttl", KAKAO_WORK_TTL);
         args.put("x-dead-letter-exchange", KAKAO_WORK_EXCHANGE_NAME);
         args.put("x-dead-letter-routing-key", KE_WORK_ROUTING_KEY);
 
