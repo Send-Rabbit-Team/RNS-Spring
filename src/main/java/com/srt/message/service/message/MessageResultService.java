@@ -145,27 +145,33 @@ public class MessageResultService {
      * 편의 메서드
      */
     public GetMessageResultRes getMessageResultRes(MessageResult messageResult){
-        return GetMessageResultRes.builder()
+        GetMessageResultRes getMessageResultRes = GetMessageResultRes.builder()
                 .contactPhoneNumber(messageResult.getContact().getPhoneNumber())
-                .contactGroup(messageResult.getContact().getContactGroup().getName())
                 .memo(messageResult.getContact().getMemo())
                 .brokerId(messageResult.getBroker().getId())
                 .brokerName(messageResult.getBroker().getName())
                 .messageStatus(messageResult.getMessageStatus())
                 .createdAt(messageResult.getCreatedAt() == null? null: messageResult.getCreatedAt().toString())
                 .build();
+        if (messageResult.getContact().getContactGroup() != null) {
+            getMessageResultRes.setContactGroup(messageResult.getContact().getContactGroup().getName());
+        }
+        return getMessageResultRes;
     }
     public GetMessageResultRes getMessageResultRes(RMessageResult rMessageResult, Contact contact){
         Broker broker = brokerCacheRepository.findBrokerById(rMessageResult.getBrokerId());
 
-        return GetMessageResultRes.builder()
+        GetMessageResultRes getMessageResultRes = GetMessageResultRes.builder()
                 .contactPhoneNumber(contact.getPhoneNumber())
-                .contactGroup(contact.getContactGroup().getName())
                 .memo(contact.getMemo())
                 .brokerId(broker.getId())
                 .brokerName(broker.getName())
                 .messageStatus(rMessageResult.getMessageStatus())
                 .createdAt(LocalDateTime.now().toString())
                 .build();
+        if (contact.getContactGroup() != null) {
+            getMessageResultRes.setContactGroup(contact.getContactGroup().getName());
+        }
+        return getMessageResultRes;
     }
 }

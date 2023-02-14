@@ -65,7 +65,7 @@ public class SenderNumberService {
 
     // 발신자 조회(페이징 O)
     public PageResult<GetSenderNumberRes> getPageSenderNumber(long memberId, int page) {
-        PageRequest pageRequest = PageRequest.of(page-1, 5, Sort.by("id").descending());
+        PageRequest pageRequest = PageRequest.of(page-1, 10, Sort.by("updatedAt").descending());
 
         Page<SenderNumber> senderNumberPage = senderNumberRepository.findAllSenderNumber(memberId, BaseStatus.ACTIVE, pageRequest);
         if (senderNumberPage.isEmpty())
@@ -78,7 +78,7 @@ public class SenderNumberService {
 
     // 발신자 조회(페이징 X)
     public List<GetSenderNumberRes> getAllSenderNumber(long memberId) {
-        List<SenderNumber> senderNumberList = senderNumberRepository.findByMemberIdAndStatus(memberId, BaseStatus.ACTIVE);
+        List<SenderNumber> senderNumberList = senderNumberRepository.findByMemberIdAndStatusOrderByUpdatedAtDesc(memberId, BaseStatus.ACTIVE);
         if (senderNumberList.isEmpty())
             throw new BaseException(NOT_EXIST_SENDER_NUMBER);
         return senderNumberList.stream().map(senderNumber -> GetSenderNumberRes.toDto(senderNumber)).collect(Collectors.toList());

@@ -25,7 +25,7 @@ public interface ContactRepository extends JpaRepository<Contact, Long> {
     // 그룹으로 연락처 조회 (페이지네이션 없음)
     List<Contact> findByContactGroupIdAndStatus(Long groupId, BaseStatus status);
 
-    List<Contact> findByContactGroupIdAndMemberIdAndStatus(Long groupId,Long memberId, BaseStatus status);
+    List<Contact> findByContactGroupIdAndMemberIdAndStatusOrderByUpdatedAtDesc(Long groupId,Long memberId, BaseStatus status);
 
     List<Contact> findByPhoneNumberIn(List<String> phoneNumber);
 
@@ -39,7 +39,7 @@ public interface ContactRepository extends JpaRepository<Contact, Long> {
     countQuery = "select count(c) from Contact c where c.member.id = :memberId and c.status = :status")
     Page<Contact> findAllContact(Long memberId, BaseStatus status, Pageable pageable);
 
-    List<Contact> findByMemberIdAndStatus(long memberId, BaseStatus status);
+    List<Contact> findByMemberIdAndStatusOrderByUpdatedAtDesc(long memberId, BaseStatus status);
 
     // 캐시용
     @EntityGraph(value = "Contact.with.Member.ContactGroup")
