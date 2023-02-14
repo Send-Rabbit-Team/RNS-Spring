@@ -1,6 +1,7 @@
 package com.srt.message.dto.message_result.get;
 
 import com.srt.message.config.status.MessageStatus;
+import com.srt.message.config.type.MessageType;
 import lombok.*;
 
 import java.util.HashMap;
@@ -12,6 +13,9 @@ import java.util.List;
 @Setter
 public class GetListMessageResultRes {
     private long totalCount;
+
+    private long totalPoint;
+
     private HashMap<String, Integer> broker = new HashMap<>();
     private HashMap<MessageStatus, Integer> messageStatus = new HashMap<>();
 
@@ -40,5 +44,18 @@ public class GetListMessageResultRes {
     public void addStatusCount(MessageStatus status) {
         int cnt = messageStatus.get(status);
         messageStatus.put(status, ++cnt);
+    }
+
+    public void addTotalPoint(MessageType messageType){
+        switch (messageType){
+            case SMS:
+                this.totalPoint += 1;
+
+            case LMS:
+                this.totalPoint += 3;
+
+            case MMS:
+                this.totalPoint += 6;
+        }
     }
 }

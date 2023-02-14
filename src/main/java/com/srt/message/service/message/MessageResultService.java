@@ -2,11 +2,14 @@ package com.srt.message.service.message;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.srt.message.config.exception.BaseException;
 import com.srt.message.config.page.PageResult;
+import com.srt.message.config.response.BaseResponseStatus;
 import com.srt.message.config.type.MessageType;
 import com.srt.message.config.type.MsgSearchType;
 import com.srt.message.domain.Broker;
 import com.srt.message.domain.Contact;
+import com.srt.message.domain.Message;
 import com.srt.message.domain.MessageResult;
 import com.srt.message.domain.redis.RMessageResult;
 import com.srt.message.dto.message.get.GetMessageRes;
@@ -24,10 +27,11 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+
+import static com.srt.message.config.response.BaseResponseStatus.NOT_EXIST_MESSAGE;
 
 @Transactional(readOnly = false)
 @RequiredArgsConstructor
@@ -59,6 +63,8 @@ public class MessageResultService {
         GetListMessageResultRes response = new GetListMessageResultRes();
         List<GetMessageResultRes> messageResultResList = new ArrayList<>();
 
+        Message message = messageRepository.findById(messageId).orElseThrow(() -> new BaseException(NOT_EXIST_MESSAGE));
+
         // 레디스에 상태 값 저장되어 있는지 확인
         String statusKey = "message.status." + messageId;
         Map<String, String> statusMap = redisHashRepository.findAll(statusKey);
@@ -71,6 +77,7 @@ public class MessageResultService {
 
                 response.addBrokerCount(rMessageResult.getBrokerId());
                 response.addStatusCount(rMessageResult.getMessageStatus());
+                response.addTotalPoint(message.getMessageType());
 
                 rMessageResultList.add(rMessageResult);
             }
@@ -95,6 +102,7 @@ public class MessageResultService {
                         finalMessageResultResList.add(r);
                         response.addBrokerCount(r.getBrokerId());
                         response.addStatusCount(r.getMessageStatus());
+                        response.addTotalPoint(message.getMessageType());
                     });
         }
 
