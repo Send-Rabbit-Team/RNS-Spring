@@ -39,6 +39,11 @@ public class GetMessageResultRes {
     private String brokerName;
 
     @ApiModelProperty(
+            example = "skt -> kt -> lg"
+    )
+    private String description;
+
+    @ApiModelProperty(
             example = "SUCCESS"
     )
     private MessageStatus messageStatus;

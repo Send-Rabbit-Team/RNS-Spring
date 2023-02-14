@@ -143,6 +143,7 @@ public class MessageResultService {
                 .memo(messageResult.getContact().getMemo())
                 .brokerId(messageResult.getBroker().getId())
                 .brokerName(messageResult.getBroker().getName())
+                .description(messageResult.getDescription())
                 .messageStatus(messageResult.getMessageStatus())
                 .createdAt(messageResult.getCreatedAt() == null ? null : messageResult.getCreatedAt().toString())
                 .build();
@@ -160,6 +161,7 @@ public class MessageResultService {
                 .memo(contact.getMemo())
                 .brokerId(broker.getId())
                 .brokerName(broker.getName())
+                .description(rMessageResult.getDescription())
                 .messageStatus(rMessageResult.getMessageStatus())
                 .createdAt(LocalDateTime.now().toString())
                 .build();
