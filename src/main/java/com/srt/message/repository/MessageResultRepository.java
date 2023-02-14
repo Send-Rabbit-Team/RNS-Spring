@@ -12,4 +12,6 @@ public interface MessageResultRepository extends JpaRepository<MessageResult, Lo
     List<MessageResult> findAllByMessageIdOrderByIdDesc(long messageId);
 
     Optional<MessageResult> findByContactAndMessage(Contact contact, Message message);
+
+    List<MessageResult> findAllByDescriptionLike(String description);
 }
