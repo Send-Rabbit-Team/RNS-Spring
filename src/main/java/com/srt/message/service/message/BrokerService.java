@@ -26,6 +26,7 @@ import org.springframework.amqp.core.MessageProperties;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.context.annotation.Scope;
 import org.springframework.context.annotation.ScopedProxyMode;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -48,6 +49,7 @@ public class BrokerService {
     private final ObjectMapper objectMapper;
 
     private final RabbitTemplate rabbitTemplate;
+    private final RedisTemplate<String, Contact> redisTemplate;
 
     private final BrokerCacheService brokerCacheService;
     private final PointService pointService;
@@ -140,8 +142,10 @@ public class BrokerService {
 
         BrokerPool brokerPool = new BrokerPool(brokerWeights);
 
+        HashMap<String, String> rMessageResultMap = new HashMap<>();
+        HashMap<String, String> contactMap = new HashMap<>();
+
         // 각 중개사 비율에 맞게 보내기
-        HashMap<String, String> rMessageResultList = new HashMap<>();
         for (int i = 0; i < contacts.size(); i++) {
             if (blockContacts.contains(contacts.get(i))) // 수신 차단 된 번호면 스킵
                 continue;
@@ -155,9 +159,13 @@ public class BrokerService {
             MessageResultDto messageResultDto = messageResultDtos.get(i);
             messageResultDto.setBrokerId(broker.getId());
 
+            // 연락처 캐싱용
+            Contact contact = contacts.get(i);
+            contactMap.put(String.valueOf(contact.getId()), convertToJson(contact));
+
             // 상태 값 저장
             RMessageResult rMessageResult = MessageResultDto.toRMessageResult(messageResultDto);
-            rMessageResultList.put(rMessageResult.getId(), convertToJson(rMessageResult));
+            rMessageResultMap.put(rMessageResult.getId(), convertToJson(rMessageResult));
 
             BrokerSendMessageDto brokerSendMessageDto = new BrokerSendMessageDto(smsMessageDto, messageResultDto);
 
@@ -172,8 +180,11 @@ public class BrokerService {
             log.info((i + 1) + " 번째 메시지가 전송되었습니다 - " + routingKey);
         }
 
+        String contactKey = "message.contact." + message.getId();
+        redisHashRepository.saveAll(contactKey, contactMap);
+
         String statusKey = "message.status." + message.getId();
-        redisHashRepository.saveAll(statusKey, rMessageResultList);
+        redisHashRepository.saveAll(statusKey, rMessageResultMap);
 
         // 임시 저장된 값 제거
         redisListRepository.remove(tmpKey);

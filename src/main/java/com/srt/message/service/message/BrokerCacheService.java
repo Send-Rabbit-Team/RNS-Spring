@@ -44,7 +44,7 @@ public class BrokerCacheService {
         if (!redisHashRepository.isExist(statusKey, rMessageResultId))
             return;
 
-        String jsonRMessageResult = redisHashRepository.findById(statusKey, rMessageResultId);
+        String jsonRMessageResult = redisHashRepository.findByRMessageResultId(statusKey, rMessageResultId);
 
         // 상태 업데이트 및 저장
         RMessageResult rMessageResult = convertToRMessageResult(jsonRMessageResult);
@@ -76,7 +76,7 @@ public class BrokerCacheService {
 
     public void saveMessageResult(final MessageResultDto messageResultDto, String brokerName) {
         Message message = messageCacheRepository.findMessageById(messageResultDto.getMessageId());
-        Contact contact = contactCacheRepository.findContactById(messageResultDto.getContactId());
+        Contact contact = contactCacheRepository.findContactByContactIdAndMessageId(messageResultDto.getContactId(), messageResultDto.getMessageId());
         Broker broker = brokerCacheRepository.findBrokerById(messageResultDto.getBrokerId());
 
         MessageResult messageResult = MessageResult.builder()

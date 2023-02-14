@@ -46,8 +46,13 @@ public class RedisHashRepositoryImpl<T> implements RedisHashRepository<T> {
     }
 
     @Override
-    public String findById(String key, String rMessageResultId) {
+    public String findByRMessageResultId(String key, String rMessageResultId) {
         return (String) hashOperations.get(key, rMessageResultId);
+    }
+
+    @Override
+    public String findByContactId(String key, String contactId) {
+        return (String) hashOperations.get(key, contactId);
     }
 
     @Override

@@ -6,7 +6,6 @@ import com.srt.message.config.status.MessageStatus;
 import com.srt.message.domain.*;
 import com.srt.message.domain.redis.RKakaoMessageResult;
 import com.srt.message.dto.message_result.KakaoMessageResultDto;
-import com.srt.message.dto.message_result.MessageResultDto;
 import com.srt.message.repository.KakaoMessageResultRepository;
 import com.srt.message.repository.cache.BrokerCacheRepository;
 import com.srt.message.repository.cache.ContactCacheRepository;
@@ -40,7 +39,7 @@ public class KakaoBrokerCacheService {
         if (!redisHashRepository.isExist(statusKey, rKakaoMessageResultId))
             return;
 
-        String jsonRKakaoMessageResult = redisHashRepository.findById(statusKey, rKakaoMessageResultId);
+        String jsonRKakaoMessageResult = redisHashRepository.findByRMessageResultId(statusKey, rKakaoMessageResultId);
 
         // 상태 업데이트 및 저장
         RKakaoMessageResult rKakaoMessageResult = convertToRMessageResult(jsonRKakaoMessageResult);

@@ -43,7 +43,7 @@ public class MessageService {
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new BaseException(NOT_EXIST_MEMBER));
 
-        List<Contact> contacts = contactRepository.findByPhoneNumberIn(messageReq.getReceivers());
+        List<Contact> contacts = contactRepository.findAllByPhoneNumberIn(messageReq.getReceivers());
         // 연락처 예외 처리
         if (contacts.contains(null) || contacts.isEmpty())
             throw new BaseException(NOT_EXIST_CONTACT_NUMBER);
