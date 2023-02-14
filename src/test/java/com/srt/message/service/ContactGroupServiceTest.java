@@ -64,7 +64,7 @@ class ContactGroupServiceTest {
         List<ContactGroup> contactGroupList = Arrays.asList(contactGroup, contactGroup, contactGroup);
 
         doReturn(Optional.ofNullable(member)).when(memberRepository).findByIdAndStatus(eq(member.getId()), eq(BaseStatus.ACTIVE));
-        doReturn(contactGroupList).when(contactGroupRepository).findByMemberIdAndStatus(eq(member.getId()), eq(BaseStatus.ACTIVE));
+        doReturn(contactGroupList).when(contactGroupRepository).findByMemberIdAndStatusOrderByUpdatedAtDesc(eq(member.getId()), eq(BaseStatus.ACTIVE));
 
         // when
         List<ContactGroupDTO> response = contactGroupService.getAllContactGroup(member.getId());

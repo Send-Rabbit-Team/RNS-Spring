@@ -112,7 +112,7 @@ class TemplateServiceTest {
     void getAllTemplate_Success(){
         // given
         doReturn(Optional.ofNullable(member)).when(memberRepository).findByIdAndStatus(anyLong(), eq(BaseStatus.ACTIVE));
-        doReturn(getTemplateList()).when(templateRepository).findByMemberIdAndStatusOrderByIdDesc(anyLong(), eq(BaseStatus.ACTIVE));
+        doReturn(getTemplateList()).when(templateRepository).findByMemberIdAndStatusOrderByUpdatedAtDesc(anyLong(), eq(BaseStatus.ACTIVE));
 
         // when
         List<GetTemplateRes> response = templateService.getAllTemplate(member.getId());
