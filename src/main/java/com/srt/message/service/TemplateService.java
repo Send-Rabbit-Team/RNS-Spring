@@ -59,7 +59,7 @@ public class TemplateService {
         getExistMember(memberId);
 
         // pageRequest 생성
-        PageRequest pageRequest = PageRequest.of(page-1, 3, Sort.by("id").descending());
+        PageRequest pageRequest = PageRequest.of(page-1, 3, Sort.by("updatedAt").descending());
 
         // template 조회
         Page<Template> templatePage = templateRepository.findAllTemplate(memberId, BaseStatus.ACTIVE, pageRequest);
@@ -76,7 +76,7 @@ public class TemplateService {
         getExistMember(memberId);
 
         // template 조회
-        List<Template> templateList = templateRepository.findByMemberIdAndStatusOrderByIdDesc(memberId, BaseStatus.ACTIVE);
+        List<Template> templateList = templateRepository.findByMemberIdAndStatusOrderByUpdatedAtDesc(memberId, BaseStatus.ACTIVE);
         if (templateList.isEmpty())
             throw new BaseException(NOT_EXIST_TEMPLATE);
 

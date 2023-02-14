@@ -139,7 +139,7 @@ class ContactServiceTest {
     @Test
     void filterContactByGroup_Success(){
         // given
-        given(contactRepository.findByContactGroupIdAndMemberIdAndStatus(eq(contact.getId()), eq(member.getId()),eq(BaseStatus.ACTIVE)))
+        given(contactRepository.findByContactGroupIdAndMemberIdAndStatusOrderByUpdatedAtDesc(eq(contact.getId()), eq(member.getId()),eq(BaseStatus.ACTIVE)))
                 .willReturn(Arrays.asList(contact));
 
         // when
@@ -154,7 +154,7 @@ class ContactServiceTest {
     void getMemberContact_Success(){
         // given
         int page = 1;
-        PageRequest pageRequest = PageRequest.of(page-1, 5, Sort.by("id").descending());
+        PageRequest pageRequest = PageRequest.of(page-1, 10, Sort.by("updatedAt").descending());
         Page<Contact> contactPage = new PageImpl<>(Arrays.asList(contact), pageRequest, 0); // 페이지 인스턴스 객체 생성
 
         given(contactRepository.findAllContact(any(), eq(BaseStatus.ACTIVE), eq(pageRequest)))
@@ -171,7 +171,7 @@ class ContactServiceTest {
     @Test
     void getMemberContactAll_Success(){
         // when
-        doReturn(Arrays.asList(contact, contact, contact)).when(contactRepository).findByMemberIdAndStatus(member.getId(), BaseStatus.ACTIVE);
+        doReturn(Arrays.asList(contact, contact, contact)).when(contactRepository).findByMemberIdAndStatusOrderByUpdatedAtDesc(member.getId(), BaseStatus.ACTIVE);
 
         // given
         GetContactAllRes response = contactService.getMemberContactAll(member.getId());

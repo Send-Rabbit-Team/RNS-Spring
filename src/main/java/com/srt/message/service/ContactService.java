@@ -126,7 +126,7 @@ public class ContactService {
 
     // 연락처 검색
     public PageResult<ContactDTO> searchContact(String phoneNumber, int currentPage, long memberId) {
-        PageRequest pageRequest = PageRequest.of(currentPage-1, 5, Sort.by("id").descending());
+        PageRequest pageRequest = PageRequest.of(currentPage-1, 10, Sort.by("updatedAt").descending());
 
         Page<ContactDTO> contactPage = contactRepository.findbyPhoneNumber(phoneNumber, pageRequest, memberId,BaseStatus.ACTIVE)
                 .map(c -> ContactDTO.toDto(c));
@@ -136,7 +136,7 @@ public class ContactService {
 
     // 연락처 그룹으로 필터링
     public List<GetGroupContactRes> filterContactByGroup(long groupId, long memberId){
-        List<Contact> contactList = contactRepository.findByContactGroupIdAndMemberIdAndStatus(groupId, memberId, BaseStatus.ACTIVE);
+        List<Contact> contactList = contactRepository.findByContactGroupIdAndMemberIdAndStatusOrderByUpdatedAtDesc(groupId, memberId, BaseStatus.ACTIVE);
 
         if (contactList.isEmpty())
             throw new BaseException(NOT_EXIST_CONTACT_NUMBER);
@@ -146,7 +146,7 @@ public class ContactService {
 
     // 전체 연락처 조회(페이징)
     public PageResult<GetContactRes> getMemberContact(long memberId, int page) {
-        PageRequest pageRequest = PageRequest.of(page-1, 5, Sort.by("id").descending());
+        PageRequest pageRequest = PageRequest.of(page-1, 10, Sort.by("updatedAt").descending());
 
         Page<GetContactRes> contactPage = contactRepository.findAllContact(memberId, BaseStatus.ACTIVE, pageRequest)
                 .map(c -> GetContactRes.toDto(c));
@@ -156,7 +156,7 @@ public class ContactService {
 
     // 연락처 전체 조회
     public GetContactAllRes getMemberContactAll(long memberId){
-        List<Contact> contactList = contactRepository.findByMemberIdAndStatus(memberId, BaseStatus.ACTIVE);
+        List<Contact> contactList = contactRepository.findByMemberIdAndStatusOrderByUpdatedAtDesc(memberId, BaseStatus.ACTIVE);
         GetContactAllRes getContactAllRes = GetContactAllRes.toDto(contactList);
         return getContactAllRes;
     }
