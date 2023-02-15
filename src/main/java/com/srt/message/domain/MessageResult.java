@@ -10,6 +10,14 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 
+@NamedEntityGraph(name = "Contact", attributeNodes = {
+        @NamedAttributeNode(value = "contact")
+})
+@NamedEntityGraph(name = "Contact.Broker", attributeNodes = {
+        @NamedAttributeNode(value = "contact"),
+        @NamedAttributeNode(value = "broker"),
+})
+
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor

@@ -77,7 +77,6 @@ public class MessageResultService {
 
                 response.addBrokerCount(rMessageResult.getBrokerId());
                 response.addStatusCount(rMessageResult.getMessageStatus());
-                response.addTotalPoint(message.getMessageType());
 
                 rMessageResultList.add(rMessageResult);
             }
@@ -96,14 +95,13 @@ public class MessageResultService {
 
         } else { // RDBMS에서 조회
             List<MessageResult> messageResults = messageResultRepository.findAllByMessageIdOrderByIdDesc(messageId);
-            List<GetMessageResultRes> finalMessageResultResList = messageResultResList;
-            messageResults.stream().parallel()
-                    .map(this::getMessageResultRes).forEach(r -> {
-                        finalMessageResultResList.add(r);
-                        response.addBrokerCount(r.getBrokerId());
-                        response.addStatusCount(r.getMessageStatus());
-                        response.addTotalPoint(message.getMessageType());
-                    });
+            messageResultResList = messageResults.stream().parallel()
+                    .map(this::getMessageResultRes).collect(Collectors.toList());
+
+            messageResultResList.stream().forEach(r -> {
+                response.addBrokerCount(r.getBrokerId());
+                response.addStatusCount(r.getMessageStatus());
+            });
         }
 
         response.setMessageResultRes(messageResultResList);
@@ -154,12 +152,17 @@ public class MessageResultService {
         GetMessageResultRes getMessageResultRes = GetMessageResultRes.builder()
                 .contactPhoneNumber(messageResult.getContact().getPhoneNumber())
                 .memo(messageResult.getContact().getMemo())
-                .brokerId(messageResult.getBroker().getId())
-                .brokerName(messageResult.getBroker().getName())
                 .description(messageResult.getDescription())
                 .messageStatus(messageResult.getMessageStatus())
                 .createdAt(messageResult.getCreatedAt() == null ? null : messageResult.getCreatedAt().toString())
                 .build();
+
+        Broker broker = messageResult.getBroker();
+        if(broker != null){
+            getMessageResultRes.setBrokerId(broker.getId());
+            getMessageResultRes.setBrokerName(broker.getName());
+        }
+
         if (messageResult.getContact().getContactGroup() != null) {
             getMessageResultRes.setContactGroup(messageResult.getContact().getContactGroup().getName());
         }

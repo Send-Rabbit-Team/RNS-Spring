@@ -14,8 +14,6 @@ import java.util.List;
 public class GetListMessageResultRes {
     private long totalCount;
 
-    private long totalPoint;
-
     private HashMap<String, Integer> broker = new HashMap<>();
     private HashMap<MessageStatus, Integer> messageStatus = new HashMap<>();
 
@@ -33,7 +31,10 @@ public class GetListMessageResultRes {
         messageStatus.put(MessageStatus.FAIL, 0);
     }
 
-    public void addBrokerCount(long brokerId) {
+    public void addBrokerCount(Long brokerId) {
+        if(brokerId == null)
+            return;
+
         String brokerKey = null;
         brokerKey = brokerId == 1 ? "kt" : brokerId == 2 ? "skt" : "lg";
 
@@ -44,18 +45,5 @@ public class GetListMessageResultRes {
     public void addStatusCount(MessageStatus status) {
         int cnt = messageStatus.get(status);
         messageStatus.put(status, ++cnt);
-    }
-
-    public void addTotalPoint(MessageType messageType){
-        switch (messageType){
-            case SMS:
-                this.totalPoint += 1;
-
-            case LMS:
-                this.totalPoint += 3;
-
-            case MMS:
-                this.totalPoint += 6;
-        }
     }
 }
