@@ -85,4 +85,6 @@ public class MessageResultController {
 
         return new BaseResponse<>(messageResList);
     }
+
+
 }
