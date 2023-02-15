@@ -43,6 +43,7 @@ public class ContactCacheRepository {
 
         try {
             contact = objectMapper.readValue(contactJson, Contact.class);
+            redisHashRepository.delete(contactKey, String.valueOf(contactId));
         }catch(JsonProcessingException e){
             e.printStackTrace();
         }

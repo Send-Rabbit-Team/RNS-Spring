@@ -89,7 +89,7 @@ public class MessageResultService {
                     map(r -> getMessageResultRes(r, contactMap.get(r.getContactId()))).collect(Collectors.toList());
 
             // 수신 차단 메시지 따로 추가
-            List<MessageResult> blockMessages = messageResultRepository.findAllByDescriptionLike("%수신 차단%");
+            List<MessageResult> blockMessages = messageResultRepository.findAllByMessageAndDescriptionLike(message, "%수신 차단%");
             for(MessageResult m: blockMessages)
                 messageResultResList.add(getMessageResultRes(m));
 

@@ -36,6 +36,11 @@ public class RedisHashRepositoryImpl<T> implements RedisHashRepository<T> {
     }
 
     @Override
+    public void saveContactAll(String key, Map<String, String> contactMap) {
+        hashOperations.putAll(key, contactMap);
+    }
+
+    @Override
     public boolean isExist(String key, String rMessageResultId) {
         return hashOperations.hasKey(key, rMessageResultId);
     }
@@ -59,6 +64,11 @@ public class RedisHashRepositoryImpl<T> implements RedisHashRepository<T> {
     public void update(String key, String rMessageResultId, T rMessageResult) {
         save(key, rMessageResultId, rMessageResult);
         redisTemplate.expire(key, 60 * 5, TimeUnit.SECONDS);
+    }
+
+    @Override
+    public void delete(String key, Object value) {
+        hashOperations.delete(key, value);
     }
 
     public String convertToJson(Object object){

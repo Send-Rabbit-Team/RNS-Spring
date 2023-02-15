@@ -32,6 +32,7 @@ import org.springframework.stereotype.Component;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static com.srt.message.config.status.BaseStatus.ACTIVE;
 import static com.srt.message.dlx.DlxProcessingErrorHandler.MESSAGE_BROKER_DEAD_COUNT;
@@ -122,6 +123,7 @@ public class BrokerService {
         }
 
         // 브로커 비율 설정
+        Map<Long, String> brokerMap = new HashMap<>();
         List<MessageRule> messageRules = messageRuleRepository.findAllByMember(member);
         if (messageRules.isEmpty()) { // 발송 규칙을 설정 안했을 경우
             List<Broker> brokers = brokerRepository.findAll();
@@ -133,29 +135,30 @@ public class BrokerService {
             }
         }
 
-        ArrayList<BrokerWeight> brokerWeights = new ArrayList<>();
+        ArrayList<BrokerWeight<Broker>> brokerWeights = new ArrayList<>();
         for (MessageRule messageRule : messageRules) {
-            brokerWeights.add(new BrokerWeight(messageRule.getBroker(), messageRule.getBrokerRate()));
+            brokerWeights.add(new BrokerWeight<>(messageRule.getBroker(), messageRule.getBrokerRate()));
+
+            Broker broker = messageRule.getBroker();
+            brokerMap.put(broker.getId(), broker.getName().toLowerCase());
         }
 
-        BrokerPool brokerPool = new BrokerPool(brokerWeights);
+        BrokerPool<Broker> brokerPool = new BrokerPool<>(brokerWeights);
 
         HashMap<String, String> rMessageResultMap = new HashMap<>();
         HashMap<String, String> contactMap = new HashMap<>();
 
-        // 각 중개사 비율에 맞게 보내기
+        // 상태 DB에 저장하기
         for (int i = 0; i < contacts.size(); i++) {
             if (blockContacts.contains(contacts.get(i))) // 수신 차단 된 번호면 스킵
                 continue;
 
             Broker broker = (Broker) brokerPool.getNext().getBroker();
-            String routingKey = "sms.work." + broker.getName().toLowerCase();
-
             smsMessageDto.setTo(contacts.get(i).getPhoneNumber());
 
             // Redis에서 MessageResultDTO 꺼내오기
             MessageResultDto messageResultDto = messageResultDtos.get(i);
-            messageResultDto.setBrokerId(broker.getId());
+            messageResultDtos.get(i).setBrokerId(broker.getId());
 
             // 연락처 캐싱용
             Contact contact = contacts.get(i);
@@ -164,8 +167,20 @@ public class BrokerService {
             // 상태 값 저장
             RMessageResult rMessageResult = MessageResultDto.toRMessageResult(messageResultDto);
             rMessageResultMap.put(rMessageResult.getId(), convertToJson(rMessageResult));
+        }
+        String contactKey = "message.contact." + message.getId();
+        redisHashRepository.saveContactAll(contactKey, contactMap);
 
+        String statusKey = "message.status." + message.getId();
+        redisHashRepository.saveAll(statusKey, rMessageResultMap);
+
+        // 각 중개사 비율에 맞게 보내기
+        for (int i = 0; i < contacts.size(); i++) {
+            MessageResultDto messageResultDto = messageResultDtos.get(i);
             BrokerSendMessageDto brokerSendMessageDto = new BrokerSendMessageDto(smsMessageDto, messageResultDto);
+
+            long brokerId = messageResultDto.getBrokerId();
+            String routingKey = "sms.work." + brokerMap.get(brokerId);
 
             // AMQP Message Builder
             org.springframework.amqp.core.Message amqpMessage = MessageBuilder
@@ -177,12 +192,6 @@ public class BrokerService {
 
             log.info((i + 1) + " 번째 메시지가 전송되었습니다 - " + routingKey);
         }
-
-        String contactKey = "message.contact." + message.getId();
-        redisHashRepository.saveAll(contactKey, contactMap);
-
-        String statusKey = "message.status." + message.getId();
-        redisHashRepository.saveAll(statusKey, rMessageResultMap);
 
         // 임시 저장된 값 제거
         redisListRepository.remove(tmpKey);
