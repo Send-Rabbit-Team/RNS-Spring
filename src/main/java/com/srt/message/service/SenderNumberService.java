@@ -91,8 +91,14 @@ public class SenderNumberService {
         SenderNumber senderNumber = senderNumberRepository.findByIdAndStatus(senderNumberId, BaseStatus.ACTIVE)
                 .orElseThrow(() -> new BaseException(NOT_EXIST_SENDER_NUMBER));
 
+        Member member = memberRepository.findByIdAndStatus(memberId, BaseStatus.ACTIVE)
+                .orElseThrow(() -> new BaseException(NOT_EXIST_MEMBER));
+
         if (senderNumber.getMember().getId() != memberId)
             throw new BaseException(NOT_AUTH_MEMBER);
+
+        if (member.getPhoneNumber().equals(senderNumber.getPhoneNumber()))
+            throw new BaseException(UNDELETABLE_SENDER_NUMBER);
 
         senderNumber.changeStatusInActive();
         senderNumberRepository.save(senderNumber);

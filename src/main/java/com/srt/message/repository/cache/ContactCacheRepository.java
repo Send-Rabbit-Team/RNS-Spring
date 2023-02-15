@@ -42,6 +42,9 @@ public class ContactCacheRepository {
         Contact contact = null;
 
         try {
+            if(contactJson == null) // redis expired 됐을 경우
+                return null;
+
             contact = objectMapper.readValue(contactJson, Contact.class);
         }catch(JsonProcessingException e){
             e.printStackTrace();
