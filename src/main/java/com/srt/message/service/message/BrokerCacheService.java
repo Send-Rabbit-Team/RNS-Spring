@@ -14,6 +14,7 @@ import com.srt.message.repository.cache.BrokerCacheRepository;
 import com.srt.message.repository.cache.ContactCacheRepository;
 import com.srt.message.repository.cache.MessageCacheRepository;
 import com.srt.message.repository.redis.RedisHashRepository;
+import com.srt.message.service.PointService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
@@ -24,6 +25,8 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class BrokerCacheService {
     private final ObjectMapper objectMapper;
+
+    private final PointService pointService;
 
     private final BrokerCacheRepository brokerCacheRepository;
     private final MessageCacheRepository messageCacheRepository;
@@ -61,13 +64,9 @@ public class BrokerCacheService {
                 rMessageResult.resendOneDescription(brokerName);
             } else if (retryCount == 3) {
                 rMessageResult.resendTwoDescription(brokerName);
-            }else{ // 실패했을 경우
-                rMessageResult.resendTwoDescription(brokerName);
-                rMessageResult.addDescription("중계사 오류");
-                rMessageResult.changeMessageStatus(MessageStatus.FAIL);
             }
 
-        }else{
+        } else {
             rMessageResult.changeMessageStatus(MessageStatus.SUCCESS);
         }
 
@@ -97,17 +96,61 @@ public class BrokerCacheService {
                 messageResult.requeueDescription(brokerName);
             } else if (retryCount == 2) {
                 messageResult.resendOneDescription(brokerName);
-            } else if (retryCount == 3){
+            } else if (retryCount == 3) {
                 messageResult.resendTwoDescription(brokerName);
-            }else{ // 실패
-                messageResult.resendTwoDescription(brokerName);
-                messageResult.addDescription("중계사 오류");
-                messageResult.changeMessageStatus(MessageStatus.FAIL);
             }
         }
 
         messageResultRepository.save(messageResult);
         log.info("[" + messageResult.getMessageStatus() + "] " + "[" + brokerName + "]" + " MessageResult 객체가 저장되었습니다. id : {}", messageResult.getId());
+    }
+
+    public void saveMessageResultFailure(final MessageResultDto messageResultDto, String brokerName){
+        // RDBMS SAVE
+        Message message = messageCacheRepository.findMessageById(messageResultDto.getMessageId());
+        Contact contact = contactCacheRepository.findContactByContactIdAndMessageId(messageResultDto.getContactId(), messageResultDto.getMessageId());
+        Broker broker = brokerCacheRepository.findBrokerById(messageResultDto.getBrokerId());
+
+        MessageResult messageResult = MessageResult.builder()
+                .message(message)
+                .contact(contact)
+                .broker(broker)
+                .messageStatus(messageResultDto.getMessageStatus())
+                .build();
+
+        messageResult.resendTwoDescription(brokerName);
+        messageResult.addDescription("중계사 오류");
+        messageResult.changeMessageStatus(MessageStatus.FAIL);
+
+        messageResultRepository.save(messageResult);
+        log.info("[" + messageResult.getMessageStatus() + "] " + "[" + brokerName + "]" + " MessageResult 객체가 저장되었습니다. id : {}", messageResult.getId());
+
+        // 환불
+        int refundSmsPoint = pointService.refundMessagePoint(message.getMember(), 1, message.getMessageType());
+        messageResult.addDescription(refundSmsPoint + " 문자당근 환불");
+
+        // 상태 DB (REDIS)
+        String rMessageResultId = messageResultDto.getRMessageResultId();
+
+        // Redis에서 상태 가져오기
+        String statusKey = "message.status." + messageResultDto.getMessageId();
+
+        // Redis에 해당 데이터가 없을 경우 종료
+        if (!redisHashRepository.isExist(statusKey, rMessageResultId))
+            return;
+
+        String jsonRMessageResult = redisHashRepository.findByRMessageResultId(statusKey, rMessageResultId);
+
+        // 상태 업데이트 및 저장
+        RMessageResult rMessageResult = convertToRMessageResult(jsonRMessageResult);
+
+        rMessageResult.resendTwoDescription(brokerName);
+        rMessageResult.addDescription("중계사 오류");
+        rMessageResult.changeMessageStatus(MessageStatus.FAIL);
+
+        rMessageResult.addDescription(refundSmsPoint + " 문자당근 환불");
+
+        redisHashRepository.update(statusKey, rMessageResultId, rMessageResult);
     }
 
     public RMessageResult convertToRMessageResult(String json) {

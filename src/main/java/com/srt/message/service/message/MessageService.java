@@ -13,7 +13,9 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static com.srt.message.config.response.BaseResponseStatus.*;
 import static com.srt.message.config.status.BaseStatus.ACTIVE;
@@ -76,14 +78,10 @@ public class MessageService {
         // MMS 타입인 경우 이미지 저장
         if (message.getMessageType() == MMS) {
             String[] images = messageReq.getMessage().getImages();
-            List<MessageImage> messageImages = new ArrayList<>();
-            for (int i = 0; i < messageImages.size(); i++) {
-                MessageImage messageImage = MessageImage.builder()
-                        .message(message)
-                        .data(images[i])
-                        .build();
-                messageImages.add(messageImage);
-            }
+            List<MessageImage> messageImages =
+                    Arrays.stream(images).map(i -> MessageImage.builder()
+                            .message(message).data(i).build()).collect(Collectors.toList());
+
             messageImageRepository.saveAll(messageImages);
         }
 

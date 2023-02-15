@@ -36,9 +36,6 @@ public class SMSMessageDto {
     )
     private String content;
 
-    @ApiModelProperty(
-            example = "[BSAKJNDNKASDJkfetjoi312oiadsioo21basdop, asdjknasdnasdnjsadkj1241]"
-    )
     private String[] images;
 
     @ApiModelProperty(hidden = true)

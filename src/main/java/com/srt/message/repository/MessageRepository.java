@@ -49,4 +49,8 @@ public interface MessageRepository extends JpaRepository<Message, Long> {
     @Query(value = "select distinct mr.message from MessageResult mr join mr.message where mr.message.member.id = :memberId " +
             "and mr.message.content like %:keyword%")
     Page<Message> findByMessageContent(String keyword, long memberId, Pageable pageable);
+
+    // 실패 제외한 메시지 갯수 가져오기
+    @Query(value = "select count(mr) from MessageResult mr where mr.message.id =: messageId and mr.messageStatus <> 'FAIL'")
+    long countNotInFailure(long messageId);
 }

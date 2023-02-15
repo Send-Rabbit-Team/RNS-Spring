@@ -103,7 +103,6 @@ public class BrokerService {
         String senderPhoneNumber = brokerMessageDto.getMessage().getSenderNumber().getPhoneNumber();
         List<Contact> blockContacts = blockRepository.findContactList(contacts, senderPhoneNumber, ACTIVE);
         for (Contact blockContact : blockContacts) {
-            int blockCnt = 0;
             for (Contact contact : contacts) {
                 if (contact == blockContact) {
                     MessageResult messageResult = MessageResult.builder()
@@ -113,14 +112,13 @@ public class BrokerService {
                             .description("수신 차단")
                             .build();
 
-                    messageResultRepository.save(messageResult);
-                    blockCnt++;
+                    // 환불
+                    int refundSmsPoint = pointService.refundMessagePoint(member, 1, message.getMessageType());
+                    messageResult.addDescription(refundSmsPoint + " 문자당근 환불");
 
-                    log.info("[" + messageResult.getMessageStatus() + "] " + "[수신 차단]" + " MessageResult 객체가 저장되었습니다. id : {}", messageResult.getId());
+                    messageResultRepository.save(messageResult);
                 }
             }
-            // 환불
-//            pointService.chargePoint()
         }
 
         // 브로커 비율 설정
@@ -200,8 +198,7 @@ public class BrokerService {
     // 메시지 발송 실패 처리
     public void processMessageFailure(String brokerName, MessageResultDto messageResultDto) {
         messageResultDto.setRetryCount(MESSAGE_BROKER_DEAD_COUNT);
-        brokerCacheService.updateRMessageResult(messageResultDto, brokerName);
-        brokerCacheService.saveMessageResult(messageResultDto, brokerName);
+        brokerCacheService.saveMessageResultFailure(messageResultDto, brokerName);
 
         log.warn(brokerName + " broker got dead letter - {}", messageResultDto);
     }
