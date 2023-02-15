@@ -30,6 +30,11 @@ public class GetMessageRes {
     @ApiModelProperty(
             example = "새해 복 많이 받으세요."
     )
+    private String title;
+
+    @ApiModelProperty(
+            example = "새해 복 많이 받으세요."
+    )
     private String content;
 
     @ApiModelProperty(
@@ -48,13 +53,11 @@ public class GetMessageRes {
     private String createdAt;
 
     public static GetMessageRes toDto(Message message){
-        String content = (message.getSubject() == null)? message.getContent():
-                message.getSubject() + "\n" + message.getContent();
-
         return GetMessageRes.builder()
                 .messageId(message.getId())
                 .senderNumber(message.getSenderNumber().getPhoneNumber())
-                .content(content)
+                .title(message.getSubject())
+                .content(message.getContent())
                 .messageType(message.getMessageType())
                 .createdAt(message.getCreatedAt().toString())
                 .build();
