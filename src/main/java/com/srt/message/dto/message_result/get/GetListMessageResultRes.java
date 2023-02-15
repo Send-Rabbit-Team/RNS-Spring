@@ -7,12 +7,18 @@ import lombok.*;
 import java.util.HashMap;
 import java.util.List;
 
+import static com.srt.message.config.type.MessageType.LMS;
+import static com.srt.message.config.type.MessageType.SMS;
+
 @Builder
 @AllArgsConstructor
 @Getter
 @Setter
 public class GetListMessageResultRes {
     private long totalCount;
+
+    private long payPoint;
+    private long refundPoint;
 
     private HashMap<String, Integer> broker = new HashMap<>();
     private HashMap<MessageStatus, Integer> messageStatus = new HashMap<>();
@@ -45,5 +51,15 @@ public class GetListMessageResultRes {
     public void addStatusCount(MessageStatus status) {
         int cnt = messageStatus.get(status);
         messageStatus.put(status, ++cnt);
+    }
+
+    public void addTotalPoint(MessageType type, MessageStatus status){
+        int point = type == SMS? 1: type == LMS? 3: 6;
+
+        if(status != MessageStatus.FAIL){
+            this.payPoint += point;
+        }else{
+            this.refundPoint += point;
+        }
     }
 }

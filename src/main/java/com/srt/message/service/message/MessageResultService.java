@@ -31,7 +31,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import static com.srt.message.config.response.BaseResponseStatus.NOT_EXIST_MESSAGE;
 
 @Transactional(readOnly = false)
 @RequiredArgsConstructor
@@ -61,9 +60,9 @@ public class MessageResultService {
     // 메시지 처리 결과 모두 조회
     public GetListMessageResultRes getMessageResultsById(long messageId) throws JsonProcessingException {
         GetListMessageResultRes response = new GetListMessageResultRes();
-        List<GetMessageResultRes> messageResultResList = new ArrayList<>();
+        List<GetMessageResultRes> messageResultResList;
 
-        Message message = messageRepository.findById(messageId).orElseThrow(() -> new BaseException(NOT_EXIST_MESSAGE));
+        Message message = messageRepository.findById(messageId).orElseThrow(() -> new BaseException(BaseResponseStatus.NOT_EXIST_MESSAGE));
 
         // 레디스에 상태 값 저장되어 있는지 확인
         String statusKey = "message.status." + messageId;
@@ -77,6 +76,7 @@ public class MessageResultService {
 
                 response.addBrokerCount(rMessageResult.getBrokerId());
                 response.addStatusCount(rMessageResult.getMessageStatus());
+                response.addTotalPoint(message.getMessageType(), rMessageResult.getMessageStatus());
 
                 rMessageResultList.add(rMessageResult);
             }
@@ -101,6 +101,7 @@ public class MessageResultService {
             messageResultResList.stream().forEach(r -> {
                 response.addBrokerCount(r.getBrokerId());
                 response.addStatusCount(r.getMessageStatus());
+                response.addTotalPoint(message.getMessageType(), r.getMessageStatus());
             });
         }
 

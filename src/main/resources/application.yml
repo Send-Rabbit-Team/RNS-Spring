@@ -53,7 +53,7 @@ server:
 
 ## log4j
 logging:
-  config: classpath:log4j2-deploy.yml
+  config: classpath:log4j2.yml
 
 ## Naver, Kakao i Cloud Secret ##
 cloud:

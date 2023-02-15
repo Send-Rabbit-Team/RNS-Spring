@@ -1,9 +1,15 @@
 package com.srt.message.dto.message.get;
 
+import com.srt.message.config.status.MessageStatus;
 import com.srt.message.config.type.MessageType;
 import com.srt.message.domain.Message;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.*;
+
+import java.util.List;
+
+import static com.srt.message.config.type.MessageType.LMS;
+import static com.srt.message.config.type.MessageType.SMS;
 
 @Builder
 @AllArgsConstructor
@@ -32,12 +38,16 @@ public class GetMessageRes {
     private MessageType messageType;
 
     @ApiModelProperty(
+            example = "ASDKJASDKJASDjk23W"
+    )
+    private List<String> images;
+
+    @ApiModelProperty(
             example = "2023-02-01 14:24:25"
     )
     private String createdAt;
 
     public static GetMessageRes toDto(Message message){
-
         String content = (message.getSubject() == null)? message.getContent():
                 message.getSubject() + "\n" + message.getContent();
 
