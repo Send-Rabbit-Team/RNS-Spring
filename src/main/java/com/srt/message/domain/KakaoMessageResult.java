@@ -37,6 +37,9 @@ public class KakaoMessageResult extends BaseTimeEntity {
     private String description;
 
     // 편의 메서드
+    public void addDescription(String description){
+        this.description += " " + description;
+    }
     public void changeMessageStatus(MessageStatus messageStatus){
         this.messageStatus = messageStatus;
     }

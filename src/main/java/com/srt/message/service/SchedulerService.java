@@ -34,9 +34,11 @@ import static com.srt.message.config.response.BaseResponseStatus.*;
 @RequiredArgsConstructor
 @Service
 public class SchedulerService {
+    private Map<Long, ScheduledFuture<?>> messageScheduledTasks = new ConcurrentHashMap<>();
+    private Map<Long, ScheduledFuture<?>> kakaoScheduledTasks = new ConcurrentHashMap<>();
+
     private final MemberRepository memberRepository;
     private final ReserveKakaoMessageRepository reserveKakaoMessageRepository;
-    private Map<Long, ScheduledFuture<?>> scheduledTasks = new ConcurrentHashMap<>();
 
     private final BrokerService brokerService;
     private final KakaoBrokerService kakaoBrokerService;
@@ -116,7 +118,7 @@ public class SchedulerService {
                 return;
 
             // redis에서 예약 발송 전송 횟수 가져와서 카운팅 처리
-            String countKey = "reserve." + taskId + ".count";
+            String countKey = "reserve.message." + taskId + ".count";
             ValueOperations<String, Object> valueOperation = redisTemplate.opsForValue();
             String count = valueOperation.get(countKey) == null? "0" : (String) valueOperation.get(countKey);
             int sendCount = Integer.parseInt(count);
@@ -125,7 +127,7 @@ public class SchedulerService {
             brokerService.sendSmsMessage(brokerMessageDto);
         }, cronTrigger);
 
-        scheduledTasks.put(taskId, task);
+        messageScheduledTasks.put(taskId, task);
     }
 
     public void registerKakao(BrokerKakaoMessageDto brokerKakaoMessageDto, long taskId) {
@@ -137,7 +139,7 @@ public class SchedulerService {
                 return;
 
             // redis에서 예약 발송 전송 횟수 가져와서 카운팅 처리
-            String countKey = "reserve." + taskId + ".count";
+            String countKey = "reserve.kakao." + taskId + ".count";
             ValueOperations<String, Object> valueOperation = redisTemplate.opsForValue();
             String count = valueOperation.get(countKey) == null? "0" : (String) valueOperation.get(countKey);
             int sendCount = Integer.parseInt(count);
@@ -146,13 +148,26 @@ public class SchedulerService {
             kakaoBrokerService.sendKakaoMessage(brokerKakaoMessageDto);
         }, cronTrigger);
 
-        scheduledTasks.put(taskId, task);
+        kakaoScheduledTasks.put(taskId, task);
     }
 
-    // 스케쥴러 취소
-    public void remove(long reserveMessageId) {
-        if (scheduledTasks.get(reserveMessageId) != null ) {
-            scheduledTasks.get(reserveMessageId).cancel(true);
+    // 메시지 스케쥴러 취소
+    public void deleteMessageReserve(long reserveMessageId) {
+        if (messageScheduledTasks.get(reserveMessageId) != null ) {
+            messageScheduledTasks.get(reserveMessageId).cancel(true);
+            log.info(reserveMessageId + "번 메시지 예약 발송 스케쥴러를 중지합니다.");
+
+            // 예약 발송 카운트 제거
+            redisTemplate.delete("reserve." + reserveMessageId + ".count");
+        }
+        else
+            throw new BaseException(NOT_RESERVE_MESSAGE);
+    }
+
+    // 알림톡 스케쥴러 취소
+    public void deleteKakaoReserve(long reserveMessageId) {
+        if (kakaoScheduledTasks.get(reserveMessageId) != null ) {
+            kakaoScheduledTasks.get(reserveMessageId).cancel(true);
             log.info(reserveMessageId + "번 메시지 예약 발송 스케쥴러를 중지합니다.");
 
             // 예약 발송 카운트 제거

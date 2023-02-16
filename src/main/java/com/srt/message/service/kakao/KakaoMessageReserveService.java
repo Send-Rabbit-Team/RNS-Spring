@@ -88,7 +88,7 @@ public class KakaoMessageReserveService {
         if(reserveKakaoMessage.getStatus() == BaseStatus.INACTIVE)
             throw new BaseException(ALREADY_CANCEL_RESERVE);
 
-        schedulerService.remove(messageId);
+        schedulerService.deleteKakaoReserve(reserveKakaoMessage.getId());
 
         reserveKakaoMessage.changeReserveStatusStop();
         return GetKakaoMessageReserveRes.toDto(reserveKakaoMessageRepository.save(reserveKakaoMessage));

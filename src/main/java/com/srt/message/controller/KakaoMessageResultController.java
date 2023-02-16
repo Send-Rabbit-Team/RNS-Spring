@@ -50,7 +50,7 @@ public class KakaoMessageResultController {
     public BaseResponse<GetKakaoMessageResultListRes> getKakaoMessageResult(
             @PathVariable Long messageId,
             HttpServletRequest request) throws JsonProcessingException {
-        return new BaseResponse<>(kakaoMessageResultService.getKakaoMessageResult(JwtInfo.getMemberId(request), messageId));
+        return new BaseResponse<>(kakaoMessageResultService.getKakaoMessageResult(messageId));
     }
 
 }

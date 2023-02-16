@@ -6,13 +6,13 @@ import java.util.*;
  * 메시지 중계사 분배 발송 알고리즘
  * Weighted round-robin algorithm
  */
-public class BrokerPool{
-    Queue<BrokerWeight> brokerQueue;
-    ArrayList<BrokerWeight> brokers;
+public class BrokerPool<T>{
+    Queue<BrokerWeight<T>> brokerQueue;
+    ArrayList<BrokerWeight<T>> brokers;
     int totalWeight;
     double value;
 
-    public BrokerPool(ArrayList<BrokerWeight> brokers){
+    public BrokerPool(ArrayList<BrokerWeight<T>> brokers){
         this.brokers = brokers;
         this.brokerQueue = new LinkedList<>();
         totalWeight = 0;
@@ -25,8 +25,8 @@ public class BrokerPool{
         value = totalWeight / 100d;
     }
 
-    public BrokerWeight getNext(){
-        BrokerWeight broker = null;
+    public BrokerWeight<T> getNext(){
+        BrokerWeight<T> broker = null;
         while(!brokerQueue.isEmpty()){
             BrokerWeight brokerWeight = brokerQueue.poll();
             double currentWeight = brokerWeight.getCurrentWeight();

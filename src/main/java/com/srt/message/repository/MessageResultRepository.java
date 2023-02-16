@@ -16,5 +16,5 @@ public interface MessageResultRepository extends JpaRepository<MessageResult, Lo
     Optional<MessageResult> findByContactAndMessage(Contact contact, Message message);
 
     @EntityGraph(value = "Contact")
-    List<MessageResult> findAllByDescriptionLike(String description);
+    List<MessageResult> findAllByMessageAndDescriptionLike(Message message, String description);
 }
