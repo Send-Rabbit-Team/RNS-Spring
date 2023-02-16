@@ -27,6 +27,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -79,7 +80,7 @@ public class KakaoMessageResultService {
             List<Long> contactIdList = rKakaoMessageResultList.stream()
                     .map(RKakaoMessageResult::getContactId).collect(Collectors.toList());
             List<Contact> contactList = contactRepository.findAllInContactIdList(contactIdList);
-            Map<Long, Contact> contactMap = contactList.stream().collect(Collectors.toMap(Contact::getId, c -> c));
+            HashMap<Long, Contact> contactMap = new HashMap<>(contactList.stream().collect(Collectors.toMap(Contact::getId, c -> c)));
 
             kakaoResultResList = rKakaoMessageResultList.stream().parallel().
                     map(r -> getKakaoMessageResultRes(r, contactMap.get(r.getContactId()))).collect(Collectors.toList());

@@ -27,6 +27,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -83,7 +84,7 @@ public class MessageResultService {
 
             List<Long> contactIdList = rMessageResultList.stream().map(RMessageResult::getContactId).collect(Collectors.toList());
             List<Contact> contactList = contactRepository.findAllInContactIdList(contactIdList);
-            Map<Long, Contact> contactMap = contactList.stream().collect(Collectors.toMap(Contact::getId, c -> c));
+            HashMap<Long, Contact> contactMap = new HashMap<>(contactList.stream().collect(Collectors.toMap(Contact::getId, c -> c)));
 
             messageResultResList = rMessageResultList.stream().parallel().
                     map(r -> getMessageResultRes(r, contactMap.get(r.getContactId()))).collect(Collectors.toList());
