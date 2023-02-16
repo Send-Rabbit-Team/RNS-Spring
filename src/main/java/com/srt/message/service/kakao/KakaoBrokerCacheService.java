@@ -71,7 +71,7 @@ public class KakaoBrokerCacheService {
 
     public void saveMessageResult(final KakaoMessageResultDto kakaoMessageResultDto, String brokerName) {
         KakaoMessage kakaoMessage = messageCacheRepository.findKakaoMessageById(kakaoMessageResultDto.getMessageId());
-        Contact contact = contactCacheRepository.findContactById(kakaoMessageResultDto.getContactId());
+        Contact contact = contactCacheRepository.findContactByContactIdAndMessageId(kakaoMessageResultDto.getContactId(), kakaoMessageResultDto.getMessageId());
         KakaoBroker kakaoBroker = brokerCacheRepository.findKakaoBrokerById(kakaoMessageResultDto.getBrokerId());
 
         KakaoMessageResult kakaoMessageResult = KakaoMessageResult.builder()
@@ -105,7 +105,7 @@ public class KakaoBrokerCacheService {
     public void saveMessageResultFailure(final KakaoMessageResultDto kakaoMessageResultDto, String brokerName){
         // RDBMS SAVE
         KakaoMessage kakaoMessage = messageCacheRepository.findKakaoMessageById(kakaoMessageResultDto.getMessageId());
-        Contact contact = contactCacheRepository.findContactById(kakaoMessageResultDto.getContactId());
+        Contact contact = contactCacheRepository.findContactByContactIdAndMessageId(kakaoMessageResultDto.getContactId(), kakaoMessageResultDto.getMessageId());
         KakaoBroker kakaoBroker = brokerCacheRepository.findKakaoBrokerById(kakaoMessageResultDto.getBrokerId());
 
         KakaoMessageResult kakaoMessageResult = KakaoMessageResult.builder()

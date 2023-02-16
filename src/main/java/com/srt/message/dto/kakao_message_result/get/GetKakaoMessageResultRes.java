@@ -14,7 +14,9 @@ public class GetKakaoMessageResultRes {
     private String contactNumber;
     private String contactMemo;
     private String contactGroup;
+    private long kakaoBrokerId;
     private String kakaoBrokerName;
+    private String description;
     private MessageStatus messageStatus;
     private String createdAt;
 

@@ -8,4 +8,6 @@ import java.util.List;
 public interface KakaoMessageResultRepository extends JpaRepository<KakaoMessageResult, Long> {
 
     List<KakaoMessageResult> findKakaoMessageResultByKakaoMessageId(Long kakaoMessageId);
+
+    List<KakaoMessageResult> findAllByKakaoMessageIdOrderByIdDesc(long kakaoMessageId);
 }
