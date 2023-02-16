@@ -88,7 +88,7 @@ public class ReserveMessageService {
         if(reserveMessage.getReserveStatus() == ReserveStatus.STOP)
             throw new BaseException(ALREADY_CANCEL_RESERVE);
 
-        schedulerService.remove(reserveMessage.getId());
+        schedulerService.deleteMessageReserve(reserveMessage.getId());
 
         reserveMessage.changeReserveStatusStop();
         reserveMessageRepository.save(reserveMessage);

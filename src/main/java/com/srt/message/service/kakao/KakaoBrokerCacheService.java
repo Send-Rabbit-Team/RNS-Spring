@@ -5,12 +5,15 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.srt.message.config.status.MessageStatus;
 import com.srt.message.domain.*;
 import com.srt.message.domain.redis.RKakaoMessageResult;
+import com.srt.message.domain.redis.RMessageResult;
 import com.srt.message.dto.message_result.KakaoMessageResultDto;
+import com.srt.message.dto.message_result.MessageResultDto;
 import com.srt.message.repository.KakaoMessageResultRepository;
 import com.srt.message.repository.cache.BrokerCacheRepository;
 import com.srt.message.repository.cache.ContactCacheRepository;
 import com.srt.message.repository.cache.MessageCacheRepository;
 import com.srt.message.repository.redis.RedisHashRepository;
+import com.srt.message.service.PointService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
@@ -20,6 +23,8 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class KakaoBrokerCacheService {
     private final ObjectMapper objectMapper;
+
+    private final PointService pointService;
 
     private final BrokerCacheRepository brokerCacheRepository;
     private final MessageCacheRepository messageCacheRepository;
@@ -95,6 +100,54 @@ public class KakaoBrokerCacheService {
 
         log.info("[" + kakaoMessageResult.getMessageStatus() + "] " + "[" + brokerName + "]" +
                 "KakaoMessageResult 객체가 저장되었습니다. id : {}", kakaoMessageResult.getId());
+    }
+
+    public void saveMessageResultFailure(final KakaoMessageResultDto kakaoMessageResultDto, String brokerName){
+        // RDBMS SAVE
+        KakaoMessage kakaoMessage = messageCacheRepository.findKakaoMessageById(kakaoMessageResultDto.getMessageId());
+        Contact contact = contactCacheRepository.findContactById(kakaoMessageResultDto.getContactId());
+        KakaoBroker kakaoBroker = brokerCacheRepository.findKakaoBrokerById(kakaoMessageResultDto.getBrokerId());
+
+        KakaoMessageResult kakaoMessageResult = KakaoMessageResult.builder()
+                .kakaoMessage(kakaoMessage)
+                .contact(contact)
+                .kakaoBroker(kakaoBroker)
+                .messageStatus(kakaoMessageResultDto.getMessageStatus())
+                .build();
+
+        kakaoMessageResult.resendOneDescription(brokerName);
+        kakaoMessageResult.addDescription("중계사 오류");
+        kakaoMessageResult.changeMessageStatus(MessageStatus.FAIL);
+
+        kakaoMessageResultRepository.save(kakaoMessageResult);
+        log.info("[" + kakaoMessageResult.getMessageStatus() + "] " + "[" + brokerName + "]" + " MessageResult 객체가 저장되었습니다. id : {}", kakaoMessageResult.getId());
+
+        // 환불
+        int refundSmsPoint = pointService.refundKakaoPoint(kakaoMessage.getMember(), 1);
+        kakaoMessageResult.addDescription(refundSmsPoint + " 알림톡 당근 환불");
+
+        // 상태 DB (REDIS)
+        String rMessageResultId = kakaoMessageResultDto.getRMessageResultId();
+
+        // Redis에서 상태 가져오기
+        String statusKey = "message.status." + kakaoMessageResultDto.getMessageId();
+
+        // Redis에 해당 데이터가 없을 경우 종료
+        if (!redisHashRepository.isExist(statusKey, rMessageResultId))
+            return;
+
+        String jsonRMessageResult = redisHashRepository.findByRMessageResultId(statusKey, rMessageResultId);
+
+        // 상태 업데이트 및 저장
+        RKakaoMessageResult rMessageResult = convertToRMessageResult(jsonRMessageResult);
+
+        rMessageResult.resendOneDescription(brokerName);
+        rMessageResult.addDescription("중계사 오류");
+        rMessageResult.changeMessageStatus(MessageStatus.FAIL);
+
+        rMessageResult.addDescription(refundSmsPoint + " 문자당근 환불");
+
+        redisHashRepository.update(statusKey, rMessageResultId, rMessageResult);
     }
 
     public RKakaoMessageResult convertToRMessageResult(String json) {

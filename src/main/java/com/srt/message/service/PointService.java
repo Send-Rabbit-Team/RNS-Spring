@@ -39,7 +39,7 @@ public class PointService {
         return GetPointRes.toDto(pointRepository.save(point));
     }
 
-    // 메시지 포인트 환불
+    // 포인트 환불 (SMS)
     public int refundMessagePoint(Member member, int amount, MessageType messageType){
         int weight = messageType == MessageType.SMS? 1 : messageType == MessageType.LMS? 3 : 6;
         Point point = getExistPointOrMakeDefault(member);
@@ -48,6 +48,16 @@ public class PointService {
         point.addSmsPoint(refundSmsPoint);
 
         return refundSmsPoint;
+    }
+
+    // 포인트 환불 (Kakao)
+    public int refundKakaoPoint(Member member, int amount){
+        Point point = getExistPointOrMakeDefault(member);
+
+        int refundKakaoPoint = amount;
+        point.addKakaoPoint(refundKakaoPoint);
+
+        return refundKakaoPoint;
     }
 
     // 포인트 검증
