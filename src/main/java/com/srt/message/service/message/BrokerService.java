@@ -118,6 +118,7 @@ public class BrokerService {
                     messageResult.addDescription(refundSmsPoint + " 문자당근 환불");
 
                     messageResultRepository.save(messageResult);
+                    break;
                 }
             }
         }

@@ -39,7 +39,5 @@ class ContactRepositoryTest {
                     .build();
             contactRepository.save(contact);
         }
-
     }
-
 }

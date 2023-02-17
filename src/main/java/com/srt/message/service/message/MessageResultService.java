@@ -91,8 +91,11 @@ public class MessageResultService {
 
             // 수신 차단 메시지 따로 추가
             List<MessageResult> blockMessages = messageResultRepository.findAllByMessageAndDescriptionLike(message, "%수신 차단%");
-            for(MessageResult m: blockMessages)
+            for(MessageResult m: blockMessages){
+                response.addStatusCount (m.getMessageStatus());
+                response.addTotalPoint(message.getMessageType(), m.getMessageStatus());
                 messageResultResList.add(getMessageResultRes(m));
+            }
 
         } else { // RDBMS에서 조회
             List<MessageResult> messageResults = messageResultRepository.findAllByMessageIdOrderByIdDesc(messageId);
