@@ -63,7 +63,7 @@ public class MessageController {
         return new BaseResponse<>("메시지 갯수: " + postKakaoMessageReq.getCount() + ", 메시지 발송 걸린 시간: " + Double.parseDouble(processTime) / 1000 + "초");
     }
 
-/*    @ApiOperation(
+    @ApiOperation(
             value = "MMS 메시지 이미지 리스트 조회",
             notes = "메시지 이미지들을 반환한다."
     )
@@ -79,5 +79,5 @@ public class MessageController {
         log.info("MMS 이미지 조회 - memberId: {}, messageId: {}", JwtInfo.getMemberId(request), messageId);
 
         return new BaseResponse<>(getMessageImageRes);
-    }*/
+    }
 }
