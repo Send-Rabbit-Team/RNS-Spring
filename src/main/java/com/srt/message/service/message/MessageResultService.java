@@ -160,6 +160,7 @@ public class MessageResultService {
                 .build();
 
         Broker broker = messageResult.getBroker();
+
         if(broker != null){
             getMessageResultRes.setBrokerId(broker.getId());
             getMessageResultRes.setBrokerName(broker.getName());

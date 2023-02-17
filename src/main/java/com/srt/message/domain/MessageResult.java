@@ -14,9 +14,13 @@ import javax.persistence.*;
         @NamedAttributeNode(value = "contact")
 })
 @NamedEntityGraph(name = "Contact.Broker", attributeNodes = {
-        @NamedAttributeNode(value = "contact"),
-        @NamedAttributeNode(value = "broker"),
-})
+        @NamedAttributeNode(value = "contact", subgraph = "contactGroup"),
+        @NamedAttributeNode(value = "broker")
+},
+        subgraphs = @NamedSubgraph(name = "contactGroup", attributeNodes = {
+                @NamedAttributeNode("contactGroup")
+        })
+)
 
 @Builder
 @AllArgsConstructor

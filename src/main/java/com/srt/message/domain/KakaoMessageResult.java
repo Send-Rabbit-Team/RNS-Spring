@@ -9,6 +9,15 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 
+@NamedEntityGraph(name = "Contact.KakaoBroker", attributeNodes = {
+        @NamedAttributeNode(value = "contact", subgraph = "contactGroup"),
+        @NamedAttributeNode(value = "kakaoBroker")
+},
+        subgraphs = @NamedSubgraph(name = "contactGroup", attributeNodes = {
+                @NamedAttributeNode("contactGroup")
+        })
+)
+
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
