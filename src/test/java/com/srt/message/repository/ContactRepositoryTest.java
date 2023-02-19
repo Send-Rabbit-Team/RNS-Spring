@@ -1,13 +1,14 @@
 package com.srt.message.repository;
 
+import com.srt.message.domain.Block;
 import com.srt.message.domain.Contact;
 import com.srt.message.domain.ContactGroup;
 import com.srt.message.domain.Member;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -19,25 +20,58 @@ class ContactRepositoryTest {
     ContactRepository contactRepository;
     @Autowired
     private ContactGroupRepository contactGroupRepository;
+    @Autowired
+    private BlockRepository blockRepository;
 
     @Test
-    void registerContact() {
+    void registerTestGroup() {
+        Member member = memberRepository.findById(5L).orElseThrow(null);
+
+        ContactGroup contactGroup = ContactGroup.builder()
+                .member(member)
+                .name("Test Group")
+                .build();
+        contactGroupRepository.save(contactGroup);
+
+        for (int i = 1; i <= 9000; i++) {
+            Contact contact = Contact.builder()
+                    .member(member)
+                    .contactGroup(contactGroup)
+                    .memo("Test User " + Integer.toString(i))
+                    .phoneNumber("010" + RandomStringUtils.randomNumeric(8))
+                    .build();
+            contactRepository.save(contact);
+        }
+
+    }
+
+    @Test
+    void registerBlockGroup() {
         Member member = memberRepository.findById(1L).orElseThrow(null);
 
         ContactGroup contactGroup = ContactGroup.builder()
                 .member(member)
-                .name("Test 집단")
+                .name("Block Test Group")
                 .build();
         contactGroupRepository.save(contactGroup);
 
-        for (int i = 1; i <= 10000; i++) {
+        for (int i = 1; i <= 1000; i++) {
+            String phoneNumber = "010" + RandomStringUtils.randomNumeric(8);
             Contact contact = Contact.builder()
                     .member(member)
                     .contactGroup(contactGroup)
-                    .memo("TestUser" + Integer.toString(i))
-                    .phoneNumber("010" + UUID.randomUUID().toString().substring(0,9))
+                    .memo("Block Test User " + Integer.toString(i))
+                    .phoneNumber(phoneNumber)
                     .build();
             contactRepository.save(contact);
+
+            Block block = Block.builder()
+                    .senderNumber("01025291674")
+                    .receiveNumber(phoneNumber)
+                    .build();
+            blockRepository.save(block);
         }
+
     }
+
 }

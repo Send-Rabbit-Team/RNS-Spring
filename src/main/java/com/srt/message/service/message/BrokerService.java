@@ -105,7 +105,7 @@ public class BrokerService {
         List<Contact> blockContacts = blockRepository.findContactList(contacts, senderPhoneNumber, ACTIVE);
         for (Contact blockContact : blockContacts) {
             for (Contact contact : contacts) {
-                if (contact == blockContact) {
+                if (contact.getPhoneNumber().equals(blockContact.getPhoneNumber())) {
                     MessageResult messageResult = MessageResult.builder()
                             .message(message)
                             .contact(blockContact)
@@ -117,6 +117,7 @@ public class BrokerService {
                     int refundSmsPoint = pointService.refundMessagePoint(member, 1, message.getMessageType());
                     messageResult.addDescription(refundSmsPoint + " 문자당근 환불");
 
+                    contacts.remove(contact);
                     messageResultRepository.save(messageResult);
                     break;
                 }
