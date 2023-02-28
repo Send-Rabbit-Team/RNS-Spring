@@ -12,6 +12,7 @@ import com.srt.message.dto.message_rule.post.PostSMSRuleRes;
 import com.srt.message.repository.BrokerRepository;
 import com.srt.message.repository.MemberRepository;
 import com.srt.message.repository.MessageRuleRepository;
+import com.srt.message.service.message.MessageRuleService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -138,9 +139,9 @@ class MessageRuleServiceTest {
         doReturn(Optional.ofNullable(brokers.get(1))).when(brokerRepository).findById(2L);
         doReturn(Optional.ofNullable(brokers.get(2))).when(brokerRepository).findById(3L);
 
-        doReturn(Optional.ofNullable(messageRules.get(0))).when(messageRuleRepository).findByBroker(brokers.get(0));
-        doReturn(Optional.ofNullable(messageRules.get(1))).when(messageRuleRepository).findByBroker(brokers.get(1));
-        doReturn(Optional.ofNullable(messageRules.get(2))).when(messageRuleRepository).findByBroker(brokers.get(2));
+        doReturn(Optional.ofNullable(messageRules.get(0))).when(messageRuleRepository).findByMemberIdAndBroker(member.getId(), brokers.get(0));
+        doReturn(Optional.ofNullable(messageRules.get(1))).when(messageRuleRepository).findByMemberIdAndBroker(member.getId(), brokers.get(1));
+        doReturn(Optional.ofNullable(messageRules.get(2))).when(messageRuleRepository).findByMemberIdAndBroker(member.getId(), brokers.get(2));
 
         // given
         PatchSMSRuleRes response = messageRuleService.editSmsRule(request, member.getId());

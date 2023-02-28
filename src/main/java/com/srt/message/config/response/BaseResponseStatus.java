@@ -48,6 +48,11 @@ public enum BaseResponseStatus {
     NOT_EXIST_POINT(false, 2028, "존재하지 않는 포인트입니다."),
     INSUFFICIENT_POINT(false, 2029, "포인트가 부족합니다."),
     INVALID_KAKAO_PAY(false, 2030, "카카오페이 인증이 유효하지 않습니다."),
+    NOT_EXIST_BLOCK_NUMBER(false, 2031, "존재하지 않는 수신 차단 번호입니다."),
+    ALREADY_EXIST_BLOCK(false, 2032, "이미 차단된 번호입니다."),
+    NOT_MMS_TYPE(false, 2033, "이미지 타입의 메시지가 아닙니다."),
+    UNDELETABLE_SENDER_NUMBER(false, 2034, "삭제할 수 없는 발신번호입니다."),
+
 
 
 

@@ -2,12 +2,15 @@ package com.srt.message.domain;
 
 import com.srt.message.config.domain.BaseEntity;
 import com.srt.message.config.type.MessageType;
+import jdk.jfr.Name;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @NamedEntityGraph(name = "Message.with.Member.SenderNumber", attributeNodes = {
         @NamedAttributeNode(value = "member", subgraph = "member_company"),
@@ -17,6 +20,7 @@ import javax.persistence.*;
                 @NamedAttributeNode("company")
         })
 )
+
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
@@ -39,6 +43,8 @@ public class Message extends BaseEntity {
     private String subject;
 
     private String content;
+
+    private long cost;
 
     @Enumerated(EnumType.STRING)
     private MessageType messageType;

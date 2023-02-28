@@ -2,12 +2,11 @@ package com.srt.message.controller;
 
 import com.srt.message.config.page.PageResult;
 import com.srt.message.config.response.BaseResponse;
-import com.srt.message.domain.Template;
 import com.srt.message.dto.jwt.JwtInfo;
 import com.srt.message.dto.template.get.GetTemplateRes;
 import com.srt.message.dto.template.patch.PatchTemplateReq;
 import com.srt.message.dto.template.post.PostTemplateReq;
-import com.srt.message.service.TemplateService;
+import com.srt.message.service.message.TemplateService;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;

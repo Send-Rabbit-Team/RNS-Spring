@@ -1,7 +1,7 @@
 package com.srt.message.controller;
 
 import com.srt.message.config.response.BaseResponse;
-import com.srt.message.service.KakaoMessageRuleService;
+import com.srt.message.service.kakao.KakaoMessageRuleService;
 import com.srt.message.dto.jwt.JwtInfo;
 import com.srt.message.dto.kakaoMessageRule.get.GetKakaoMessageRuleRes;
 import com.srt.message.dto.kakaoMessageRule.patch.PatchKakaoMessageRuleReq;

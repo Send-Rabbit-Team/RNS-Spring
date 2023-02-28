@@ -2,8 +2,7 @@ package com.srt.message.controller;
 
 import com.srt.message.config.page.PageResult;
 import com.srt.message.config.response.BaseResponse;
-import com.srt.message.domain.KakaoTemplate;
-import com.srt.message.service.KakaoTemplateService;
+import com.srt.message.service.kakao.KakaoTemplateService;
 import com.srt.message.dto.jwt.JwtInfo;
 import com.srt.message.dto.kakaoTemplate.get.GetKakaoTemplateRes;
 import com.srt.message.dto.kakaoTemplate.patch.PatchKakaoTemplateReq;

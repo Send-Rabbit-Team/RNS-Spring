@@ -1,4 +1,4 @@
-package com.srt.message.service.rabbit;
+package com.srt.message.service.message;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -6,15 +6,16 @@ import com.srt.message.config.status.MessageStatus;
 import com.srt.message.domain.*;
 import com.srt.message.domain.redis.RMessageResult;
 import com.srt.message.dto.message.BrokerSendMessageDto;
+import com.srt.message.repository.BlockRepository;
 import com.srt.message.repository.BrokerRepository;
-import com.srt.message.repository.ReserveMessageRepository;
+import com.srt.message.repository.MessageResultRepository;
 import com.srt.message.repository.redis.RedisHashRepository;
 import com.srt.message.repository.redis.RedisListRepository;
 import com.srt.message.dto.message.BrokerMessageDto;
 import com.srt.message.dto.message.SMSMessageDto;
 import com.srt.message.dto.message_result.MessageResultDto;
 import com.srt.message.repository.MessageRuleRepository;
-import com.srt.message.service.SchedulerService;
+import com.srt.message.service.PointService;
 import com.srt.message.utils.algorithm.BrokerPool;
 import com.srt.message.utils.algorithm.BrokerWeight;
 import lombok.RequiredArgsConstructor;
@@ -25,12 +26,16 @@ import org.springframework.amqp.core.MessageProperties;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.context.annotation.Scope;
 import org.springframework.context.annotation.ScopedProxyMode;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+import static com.srt.message.config.status.BaseStatus.ACTIVE;
+import static com.srt.message.dlx.DlxProcessingErrorHandler.MESSAGE_BROKER_DEAD_COUNT;
 import static com.srt.message.utils.rabbitmq.RabbitSMSUtil.SMS_EXCHANGE_NAME;
 
 
@@ -42,15 +47,22 @@ public class BrokerService {
     private final int TMP_MESSAGE_DURATION = 5 * 60;
     private final int VALUE_MESSAGE_DURATION = 10 * 60;
 
+    private final ObjectMapper objectMapper;
+
+    private final RabbitTemplate rabbitTemplate;
+    private final RedisTemplate<String, Contact> redisTemplate;
+
+    private final BrokerCacheService brokerCacheService;
+    private final PointService pointService;
+
     private final RedisHashRepository redisHashRepository;
     private final RedisListRepository redisListRepository;
 
-    private final RabbitTemplate rabbitTemplate;
+    private final BlockRepository blockRepository;
 
     private final BrokerRepository brokerRepository;
     private final MessageRuleRepository messageRuleRepository;
-
-    private final ObjectMapper objectMapper;
+    private final MessageResultRepository messageResultRepository;
 
     private SMSMessageDto smsMessageDto;
     private Message message;
@@ -83,12 +95,37 @@ public class BrokerService {
         String tmpKey = "message.tmp." + message.getId();
         redisListRepository.rightPushAll(tmpKey, rMessageResultDtos, TMP_MESSAGE_DURATION);
 
-        String valueKey ="message.value." + message.getId(); // tmp에서 TTL 만료됐을 경우 value값 꺼내오는 용도
+        String valueKey = "message.value." + message.getId(); // tmp에서 TTL 만료됐을 경우 value값 꺼내오는 용도
         redisListRepository.rightPushAll(valueKey, rMessageResultDtos, VALUE_MESSAGE_DURATION);
 
         Member member = brokerMessageDto.getMember();
 
+        // 수신 차단 처리
+        String senderPhoneNumber = brokerMessageDto.getMessage().getSenderNumber().getPhoneNumber();
+        List<Contact> blockContacts = blockRepository.findContactList(contacts, senderPhoneNumber, ACTIVE);
+        for (Contact blockContact : blockContacts) {
+            for (Contact contact : contacts) {
+                if (contact.getPhoneNumber().equals(blockContact.getPhoneNumber())) {
+                    MessageResult messageResult = MessageResult.builder()
+                            .message(message)
+                            .contact(blockContact)
+                            .messageStatus(MessageStatus.FAIL)
+                            .description("수신 차단")
+                            .build();
+
+                    // 환불
+                    int refundSmsPoint = pointService.refundMessagePoint(member, 1, message.getMessageType());
+                    messageResult.addDescription(refundSmsPoint + " 문자당근 환불");
+
+                    contacts.remove(contact);
+                    messageResultRepository.save(messageResult);
+                    break;
+                }
+            }
+        }
+
         // 브로커 비율 설정
+        Map<Long, String> brokerMap = new HashMap<>();
         List<MessageRule> messageRules = messageRuleRepository.findAllByMember(member);
         if (messageRules.isEmpty()) { // 발송 규칙을 설정 안했을 경우
             List<Broker> brokers = brokerRepository.findAll();
@@ -100,30 +137,52 @@ public class BrokerService {
             }
         }
 
-        ArrayList<BrokerWeight> brokerWeights = new ArrayList<>();
+        ArrayList<BrokerWeight<Broker>> brokerWeights = new ArrayList<>();
         for (MessageRule messageRule : messageRules) {
-            brokerWeights.add(new BrokerWeight(messageRule.getBroker(), messageRule.getBrokerRate()));
+            brokerWeights.add(new BrokerWeight<>(messageRule.getBroker(), messageRule.getBrokerRate()));
+
+            Broker broker = messageRule.getBroker();
+            brokerMap.put(broker.getId(), broker.getName().toLowerCase());
         }
 
-        BrokerPool brokerPool = new BrokerPool(brokerWeights);
+        BrokerPool<Broker> brokerPool = new BrokerPool<>(brokerWeights);
 
-        HashMap<String, String> rMessageResultList = new HashMap<>();
-        // 각 중개사 비율에 맞게 보내기
+        HashMap<String, String> rMessageResultMap = new HashMap<>();
+        HashMap<String, String> contactMap = new HashMap<>();
+
+        // 상태 DB에 저장하기
         for (int i = 0; i < contacts.size(); i++) {
-            Broker broker = (Broker) brokerPool.getNext().getBroker();
-            String routingKey = "sms.send." + broker.getName().toLowerCase();
+            if (blockContacts.contains(contacts.get(i))) // 수신 차단 된 번호면 스킵
+                continue;
 
+            Broker broker = (Broker) brokerPool.getNext().getBroker();
             smsMessageDto.setTo(contacts.get(i).getPhoneNumber());
 
             // Redis에서 MessageResultDTO 꺼내오기
-            MessageResultDto messageResultDto = messageResultDtos.get(0);
-            messageResultDto.setBrokerId(broker.getId());
+            MessageResultDto messageResultDto = messageResultDtos.get(i);
+            messageResultDtos.get(i).setBrokerId(broker.getId());
+
+            // 연락처 캐싱용
+            Contact contact = contacts.get(i);
+            contactMap.put(String.valueOf(contact.getId()), convertToJson(contact));
 
             // 상태 값 저장
             RMessageResult rMessageResult = MessageResultDto.toRMessageResult(messageResultDto);
-            rMessageResultList.put(rMessageResult.getId(), convertToJson(rMessageResult));
+            rMessageResultMap.put(rMessageResult.getId(), convertToJson(rMessageResult));
+        }
+        String contactKey = "message.contact." + message.getId();
+        redisHashRepository.saveContactAll(contactKey, contactMap);
 
+        String statusKey = "message.status." + message.getId();
+        redisHashRepository.saveAll(statusKey, rMessageResultMap);
+
+        // 각 중개사 비율에 맞게 보내기
+        for (int i = 0; i < contacts.size(); i++) {
+            MessageResultDto messageResultDto = messageResultDtos.get(i);
             BrokerSendMessageDto brokerSendMessageDto = new BrokerSendMessageDto(smsMessageDto, messageResultDto);
+
+            long brokerId = messageResultDto.getBrokerId();
+            String routingKey = "sms.work." + brokerMap.get(brokerId);
 
             // AMQP Message Builder
             org.springframework.amqp.core.Message amqpMessage = MessageBuilder
@@ -136,9 +195,6 @@ public class BrokerService {
             log.info((i + 1) + " 번째 메시지가 전송되었습니다 - " + routingKey);
         }
 
-        String statusKey = "message.status." + message.getId();
-        redisHashRepository.saveAll(statusKey, rMessageResultList);
-
         // 임시 저장된 값 제거
         redisListRepository.remove(tmpKey);
         redisListRepository.remove(valueKey);
@@ -148,6 +204,14 @@ public class BrokerService {
         String processTime = String.valueOf(stopWatch.getTime());
         log.info("Process Time: {} ", processTime);
         return processTime;
+    }
+
+    // 메시지 발송 실패 처리
+    public void processMessageFailure(String brokerName, MessageResultDto messageResultDto) {
+        messageResultDto.setRetryCount(MESSAGE_BROKER_DEAD_COUNT);
+        brokerCacheService.saveMessageResultFailure(messageResultDto, brokerName);
+
+        log.warn(brokerName + " broker got dead letter - {}", messageResultDto);
     }
 
     // Json 형태로 반환

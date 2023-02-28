@@ -7,7 +7,7 @@ import com.srt.message.dto.message_rule.patch.PatchSMSRuleReq;
 import com.srt.message.dto.message_rule.patch.PatchSMSRuleRes;
 import com.srt.message.dto.message_rule.post.PostSMSRuleReq;
 import com.srt.message.dto.message_rule.post.PostSMSRuleRes;
-import com.srt.message.service.MessageRuleService;
+import com.srt.message.service.message.MessageRuleService;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;

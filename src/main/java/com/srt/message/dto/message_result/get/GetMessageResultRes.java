@@ -31,12 +31,17 @@ public class GetMessageResultRes {
     @ApiModelProperty(
             example = "1"
     )
-    private long brokerId;
+    private Long brokerId;
 
     @ApiModelProperty(
             example = "KT"
     )
     private String brokerName;
+
+    @ApiModelProperty(
+            example = "skt -> kt -> lg"
+    )
+    private String description;
 
     @ApiModelProperty(
             example = "SUCCESS"

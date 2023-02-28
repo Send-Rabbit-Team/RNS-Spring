@@ -2,6 +2,7 @@ package com.srt.message.service;
 
 import com.srt.message.config.exception.BaseException;
 import com.srt.message.config.status.BaseStatus;
+import com.srt.message.config.type.MessageType;
 import com.srt.message.domain.Member;
 import com.srt.message.domain.Point;
 import com.srt.message.dto.point.get.GetPointRes;
@@ -36,6 +37,27 @@ public class PointService {
         point.addSmsPoint(smsPoint);
         point.addKakaoPoint(kakaoPoint);
         return GetPointRes.toDto(pointRepository.save(point));
+    }
+
+    // 포인트 환불 (SMS)
+    public int refundMessagePoint(Member member, int amount, MessageType messageType){
+        int weight = messageType == MessageType.SMS? 1 : messageType == MessageType.LMS? 3 : 6;
+        Point point = getExistPointOrMakeDefault(member);
+
+        int refundSmsPoint = amount * weight;
+        point.addSmsPoint(refundSmsPoint);
+
+        return refundSmsPoint;
+    }
+
+    // 포인트 환불 (Kakao)
+    public int refundKakaoPoint(Member member, int amount){
+        Point point = getExistPointOrMakeDefault(member);
+
+        int refundKakaoPoint = amount;
+        point.addKakaoPoint(refundKakaoPoint);
+
+        return refundKakaoPoint;
     }
 
     // 포인트 검증

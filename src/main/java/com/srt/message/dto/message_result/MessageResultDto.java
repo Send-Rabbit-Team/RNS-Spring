@@ -26,6 +26,8 @@ public class MessageResultDto {
 
     private MessageStatus messageStatus;
 
+    private long retryCount;
+
     private LocalDateTime createdAt;
 
     public static RMessageResult toRMessageResult(MessageResultDto dto){
@@ -33,7 +35,7 @@ public class MessageResultDto {
                 .id(dto.getRMessageResultId())
                 .messageId(dto.messageId)
                 .brokerId(dto.brokerId)
-                .contactId(dto.brokerId)
+                .contactId(dto.contactId)
                 .messageStatus(dto.messageStatus)
                 .build();
     }

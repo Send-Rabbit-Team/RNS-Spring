@@ -1,11 +1,13 @@
 package com.srt.message.controller;
 
 import com.srt.message.config.response.BaseResponse;
-import com.srt.message.service.KakaoMessageService;
+import com.srt.message.dto.message_image.get.GetMessageImageRes;
+import com.srt.message.service.kakao.KakaoMessageService;
 import com.srt.message.dto.jwt.JwtInfo;
 import com.srt.message.dto.kakao_message.post.PostKakaoMessageReq;
 import com.srt.message.dto.message.post.PostSendMessageReq;
-import com.srt.message.service.MessageService;
+import com.srt.message.service.message.MessageImageService;
+import com.srt.message.service.message.MessageService;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
@@ -21,6 +23,8 @@ import javax.servlet.http.HttpServletRequest;
 @RequiredArgsConstructor
 public class MessageController {
     private final MessageService messageService;
+
+    private final MessageImageService messageImageService;
 
     private final KakaoMessageService kakaoMessageService;
 
@@ -57,5 +61,23 @@ public class MessageController {
         log.info("중계사 알림톡 전송 - memberId: {}, postSendMessageReq: {}", JwtInfo.getMemberId(request), postKakaoMessageReq);
 
         return new BaseResponse<>("메시지 갯수: " + postKakaoMessageReq.getCount() + ", 메시지 발송 걸린 시간: " + Double.parseDouble(processTime) / 1000 + "초");
+    }
+
+    @ApiOperation(
+            value = "MMS 메시지 이미지 리스트 조회",
+            notes = "메시지 이미지들을 반환한다."
+    )
+    @ApiResponses({
+            @ApiResponse(code = 1000, message = "요청에 성공하였습니다."),
+            @ApiResponse(code = 2023, message = "존재하는 메시지가 아닙니다."),
+            @ApiResponse(code = 2033, message = "이미지 타입의 메시지가 아닙니다."),
+    })
+    @GetMapping("/images")
+    public BaseResponse<GetMessageImageRes> getMMSImages (@RequestParam long messageId, HttpServletRequest request) {
+        GetMessageImageRes getMessageImageRes = messageImageService.getMMSImages(messageId);
+
+        log.info("MMS 이미지 조회 - memberId: {}, messageId: {}", JwtInfo.getMemberId(request), messageId);
+
+        return new BaseResponse<>(getMessageImageRes);
     }
 }

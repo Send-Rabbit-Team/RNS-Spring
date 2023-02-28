@@ -44,7 +44,7 @@ public class ContactGroupService {
     public List<ContactGroupDTO>  getAllContactGroup(long memberId){
         Member member = getExistMember(memberId);
 
-        List<ContactGroup> contactGroupList = contactGroupRepository.findByMemberIdAndStatus(memberId, BaseStatus.ACTIVE);
+        List<ContactGroup> contactGroupList = contactGroupRepository.findByMemberIdAndStatusOrderByUpdatedAtDesc(memberId, BaseStatus.ACTIVE);
 
         if (contactGroupList.isEmpty())
             throw new BaseException(NOT_EXIST_MEMBER);
@@ -131,7 +131,7 @@ public class ContactGroupService {
 
     // 그룹 조회
     public PageResult<GetContactGroupRes> getMemberContactGroup(long memberId, int page) {
-        PageRequest pageRequest = PageRequest.of(page - 1, 5, Sort.by("id").descending());
+        PageRequest pageRequest = PageRequest.of(page - 1, 10, Sort.by("updatedAt").descending());
 
         Page<GetContactGroupRes> contactGroupResPage = contactGroupRepository.findAllContactGroup(memberId, BaseStatus.ACTIVE, pageRequest)
                 .map(c -> GetContactGroupRes.toDto(c));

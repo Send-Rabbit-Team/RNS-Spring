@@ -98,7 +98,7 @@ class SenderNumberServiceTest {
         // given
         RegisterSenderNumberReq request = RegisterSenderNumberReq.builder()
                 .phoneNumber("01012341234").memo("카카오").build();
-        doReturn(Optional.ofNullable(senderNumber)).when(senderNumberRepository).findByPhoneNumberAndStatus(any(), eq(BaseStatus.ACTIVE));
+        doReturn(Optional.ofNullable(senderNumber)).when(senderNumberRepository).findByMemberIdAndStatusOrderByUpdatedAtDesc(any(), eq(BaseStatus.ACTIVE));
 
         // when
         BaseException exception = assertThrows(BaseException.class, () ->
@@ -129,7 +129,7 @@ class SenderNumberServiceTest {
     @Test
     void getAllSenderNumber_Success(){
         // given
-        doReturn(getSenderNumberList()).when(senderNumberRepository).findByMemberIdAndStatus(anyLong(), eq(BaseStatus.ACTIVE));
+        doReturn(getSenderNumberList()).when(senderNumberRepository).findByMemberIdAndStatusOrderByUpdatedAtDesc(anyLong(), eq(BaseStatus.ACTIVE));
 
         // when
         List<GetSenderNumberRes> response = senderNumberService.getAllSenderNumber(member.getId());
