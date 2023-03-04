@@ -109,9 +109,9 @@
 - 해당 큐 구조를 통해 브로커 서버가 꺼져있을시에, 다른 중계사로 보내고 모든 중계사를 다 돌았을 경우에 메시지 발송이 안되면 실패 처리하는 프로세스를 구현할 수 있다.
 - 전송 실패 시나리오 (DLX Error Handling)
   - (retryCount <= 1) KT WorkQueue Publish -> KT 중계사 꺼져있음 (Consume X) -> KT WorkQueue 10초간 대기 -> DLX 큐인 WorkDead 큐로 이동 -> Receiver 서버에서 retryCount 판별 retryCount == 1 일시, 해당 과정 다시한번 반복
-- (retryCount == 2) SKT WorkrQueue Publish -> SKT 중계사 꺼져있음 (Consume X) '' 위의 과정 반복
-- (retryCount == 3) LG WorkrQueue Publish -> LG 중계사 꺼져있음 (Consume X) '' 위의 과정 반복
-- (retryCount == 4) 처음 보낸 중계사의 브로커(KT)로 실패 처리 함, 실패 사유로 중계사 오류 및 거쳐온 중계사들을 적어서 실패 처리함 
+  - (retryCount == 2) SKT WorkrQueue Publish -> SKT 중계사 꺼져있음 (Consume X) '' 위의 과정 반복
+  - (retryCount == 3) LG WorkrQueue Publish -> LG 중계사 꺼져있음 (Consume X) '' 위의 과정 반복
+  - (retryCount == 4) 처음 보낸 중계사의 브로커(KT)로 실패 처리 함, 실패 사유로 중계사 오류 및 거쳐온 중계사들을 적어서 실패 처리함 
 
 ## RNS 기능
 ### 발송 기능
