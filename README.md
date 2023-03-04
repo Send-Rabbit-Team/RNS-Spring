@@ -113,6 +113,24 @@
 - (retrryCount == 3) LG WorkrQueue Publish -> LG 중계사 꺼져있음 (Consume X) '' 위의 과정 반복
 - (retrryCount == 4) 처음 보낸 중계사의 브로커(KT)로 실패 처리 함, 실패 사유로 중계사 오류 및 거쳐온 중계사들을 적어서 실패 처리함 
 
+## RNS 기능
+### 발송 기능
+- [메시지 발송](https://github.com/Send-Rabbit-Team/RNS-Spring/blob/main/src/main/java/com/srt/message/service/message/MessageService.java): 메시지 작성, [발송 분배 비율 설정](https://github.com/Send-Rabbit-Team/RNS-Spring/blob/main/src/main/java/com/srt/message/service/message/MessageRuleService.java), [포인트 결제](https://github.com/Send-Rabbit-Team/RNS-Spring/blob/main/src/main/java/com/srt/message/service/PointService.java)
+- [알림톡 발송](https://github.com/Send-Rabbit-Team/RNS-Spring/blob/main/src/main/java/com/srt/message/service/kakao/KakaoMessageService.java): 알림톡 작성, [발송 분배 비율 설정](https://github.com/Send-Rabbit-Team/RNS-Spring/blob/main/src/main/java/com/srt/message/service/kakao/KakaoMessageRuleService.java), [포인트 결제](https://github.com/Send-Rabbit-Team/RNS-Spring/blob/main/src/main/java/com/srt/message/service/PointService.java)
+
+### 발송 관리 기능
+- [발신번호 관리](https://github.com/Send-Rabbit-Team/RNS-Spring/blob/main/src/main/java/com/srt/message/service/SenderNumberService.java): 발신번호 조회, 추가, 삭제
+- [그룹 관리](https://github.com/Send-Rabbit-Team/RNS-Spring/blob/main/src/main/java/com/srt/message/service/ContactGroupService.java): 연락처 그룹 조회, 추가, 수정, 삭제 
+- [연락처 관리](https://github.com/Send-Rabbit-Team/RNS-Spring/blob/main/src/main/java/com/srt/message/service/ContactService.java): 연락처 조회, 추가, 수정, 삭제
+- [탬플릿 관리(메시지)](https://github.com/Send-Rabbit-Team/RNS-Spring/blob/main/src/main/java/com/srt/message/service/message/TemplateService.java): 메시지 탬플릿 조회, 추가, 수정, 삭제
+- [탬플릿 관리(알림톡)](https://github.com/Send-Rabbit-Team/RNS-Spring/blob/main/src/main/java/com/srt/message/service/kakao/KakaoTemplateService.java): 알림톡 탬플릿 조회, 추가, 수정, 삭제
+
+### 발송 조회 기능
+- [메시지 발송 결과 조회](https://github.com/Send-Rabbit-Team/RNS-Spring/blob/main/src/main/java/com/srt/message/service/message/MessageResultService.java): 발송한 메시지 조회, 검색, 필터, 상세 내역 조회
+- [알림톡 발송 결과 조회](https://github.com/Send-Rabbit-Team/RNS-Spring/blob/main/src/main/java/com/srt/message/service/kakao/KakaoMessageResultService.java): 발송한 알림톡 조회, 검색, 필터, 상세 내역 조회
+- [메시지 예약 내역 조회](https://github.com/Send-Rabbit-Team/RNS-Spring/blob/main/src/main/java/com/srt/message/service/message/ReserveMessageService.java): 예약된 메시지 조회, 예약 취소
+- [알림톡 예약 내역 조회](https://github.com/Send-Rabbit-Team/RNS-Spring/blob/main/src/main/java/com/srt/message/service/kakao/KakaoMessageReserveService.java): 예약된 알림톡 조회, 예약 취소
+
 ## RNS 관련 깃허브
 <a href="https://github.com/Send-Rabbit-Team/RNS-React"><strong>RNS-React</strong></a></br>
 <a href="https://github.com/Send-Rabbit-Team/RNS-RECEIVER"><strong>RNS-Receiver</strong></a></br>
